@@ -44,7 +44,7 @@ export default function NewChatScreen() {
       {/* Header */}
       <View className="px-4 pt-12 pb-4 bg-black border-b border-gray-800">
         <View className="flex-row items-center mb-4">
-          <TouchableOpacity className="mr-4" onPress={() => navigation.back()}>
+          <TouchableOpacity className="mr-4" onPress={() => navigation.push('/screens/chat/message-screen')}>
             <ArrowLeft size={26} color="#ffffff" />
           </TouchableOpacity>
           <Text className="text-white text-2xl font-semibold">Nova Conversa</Text>
@@ -52,10 +52,10 @@ export default function NewChatScreen() {
 
         {/* Search Bar */}
         <View className="flex-row items-center bg-gray-900 rounded-xl px-4 py-2.5">
-          <Search size={18} color="#00ff88" />
+          <Search size={18} color="#00FF40" />
           <TextInput
             placeholder="Buscar usuários..."
-            placeholderTextColor="#00ff88"
+            placeholderTextColor="#00FF40"
             value={searchText}
             onChangeText={setSearchText}
             className="flex-1 ml-3 text-white text-base"
