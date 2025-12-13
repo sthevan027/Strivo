@@ -1,6 +1,11 @@
 // App.tsx
+import CreateModal from '@/src/components/create-post';
+import FeedOptions from '@/src/components/feed-options';
+import ShareModal from '@/src/components/share-modal';
+import { recentContacts } from '@/src/utils/contact-mock';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import { Bookmark, Heart, MessageCircle, Plus, Share2 } from 'lucide-react-native';
+import { Bell, Bookmark, Heart, MessageCircle, MessageSquareMoreIcon, Plus, Share2 } from 'lucide-react-native';
 import React, { useState } from 'react';
 import {
   Dimensions,
@@ -38,6 +43,11 @@ export default function Feed() {
   const [savedPosts, setSavedPosts] = useState<Set<number>>(new Set());
   const [followingUsers, setFollowingUsers] = useState<Set<number>>(new Set());
   const navigation = useRouter();
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalCreateVisible, setModalCreateVisible] = useState(false);
+  const [showShare, setShowShare] = useState(false);
+
+  const router = useRouter();
   const stories: Story[] = [
     { 
       id: 1, 
@@ -120,19 +130,24 @@ export default function Feed() {
     });
   };
 
+  
+
   return (
     <SafeAreaView className="flex-1 bg-black">
       <StatusBar barStyle="light-content" backgroundColor="#000" />
       
       {/* Header */}
       <View className="flex-row justify-between items-center px-4 py-3 bg-black">
-        <Text className="text-[#7FFF00] text-3xl font-bold">Strivo</Text>
+        <Text className="text-[#00FF40] text-3xl font-bold">Strivo</Text>
         <View className="flex-row items-center gap-4">
-          <TouchableOpacity>
-            <Heart size={28} color="#fff" />
+          <TouchableOpacity onPress={() => setModalCreateVisible(true)}>
+            <Plus size={28} color="#fff" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.push('/screens/notifications')}>
+            <Bell size={28} color="#fff" />
           </TouchableOpacity>
           <TouchableOpacity className="relative" onPress={() => navigation.push('/screens/chat/message-screen')}>
-            <MessageCircle size={28} color="#fff" />
+            <MessageSquareMoreIcon size={28} color="#fff" />
             <View className="absolute -top-1 -right-1 bg-red-600 rounded-full w-5 h-5 items-center justify-center">
               <Text className="text-white text-xs font-bold">3</Text>
             </View>
@@ -149,17 +164,45 @@ export default function Feed() {
         >
           {stories.map((story) => (
             <TouchableOpacity key={story.id} className="items-center mx-2">
-              <View className={`relative ${story.isUser ? 'border-2 border-[#7FFF00]' : 'border-2 border-gray-700'} rounded-full p-0.5`}>
-                <Image
-                  source={{ uri: story.avatar }}
-                  className="w-16 h-16 rounded-full"
-                />
-                {story.isUser && (
-                  <View className="absolute bottom-0 right-0 bg-[#7FFF00] rounded-full w-5 h-5 items-center justify-center">
-                    <Plus size={16} color="#000" strokeWidth={3} />
+              {story.isUser ? (
+                <LinearGradient
+                  colors={['#16a34a', '#4ade80', '#d3ef86', '#16a32d']}
+                  locations={[0, 0.3, 0.7, 1]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={{
+                    padding: 3,
+                    borderRadius: 9999,
+                    shadowColor: '#22c55e',
+                    shadowOffset: { width: 0, height: 0 },
+                    shadowOpacity: 0.6,
+                    shadowRadius: 15,
+                    elevation: 10,
+                  }}
+                >
+                  <View style={{ 
+                    backgroundColor: 'black', 
+                    borderRadius: 9999, 
+                    padding: 3 
+                  }}>
+                    <View className="relative">
+                      <Image
+                        source={{ uri: story.avatar }}
+                        className="w-20 h-20 rounded-full"
+                        style={{ borderWidth: 2, borderColor: 'black' }}
+                      />
+
+                    </View>
                   </View>
-                )}
-              </View>
+                </LinearGradient>
+              ) : (
+                <View className="border-2 border-gray-700 rounded-full p-0.5">
+                  <Image
+                    source={{ uri: story.avatar }}
+                    className="w-20 h-20 rounded-full"
+                  />
+                </View>
+              )}
               <Text className="text-white text-xs mt-1 max-w-[70px]" numberOfLines={1}>
                 {story.username}
               </Text>
@@ -174,42 +217,62 @@ export default function Feed() {
           <View key={post.id} className="mb-1">
             {/* Post Header */}
             <View className="flex-row items-center justify-between px-3 py-2">
-              <View className="flex-row items-center flex-1">
-                <Image
-                  source={{ uri: post.userAvatar }}
-                  className="w-10 h-10 rounded-full border-2 border-[#7FFF00]"
-                />
-                <View className="ml-3 flex-1">
+             <View className="flex-row items-center flex-1">
+                <LinearGradient
+                  colors={['#16a34a', '#4ade80', '#d3ef86', '#16a32d']}
+                  locations={[0, 0.3, 0.7, 1]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={{
+                    padding: 2,
+                    borderRadius: 9999,
+                    shadowColor: '#22c55e',
+                    shadowOffset: { width: 0, height: 0 },
+                    shadowOpacity: 0.6,
+                    shadowRadius: 10,
+                    elevation: 8,
+                  }}
+                >
+                  <View style={{ 
+                    backgroundColor: 'black', 
+                    borderRadius: 9999, 
+                    padding: 2 
+                  }}>
+                    <Image
+                      source={{ uri: post.userAvatar }}
+                      className="w-10 h-10 rounded-full"
+                      style={{ borderWidth: 2, borderColor: 'black' }}
+                    />
+                  </View>
+                </LinearGradient>
+                
+                <TouchableOpacity onPress={() => navigation.push('/screens/profile/other-user-profile')} className="ml-3 flex-1">
                   <Text className="text-white font-semibold text-sm">
                     {post.username}
                   </Text>
                   <View className="flex-row items-center">
                     <Text className="text-gray-400 text-xs" numberOfLines={1}>
-                      🎵 {post.music}
+                      Rafael Figueiredo
                     </Text>
                   </View>
-                </View>
+                </TouchableOpacity>
               </View>
-              
+
               <TouchableOpacity 
-                onPress={() => toggleFollow(post.id)}
-                className={`px-4 py-1.5 rounded-md ${
-                  followingUsers.has(post.id) ? 'bg-gray-700' : 'bg-[#7FFF00]'
-                }`}
+                onPress={() => setModalVisible(true)}
+                className='flex items-start justify-start text-start'
               >
-                <Text className={`font-semibold text-sm ${
-                  followingUsers.has(post.id) ? 'text-white' : 'text-black'
-                }`}>
-                  {followingUsers.has(post.id) ? 'Seguindo' : 'Seguir'}
-                </Text>
+               <Text className='text-white text-4xl mt-[-6px]'>...</Text>
               </TouchableOpacity>
             </View>
 
             {/* Post Image */}
             <Image
               source={{ uri: post.image }}
-              className="w-full"
-              style={{ height: SCREEN_HEIGHT * 0.6 }}
+              style={{
+                width: '100%',
+                aspectRatio: 4/5,
+              }}
               resizeMode="cover"
             />
 
@@ -222,8 +285,8 @@ export default function Feed() {
                 >
                   <Heart 
                     size={26} 
-                    color={likedPosts.has(post.id) ? '#7FFF00' : '#fff'} 
-                    fill={likedPosts.has(post.id) ? '#7FFF00' : 'transparent'}
+                    color={likedPosts.has(post.id) ? '#00FF40' : '#fff'} 
+                    fill={likedPosts.has(post.id) ? '#00FF40' : 'transparent'}
                   />
                   <Text className="text-white text-sm ml-1 font-medium">
                     {likedPosts.has(post.id) ? post.likes + 1 : post.likes}
@@ -237,7 +300,7 @@ export default function Feed() {
                   </Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity className="flex-row items-center">
+                <TouchableOpacity onPress={() => setShowShare(true)} className="flex-row items-center">
                   <Share2 size={24} color="#fff" />
                   <Text className="text-white text-sm ml-1 font-medium">
                     {post.shares}
@@ -248,14 +311,21 @@ export default function Feed() {
               <TouchableOpacity onPress={() => toggleSave(post.id)}>
                 <Bookmark 
                   size={26} 
-                  color={savedPosts.has(post.id) ? '#7FFF00' : '#fff'} 
-                  fill={savedPosts.has(post.id) ? '#7FFF00' : 'transparent'}
+                  color={savedPosts.has(post.id) ? '#00FF40' : '#fff'} 
+                  fill={savedPosts.has(post.id) ? '#00FF40' : 'transparent'}
                 />
               </TouchableOpacity>
             </View>
           </View>
         ))}
+        <FeedOptions visible={modalVisible} onClose={() => setModalVisible(false)} />
+        <CreateModal visible={modalCreateVisible} onClose={() => setModalCreateVisible(false)} />
       </ScrollView>
+      <ShareModal
+      visible={showShare}
+      onClose={() => setShowShare(false)}
+      recentContacts={recentContacts}
+    />
     </SafeAreaView>
   );
 }

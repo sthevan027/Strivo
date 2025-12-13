@@ -1,8 +1,10 @@
+import CreateGroup from '@/src/components/create-group';
 import { Conversation } from '@/src/utils/types/message';
 import { useRouter } from 'expo-router';
-import { ArrowLeft, Check, CheckCheck, Menu, Plus, Search } from 'lucide-react-native';
+import { ArrowLeft, Check, CheckCheck, Plus, Search } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { Image, ScrollView, StatusBar, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import NewGroupModal from './group/new-modal';
 
 
 const initialConversations: Conversation[] = [
@@ -79,6 +81,8 @@ export default function MessagesScreen() {
   const [searchText, setSearchText] = useState<string>('');
   const [conversations, setConversations] = useState<Conversation[]>(initialConversations);
   const navigation = useRouter();
+  const [modalVisible, setModalVisible] = useState(false);
+  const [isGroupModalVisible, setIsGroupModalVisible] = useState(false);
 
   const filteredConversations = conversations.filter(conv =>
     conv.username.toLowerCase().includes(searchText.toLowerCase())
@@ -108,21 +112,19 @@ export default function MessagesScreen() {
             <Text className="text-white text-2xl font-semibold">Mensagens</Text>
           </View>
           <View className="flex-row items-center gap-5">
-            <TouchableOpacity>
-              <Search size={24} color="#00ff88" />
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <Menu size={24} color="#00ff88" />
+         
+            <TouchableOpacity onPress={() => setModalVisible(true)}>
+              <Plus size={24} color="#00FF40" />
             </TouchableOpacity>
           </View>
         </View>
 
         {/* Search Bar */}
         <View className="flex-row items-center bg-gray-900 rounded-xl px-4 py-2.5">
-          <Search size={18} color="#00ff88" />
+          <Search size={18} color="#00FF40" />
           <TextInput
             placeholder="Pesquisar..."
-            placeholderTextColor="#00ff88"
+            placeholderTextColor="#00FF40"
             value={searchText}
             onChangeText={setSearchText}
             className="flex-1 ml-3 text-white text-base"
@@ -142,7 +144,7 @@ export default function MessagesScreen() {
             {/* Avatar with Story Ring */}
             <View className="mr-3">
               {conv.hasStory ? (
-                <View className="rounded-full p-0.5 bg-green-500">
+                <View className="rounded-full p-0.5 bg-[#00FF40]">
                   <View className="rounded-full p-0.5 bg-black">
                     <Image
                       source={{ uri: conv.avatar }}
@@ -157,6 +159,7 @@ export default function MessagesScreen() {
                 />
               )}
             </View>
+            
 
             {/* Message Info */}
             <View className="flex-1 flex-row items-center justify-between">
@@ -166,7 +169,7 @@ export default function MessagesScreen() {
                 </Text>
                 <View className="flex-row items-center">
                   {conv.read ? (
-                    <CheckCheck size={16} color="#00ff88" style={{ marginRight: 4 }} />
+                    <CheckCheck size={16} color="#00FF40" style={{ marginRight: 4 }} />
                   ) : (
                     <Check size={16} color="#6b7280" style={{ marginRight: 4 }} />
                   )}
@@ -183,7 +186,7 @@ export default function MessagesScreen() {
               <View className="items-end">
                 <Text className="text-gray-400 text-xs mb-1">{conv.time}</Text>
                 {conv.unread > 0 && (
-                  <View className="bg-green-500 rounded-full w-5 h-5 items-center justify-center">
+                  <View className="bg-[#00FF40] rounded-full w-5 h-5 items-center justify-center">
                     <Text className="text-black text-xs font-bold">{conv.unread}</Text>
                   </View>
                 )}
@@ -192,15 +195,22 @@ export default function MessagesScreen() {
           </TouchableOpacity>
         ))}
       </ScrollView>
+       
 
-      {/* Floating Action Button - Nova Conversa */}
-      <TouchableOpacity
-        className="absolute bottom-6 right-6 bg-green-500 w-14 h-14 rounded-full items-center justify-center shadow-lg"
-        activeOpacity={0.8}
-        onPress={() => navigation.navigate('/screens/chat/new-chat-screen')}
-      >
-        <Plus size={28} color="#000000" />
-      </TouchableOpacity>
+         <CreateGroup 
+          setIsGroupModalVisible={() => {
+            setModalVisible(false);
+            setTimeout(() => setIsGroupModalVisible(true), 50);
+          }} 
+          visible={modalVisible} 
+          onClose={() => setModalVisible(false)} 
+        />
+
+        <NewGroupModal
+          visible={isGroupModalVisible}
+          onClose={() => setIsGroupModalVisible(false)}
+        />
+
     </View>
   );
 }
