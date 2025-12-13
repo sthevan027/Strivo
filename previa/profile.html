@@ -88,7 +88,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM4 19h6v-6H4v6zM16 3h5v5h-5V3zM4 3h6v6H4V3z"></path>
                     </svg>
                 </button>
-                <button class="px-6 py-3 bg-primary text-black rounded-lg font-medium hover:bg-primary-dark smooth-transition">
+                <button onclick="navigateTo('edit-profile')" class="px-6 py-3 bg-primary text-black rounded-lg font-medium hover:bg-primary-dark smooth-transition">
                     Editar Perfil
                 </button>
             </div>
@@ -151,6 +151,9 @@
                     break;
                 case 'settings':
                     window.location.href = 'settings.html';
+                    break;
+                case 'edit-profile':
+                    window.location.href = 'edit-profile.html';
                     break;
             }
         }

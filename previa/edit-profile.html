@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Perfil • Strivo</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        #crop-image-preview {
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+        #zoom-slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #53fc18;
+            cursor: pointer;
+        }
+        #zoom-slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #53fc18;
+            cursor: pointer;
+            border: none;
+        }
+    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#53fc18',
+                        'primary-dark': '#45d614',
+                        'dark-bg': '#0f0f0f',
+                        'dark-card': '#1a1a1a',
+                        'dark-border': '#2a2a2a'
+                    }
+                }
+            }
+        };
+    </script>
+</head>
+<body class="bg-dark-bg text-white font-sans">
+    <!-- Header -->
+    <header class="px-6 py-4 sticky top-0 z-30">
+        <div class="max-w-6xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <button onclick="navigateTo('back')" class="w-10 h-10 bg-primary/20 hover:bg-primary/30 rounded-full flex items-center justify-center transition-colors duration-300 border border-primary/30">
+                    <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                </button>
+                <div class="flex flex-col group">
+                    <h1 class="text-xl font-bold text-white">Editar Perfil</h1>
+                    <div class="h-0.5 bg-primary mt-1 w-full scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-in-out origin-center"></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-2xl mx-auto p-6">
+        <!-- Profile Picture Section -->
+        <div class="bg-dark-card border border-dark-border rounded-2xl p-6 mb-6">
+            <div class="flex flex-col items-center">
+                <div class="relative mb-4">
+                    <div class="w-32 h-32 bg-gradient-to-br from-primary to-primary-dark rounded-full flex items-center justify-center p-1">
+                        <div class="w-full h-full bg-dark-bg rounded-full flex items-center justify-center overflow-hidden">
+                            <img id="profile-preview" 
+                                 src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face" 
+                                 alt="Foto de perfil" 
+                                 class="w-full h-full rounded-full object-cover">
+                        </div>
+                    </div>
+                    <label for="profile-photo" class="absolute bottom-0 right-0 w-10 h-10 bg-primary rounded-full flex items-center justify-center cursor-pointer hover:bg-primary-dark transition-colors duration-300 border-2 border-dark-bg">
+                        <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        <input type="file" id="profile-photo" accept="image/*" class="hidden" onchange="previewProfilePhoto(event)">
+                    </label>
+                </div>
+                <button onclick="document.getElementById('profile-photo').click()" class="text-primary hover:text-primary-dark transition-colors duration-300 text-sm font-medium">
+                    Alterar foto de perfil
+                </button>
+            </div>
+        </div>
+
+        <!-- Form Section -->
+        <div class="bg-dark-card border border-dark-border rounded-2xl p-6 mb-6">
+            <h2 class="text-lg font-bold text-white mb-6">Informações Pessoais</h2>
+            
+            <form id="edit-profile-form" class="space-y-6">
+                <!-- Nome de Usuário -->
+                <div>
+                    <label for="username" class="block text-sm font-medium text-gray-300 mb-2">
+                        Nome de Usuário
+                    </label>
+                    <div class="relative">
+                        <span class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">@</span>
+                        <input type="text" 
+                               id="username" 
+                               name="username"
+                               value="strivo"
+                               class="w-full bg-dark-bg border border-dark-border rounded-lg pl-8 pr-4 py-3 text-white placeholder-gray-500 focus:border-primary focus:outline-none transition-colors duration-300"
+                               placeholder="seu_usuario">
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">Seu nome de usuário será usado na URL do seu perfil</p>
+                </div>
+
+                <!-- Nome Completo -->
+                <div>
+                    <label for="fullname" class="block text-sm font-medium text-gray-300 mb-2">
+                        Nome Completo
+                    </label>
+                    <input type="text" 
+                           id="fullname" 
+                           name="fullname"
+                           value="Strivo Creator"
+                           class="w-full bg-dark-bg border border-dark-border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-primary focus:outline-none transition-colors duration-300"
+                           placeholder="Seu nome completo">
+                </div>
+
+                <!-- Bio -->
+                <div>
+                    <label for="bio" class="block text-sm font-medium text-gray-300 mb-2">
+                        Biografia
+                    </label>
+                    <textarea id="bio" 
+                              name="bio"
+                              rows="4"
+                              class="w-full bg-dark-bg border border-dark-border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-primary focus:outline-none transition-colors duration-300 resize-none"
+                              placeholder="Conte um pouco sobre você...">Connecting creators</textarea>
+                    <p class="text-xs text-gray-500 mt-1">Máximo de 150 caracteres</p>
+                    <div class="text-right mt-1">
+                        <span id="bio-count" class="text-xs text-gray-500">17/150</span>
+                    </div>
+                </div>
+
+                <!-- Email -->
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-300 mb-2">
+                        E-mail
+                    </label>
+                    <input type="email" 
+                           id="email" 
+                           name="email"
+                           value="contato@strivo.com"
+                           class="w-full bg-dark-bg border border-dark-border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-primary focus:outline-none transition-colors duration-300"
+                           placeholder="seu@email.com">
+                    <p class="text-xs text-gray-500 mt-1">Usado para notificações e recuperação de conta</p>
+                </div>
+            </form>
+        </div>
+
+        <!-- Social Links Section -->
+        <div class="bg-dark-card border border-dark-border rounded-2xl p-6 mb-6">
+            <h2 class="text-lg font-bold text-white mb-6">Links Sociais</h2>
+            
+            <div class="space-y-4">
+                <!-- YouTube -->
+                <div>
+                    <label for="youtube" class="block text-sm font-medium text-gray-300 mb-2">
+                        YouTube
+                    </label>
+                    <div class="relative">
+                        <span class="absolute left-4 top-1/2 transform -translate-y-1/2 z-10 pointer-events-none">
+                            <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                            </svg>
+                        </span>
+                        <input type="url" 
+                               id="youtube" 
+                               name="youtube"
+                               class="w-full bg-dark-bg border border-dark-border rounded-lg pl-12 pr-4 py-3 text-white placeholder-gray-500 focus:border-primary focus:outline-none transition-colors duration-300"
+                               placeholder="https://youtube.com/@seu_canal">
+                    </div>
+                </div>
+
+                <!-- Twitch -->
+                <div>
+                    <label for="twitch" class="block text-sm font-medium text-gray-300 mb-2">
+                        Twitch
+                    </label>
+                    <div class="relative">
+                        <span class="absolute left-4 top-1/2 transform -translate-y-1/2 z-10 pointer-events-none">
+                            <svg class="w-5 h-5 text-purple-500" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm16.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h15.714Z"/>
+                            </svg>
+                        </span>
+                        <input type="url" 
+                               id="twitch" 
+                               name="twitch"
+                               class="w-full bg-dark-bg border border-dark-border rounded-lg pl-12 pr-4 py-3 text-white placeholder-gray-500 focus:border-primary focus:outline-none transition-colors duration-300"
+                               placeholder="https://twitch.tv/seu_canal">
+                    </div>
+                </div>
+
+                <!-- Instagram -->
+                <div>
+                    <label for="instagram" class="block text-sm font-medium text-gray-300 mb-2">
+                        Instagram
+                    </label>
+                    <div class="relative">
+                        <span class="absolute left-4 top-1/2 transform -translate-y-1/2 z-10 pointer-events-none">
+                            <svg class="w-5 h-5" fill="url(#instagram-gradient)" viewBox="0 0 24 24">
+                                <defs>
+                                    <linearGradient id="instagram-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" style="stop-color:#833AB4;stop-opacity:1" />
+                                        <stop offset="50%" style="stop-color:#E1306C;stop-opacity:1" />
+                                        <stop offset="100%" style="stop-color:#FCAF45;stop-opacity:1" />
+                                    </linearGradient>
+                                </defs>
+                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.98-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.98-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                            </svg>
+                        </span>
+                        <input type="url" 
+                               id="instagram" 
+                               name="instagram"
+                               class="w-full bg-dark-bg border border-dark-border rounded-lg pl-12 pr-4 py-3 text-white placeholder-gray-500 focus:border-primary focus:outline-none transition-colors duration-300"
+                               placeholder="https://instagram.com/seu_perfil">
+                    </div>
+                </div>
+
+                <!-- Twitter/X -->
+                <div>
+                    <label for="twitter" class="block text-sm font-medium text-gray-300 mb-2">
+                        Twitter / X
+                    </label>
+                    <div class="relative">
+                        <span class="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 pointer-events-none">
+                            <svg class="w-5 h-5 text-gray-300" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                            </svg>
+                        </span>
+                        <input type="url" 
+                               id="twitter" 
+                               name="twitter"
+                               class="w-full bg-dark-bg border border-dark-border rounded-lg pl-12 pr-4 py-3 text-white placeholder-gray-500 focus:border-primary focus:outline-none transition-colors duration-300 hover:transform-none"
+                               placeholder="https://x.com/seu_perfil">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row gap-4 mb-6">
+            <button onclick="saveProfile()" class="flex-1 py-4 bg-primary text-black rounded-lg font-bold text-lg hover:bg-primary-dark transition-colors duration-300">
+                Salvar Alterações
+            </button>
+            <button onclick="navigateTo('back')" class="flex-1 py-4 bg-dark-card border border-dark-border text-white rounded-lg font-bold text-lg hover:border-primary transition-colors duration-300">
+                Cancelar
+            </button>
+        </div>
+    </main>
+
+    <!-- Modal de Notificação -->
+    <div id="notification-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center">
+        <div class="bg-dark-card border border-primary rounded-2xl p-8 max-w-sm w-full mx-4 transform transition-all duration-300 scale-95 opacity-0" id="notification-content">
+            <div class="flex flex-col items-center text-center">
+                <div class="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mb-4">
+                    <svg id="notification-icon" class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                </div>
+                <h3 id="notification-title" class="text-xl font-bold text-white mb-2">Sucesso!</h3>
+                <p id="notification-message" class="text-gray-300 mb-6">Perfil atualizado com sucesso!</p>
+                <button onclick="closeNotification()" class="w-full py-3 bg-primary text-black rounded-lg font-medium hover:bg-primary-dark transition-colors duration-300">
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Ajuste de Imagem -->
+    <div id="image-crop-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-dark-card border border-dark-border rounded-2xl p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold text-white">Ajustar Foto de Perfil</h3>
+                <button onclick="closeCropModal()" class="text-gray-400 hover:text-white transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="mb-4">
+                <div id="image-crop-container" class="relative w-full bg-dark-bg rounded-lg overflow-hidden" style="aspect-ratio: 1; min-height: 300px;">
+                    <div id="image-crop-area" class="absolute inset-0 flex items-center justify-center overflow-hidden">
+                        <div id="crop-overlay" class="absolute border-2 border-primary rounded-full pointer-events-none z-10" style="width: 80%; height: 80%; top: 10%; left: 10%; box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);"></div>
+                        <img id="crop-image-preview" class="absolute max-w-none object-contain cursor-move select-none" style="transform: scale(1) translate(0, 0); transform-origin: center center;" draggable="false">
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-300 mb-2">Zoom</label>
+                <input type="range" id="zoom-slider" min="0.5" max="3" step="0.1" value="1" 
+                       class="w-full h-2 bg-dark-bg rounded-lg appearance-none cursor-pointer accent-primary">
+            </div>
+
+            <div class="flex gap-4">
+                <button onclick="closeCropModal()" class="flex-1 py-3 bg-dark-bg border border-dark-border text-white rounded-lg font-medium hover:border-primary transition-colors duration-300">
+                    Cancelar
+                </button>
+                <button onclick="applyCrop()" class="flex-1 py-3 bg-primary text-black rounded-lg font-medium hover:bg-primary-dark transition-colors duration-300">
+                    Aplicar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variáveis globais para o cropper
+        let currentImageFile = null;
+        let currentScale = 1;
+        let currentX = 0;
+        let currentY = 0;
+        let isDragging = false;
+        let dragStartX = 0;
+        let dragStartY = 0;
+
+        // Preview da foto de perfil
+        function previewProfilePhoto(event) {
+            const file = event.target.files[0];
+            if (file) {
+                currentImageFile = file;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const modal = document.getElementById('image-crop-modal');
+                    const cropPreview = document.getElementById('crop-image-preview');
+                    
+                    cropPreview.onload = function() {
+                        // Resetar transformações
+                        currentScale = 1;
+                        currentX = 0;
+                        currentY = 0;
+                        document.getElementById('zoom-slider').value = 1;
+                        
+                        // Ajustar tamanho inicial da imagem
+                        const container = document.getElementById('image-crop-container');
+                        const containerSize = container.offsetWidth;
+                        const cropSize = containerSize * 0.8;
+                        
+                        // Calcular tamanho inicial para preencher o círculo de crop
+                        const imgAspect = cropPreview.naturalWidth / cropPreview.naturalHeight;
+                        let initialWidth, initialHeight;
+                        
+                        if (imgAspect > 1) {
+                            initialHeight = cropSize;
+                            initialWidth = cropSize * imgAspect;
+                        } else {
+                            initialWidth = cropSize;
+                            initialHeight = cropSize / imgAspect;
+                        }
+                        
+                        cropPreview.style.width = initialWidth + 'px';
+                        cropPreview.style.height = initialHeight + 'px';
+                        updateImageTransform();
+                        
+                        // Reinicializar eventos de drag
+                        initDragEvents();
+                    };
+                    
+                    cropPreview.src = e.target.result;
+                    
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Fechar modal
+        function closeCropModal() {
+            const modal = document.getElementById('image-crop-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            // Resetar input
+            document.getElementById('profile-photo').value = '';
+        }
+
+        // Atualizar transformação da imagem
+        function updateImageTransform() {
+            const img = document.getElementById('crop-image-preview');
+            img.style.transform = `translate(${currentX}px, ${currentY}px) scale(${currentScale})`;
+        }
+
+        // Controle de zoom
+        document.getElementById('zoom-slider').addEventListener('input', function(e) {
+            currentScale = parseFloat(e.target.value);
+            updateImageTransform();
+        });
+
+        // Drag da imagem
+        let cropImage = null;
+        let cropArea = null;
+
+        // Inicializar eventos quando a imagem for carregada
+        function initDragEvents() {
+            cropImage = document.getElementById('crop-image-preview');
+            cropArea = document.getElementById('image-crop-area');
+            
+            if (!cropImage || !cropArea) return;
+
+            cropImage.addEventListener('mousedown', function(e) {
+                isDragging = true;
+                const rect = cropArea.getBoundingClientRect();
+                dragStartX = e.clientX - currentX;
+                dragStartY = e.clientY - currentY;
+                cropImage.style.cursor = 'grabbing';
+                e.preventDefault();
+            });
+
+            document.addEventListener('mousemove', function(e) {
+                if (isDragging && cropImage) {
+                    currentX = e.clientX - dragStartX;
+                    currentY = e.clientY - dragStartY;
+                    updateImageTransform();
+                }
+            });
+
+            document.addEventListener('mouseup', function() {
+                if (isDragging && cropImage) {
+                    isDragging = false;
+                    cropImage.style.cursor = 'move';
+                }
+            });
+
+            // Touch events para mobile
+            cropImage.addEventListener('touchstart', function(e) {
+                isDragging = true;
+                const touch = e.touches[0];
+                dragStartX = touch.clientX - currentX;
+                dragStartY = touch.clientY - currentY;
+                e.preventDefault();
+            });
+
+            document.addEventListener('touchmove', function(e) {
+                if (isDragging && cropImage) {
+                    const touch = e.touches[0];
+                    currentX = touch.clientX - dragStartX;
+                    currentY = touch.clientY - dragStartY;
+                    updateImageTransform();
+                    e.preventDefault();
+                }
+            });
+
+            document.addEventListener('touchend', function() {
+                isDragging = false;
+            });
+        }
+
+        // Inicializar eventos quando o DOM estiver pronto
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initDragEvents);
+        } else {
+            // Aguardar um pouco para garantir que os elementos existam
+            setTimeout(initDragEvents, 100);
+        }
+
+        // Aplicar crop
+        function applyCrop() {
+            const img = document.getElementById('crop-image-preview');
+            const container = document.getElementById('image-crop-container');
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = 400;
+            canvas.height = 400;
+            
+            // Aguardar imagem carregar
+            if (!img.complete || !img.naturalWidth) {
+                img.onload = applyCrop;
+                return;
+            }
+            
+            // Criar máscara circular
+            ctx.beginPath();
+            ctx.arc(200, 200, 200, 0, Math.PI * 2);
+            ctx.clip();
+            
+            // Obter dimensões do container
+            const containerRect = container.getBoundingClientRect();
+            const containerSize = containerRect.width;
+            const cropSize = containerSize * 0.8; // 80% = círculo de crop
+            const cropRadius = cropSize / 2;
+            
+            // Obter posição e tamanho da imagem na tela
+            const imgRect = img.getBoundingClientRect();
+            
+            // Calcular escala da imagem exibida vs original
+            const displayWidth = imgRect.width;
+            const displayHeight = imgRect.height;
+            const scaleX = img.naturalWidth / displayWidth;
+            const scaleY = img.naturalHeight / displayHeight;
+            
+            // Centro do container (onde está o círculo de crop)
+            const containerCenterX = containerRect.left + containerSize / 2;
+            const containerCenterY = containerRect.top + containerSize / 2;
+            
+            // Posição do centro do crop em relação à imagem
+            const cropXInImage = (containerCenterX - imgRect.left) * scaleX;
+            const cropYInImage = (containerCenterY - imgRect.top) * scaleY;
+            
+            // Tamanho do crop na imagem original (considerando o zoom)
+            const cropSizeInImage = (cropSize * scaleX) / currentScale;
+            
+            // Calcular área de origem
+            const sourceX = Math.max(0, cropXInImage - cropSizeInImage / 2);
+            const sourceY = Math.max(0, cropYInImage - cropSizeInImage / 2);
+            const sourceSize = Math.min(
+                cropSizeInImage,
+                img.naturalWidth - sourceX,
+                img.naturalHeight - sourceY
+            );
+            
+            // Desenhar imagem no canvas
+            ctx.drawImage(
+                img,
+                sourceX, sourceY, sourceSize, sourceSize,
+                0, 0, 400, 400
+            );
+            
+            // Converter para base64 e atualizar preview
+            const croppedImage = canvas.toDataURL('image/png');
+            document.getElementById('profile-preview').src = croppedImage;
+            
+            // Fechar modal
+            closeCropModal();
+        }
+
+        // Contador de caracteres da bio
+        const bioTextarea = document.getElementById('bio');
+        const bioCount = document.getElementById('bio-count');
+        
+        function updateBioCount() {
+            const length = bioTextarea.value.length;
+            bioCount.textContent = `${length}/150`;
+            if (length > 150) {
+                bioCount.classList.add('text-red-500');
+                bioCount.classList.remove('text-gray-500');
+            } else {
+                bioCount.classList.remove('text-red-500');
+                bioCount.classList.add('text-gray-500');
+            }
+        }
+        
+        bioTextarea.addEventListener('input', updateBioCount);
+        updateBioCount(); // Inicializa o contador
+
+        // Salvar perfil
+        function saveProfile() {
+            const form = document.getElementById('edit-profile-form');
+            const formData = new FormData(form);
+            
+            // Validações básicas
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const bio = document.getElementById('bio').value.trim();
+            
+            if (!username) {
+                showNotification('Erro', 'O nome de usuário é obrigatório!', 'error');
+                return;
+            }
+            
+            if (!email || !email.includes('@')) {
+                showNotification('Erro', 'Por favor, insira um e-mail válido!', 'error');
+                return;
+            }
+            
+            if (bio.length > 150) {
+                showNotification('Erro', 'A biografia não pode ter mais de 150 caracteres!', 'error');
+                return;
+            }
+            
+            // Simulação de salvamento
+            showNotification('Sucesso!', 'Perfil atualizado com sucesso!', 'success', true);
+            // Aqui você faria a requisição para o backend
+        }
+
+        // Variável para controlar redirecionamento
+        let shouldRedirect = false;
+
+        // Função para mostrar notificação
+        function showNotification(title, message, type = 'success', redirect = false) {
+            const modal = document.getElementById('notification-modal');
+            const content = document.getElementById('notification-content');
+            const titleEl = document.getElementById('notification-title');
+            const messageEl = document.getElementById('notification-message');
+            const iconEl = document.getElementById('notification-icon');
+            const iconContainer = iconEl.parentElement;
+            
+            // Atualizar conteúdo
+            titleEl.textContent = title;
+            messageEl.textContent = message;
+            
+            // Definir se deve redirecionar
+            shouldRedirect = redirect;
+            
+            // Ajustar cores e ícone baseado no tipo
+            if (type === 'error') {
+                iconContainer.classList.remove('bg-primary/20');
+                iconContainer.classList.add('bg-red-500/20');
+                iconEl.classList.remove('text-primary');
+                iconEl.classList.add('text-red-500');
+                content.classList.remove('border-primary');
+                content.classList.add('border-red-500');
+                // Ícone de X para erro
+                iconEl.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>';
+            } else {
+                iconContainer.classList.remove('bg-red-500/20');
+                iconContainer.classList.add('bg-primary/20');
+                iconEl.classList.remove('text-red-500');
+                iconEl.classList.add('text-primary');
+                content.classList.remove('border-red-500');
+                content.classList.add('border-primary');
+                // Ícone de check para sucesso
+                iconEl.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>';
+            }
+            
+            // Mostrar modal
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            // Animação de entrada
+            setTimeout(() => {
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        // Fechar notificação
+        function closeNotification() {
+            const modal = document.getElementById('notification-modal');
+            const content = document.getElementById('notification-content');
+            
+            // Animação de saída
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                
+                // Redirecionar se necessário
+                if (shouldRedirect) {
+                    window.location.href = 'profile.html';
+                }
+            }, 300);
+        }
+
+        // Navegação
+        function navigateTo(page) {
+            switch(page) {
+                case 'back':
+                    window.location.href = 'profile.html';
+                    break;
+                case 'profile':
+                    window.location.href = 'profile.html';
+                    break;
+            }
+        }
+    </script>
+</body>
+</html>
+
