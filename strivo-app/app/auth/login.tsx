@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
-import { AntDesign, FontAwesome5 } from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons";
 
 export const unstable_settings = {
   headerShown: false,
@@ -35,7 +35,6 @@ export default function LoginScreen() {
           className="px-6"
           showsVerticalScrollIndicator={false}
         >
-          {/* Logo substituída por texto */}
           <View className="items-center mb-10">
             <Text className="text-green-500 text-5xl font-bold tracking-tight mb-2">
               Strivo
@@ -44,8 +43,6 @@ export default function LoginScreen() {
               Entrar na sua conta
             </Text>
           </View>
-
-          {/* Form */}
           <View className="space-y-4">
             <View>
               <Text className="text-zinc-500 mb-1 ml-1 text-sm font-medium">
@@ -54,7 +51,7 @@ export default function LoginScreen() {
               <TextInput
                 placeholder="exemplo@email.com"
                 placeholderTextColor="#52525b"
-                className="w-full h-14 bg-zinc-900 border border-zinc-800 rounded-xl px-4 text-white focus:border-green-500 transition-all"
+                className="w-full h-14 bg-zinc-900 border border-zinc-800 rounded-xl px-4 text-white"
                 keyboardType="email-address"
                 autoCapitalize="none"
                 value={email}
@@ -69,7 +66,7 @@ export default function LoginScreen() {
               <TextInput
                 placeholder="••••••••"
                 placeholderTextColor="#52525b"
-                className="w-full h-14 bg-zinc-900 border border-zinc-800 rounded-xl px-4 text-white focus:border-green-500 transition-all"
+                className="w-full h-14 bg-zinc-900 border border-zinc-800 rounded-xl px-4 text-white"
                 secureTextEntry
                 value={password}
                 onChangeText={setPassword}
@@ -84,8 +81,6 @@ export default function LoginScreen() {
               <Text className="text-zinc-500 text-sm">Esqueceu a senha?</Text>
             </TouchableOpacity>
           </View>
-
-          {/* Divisor */}
           <View className="flex-row items-center my-8">
             <View className="flex-1 h-[1px] bg-zinc-800" />
             <Text className="text-zinc-600 mx-4 text-xs uppercase font-bold">
@@ -94,20 +89,15 @@ export default function LoginScreen() {
             <View className="flex-1 h-[1px] bg-zinc-800" />
           </View>
 
-          {/* Botões redes sociais */}
-          <View className="flex-row gap-4 mb-8">
-            <TouchableOpacity className="flex-1 h-14 flex-row bg-zinc-900 border border-zinc-800 rounded-xl items-center justify-center active:bg-zinc-800">
+          <View className="mb-8">
+            <TouchableOpacity className="w-full h-14 flex-row bg-zinc-900 border border-zinc-800 rounded-xl items-center justify-center active:bg-zinc-800">
               <AntDesign name="google" size={24} color="white" />
-              <Text className="text-white font-medium ml-2">Google</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity className="flex-1 h-14 flex-row bg-zinc-900 border border-zinc-800 rounded-xl items-center justify-center active:bg-zinc-800">
-              <FontAwesome5 name="facebook" size={24} color="#1877F2" />
-              <Text className="text-white font-medium ml-2">Facebook</Text>
+              <Text className="text-white font-medium ml-2">
+                Continuar com Google
+              </Text>
             </TouchableOpacity>
           </View>
 
-          {/* Link para cadastro */}
           <View className="flex-row justify-center pb-8">
             <Text className="text-zinc-400">Não tem uma conta? </Text>
             <TouchableOpacity onPress={() => router.push("/auth/register")}>
