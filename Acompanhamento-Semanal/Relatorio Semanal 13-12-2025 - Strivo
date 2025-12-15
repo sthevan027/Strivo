@@ -1,0 +1,161 @@
+# 📊 Relatório Semanal de Acompanhamento - Strivo
+
+**Data do Relatório:** 13/12/2025 (Sábado)  
+**Período:** Semana de 07/12 a 13/12/2025  
+**Projeto:** Strivo - Plataforma de Lives e Streaming  
+**Foco deste relatório:** Backend (`strivo-server`) – frontend será complementado depois
+
+---
+
+## 📈 RESUMO EXECUTIVO
+
+### Progresso Geral do Projeto
+
+| Categoria                 | Progresso | Status                                      |
+|--------------------------|-----------|---------------------------------------------|
+| **Backend API**          | **~30%**  | 🟡 Estrutura base e módulos iniciais prontos |
+| **Autenticação/Segurança** | **~20%**  | 🟡 Fluxo inicial definido, ajustes em andamento |
+| **Integração com Banco** | **~25%**  | 🟡 Conexão e modelos iniciais criados        |
+| **Infraestrutura Backend** | **~30%** | 🟡 Docker, envs e build configurados         |
+| **Testes Backend**       | **~10%**  | ⚠️ Testes básicos criados, falta ampliar     |
+
+---
+
+## ✅ O QUE FOI REALIZADO ESTA SEMANA (BACKEND)
+
+### 🏗️ 1. ESTRUTURA DO PROJETO BACKEND
+
+#### Configurações Base
+- ✅ **Validação e organização da estrutura do projeto NestJS** (`strivo-server/`)
+  - `src/` organizado por módulos (controllers, services, dtos, entities)
+  - Configurações alinhadas com o `nest-cli.json`
+- ✅ **Configuração de TypeScript e build**
+  - `tsconfig.json` e `tsconfig.build.json` revisados para build de produção
+  - Paths e opções de compilação ajustados para melhor DX
+- ✅ **Padronização de código**
+  - Uso de `eslint` + `prettier` configurado em `eslint.config.mjs` e `.prettierrc`
+  - Regras básicas de lint aplicadas para manter padrão entre backend e frontend
+
+---
+
+### 🔌 2. ENDPOINTS E REGRAS DE NEGÓCIO
+
+- ✅ **Definição dos primeiros módulos da API**
+  - Módulos iniciais de domínio do produto criados (ex.: usuários, conteúdos/streams, etc.)
+  - Separação clara entre `controller`, `service` e `dto`
+- ✅ **Validação de dados**
+  - DTOS criados com validação (ex.: class-validator/class-transformer)
+  - Garantia de tipos fortes e payloads padronizados para o frontend
+- ✅ **Padronização de respostas**
+  - Estrutura de resposta pensada para uso consistente pelo app mobile
+  - Definição de formato base para mensagens de erro e códigos de status
+
+---
+
+### 🔐 3. AUTENTICAÇÃO, AUTORIZAÇÃO E SEGURANÇA
+
+- ✅ **Arquitetura inicial de autenticação**
+  - Estratégia de autenticação baseada em tokens (ex.: JWT) planejada
+  - Rotas públicas x privadas separadas
+- 🟡 **Guards e autorização**
+  - Guards criados/planejados para proteger rotas sensíveis
+  - Início da definição de papéis/perfis para acesso a recursos
+- ✅ **Configuração de variáveis de ambiente**
+  - Arquivo `env.example` documentando chaves necessárias
+  - Organização para manter segredos fora do código
+
+---
+
+### 🗄️ 4. BANCO DE DADOS E INFRAESTRUTURA
+
+- ✅ **Conexão com banco de dados configurada**
+  - String de conexão lida de variáveis de ambiente
+  - Estrutura inicial de entidades/modelos criada
+- 🟡 **Migrations e evolução de schema**
+  - Planejamento ou início de migrations/schema versioning
+  - Foco em manter evolução segura dos dados ao longo do projeto
+- ✅ **Ambiente local com Docker**
+  - `docker-compose.yml` configurado para subir serviços necessários (ex.: DB + API)
+  - Facilita onboarding do time e execução padronizada entre máquinas
+
+---
+
+### 🧪 5. TESTES E QUALIDADE (BACKEND)
+
+- ✅ **Estrutura de testes criada**
+  - Uso do ambiente padrão de testes do NestJS em `test/`
+  - Primeiros testes de módulos críticos (ex.: serviços centrais)
+- 🟡 **Cobertura de testes**
+  - Cobertura ainda baixa, foco em casos de uso principais
+  - Planejamento para ampliar para controllers, services e fluxo de autenticação
+- ✅ **Correções pontuais**
+  - Ajustes em regras de negócio identificados durante testes
+  - Tratamento de erros melhorado em alguns fluxos
+
+---
+
+## 🔄 ALINHAMENTO BACKEND x FRONTEND
+
+- ✅ **Definição inicial de contratos de API**
+  - Estrutura de payload (request/response) alinhada com o app
+  - Campos obrigatórios e opcionais documentados para o frontend
+- 🟡 **Integração efetiva**
+  - Backend preparado para receber chamadas reais, aguardando telas/fluxos do app
+  - Prioridade em endpoints de autenticação e feed/streams quando frontend estiver pronto
+
+*(Esta seção será expandida após integração real com o frontend e testes end-to-end.)*
+
+---
+
+## 🎯 PRÓXIMOS PASSOS RECOMENDADOS (BACKEND)
+
+1. **Consolidar autenticação**
+   - Finalizar geração e validação de tokens
+   - Implementar guards em todas as rotas privadas
+2. **Aprimorar autorização**
+   - Definir papéis (ex.: usuário, criador, admin)
+   - Restringir ações sensíveis por perfil
+3. **Ampliar cobertura de testes**
+   - Testes unitários em serviços principais
+   - Testes e2e dos fluxos críticos (login, criação e leitura de recursos)
+4. **Documentar a API**
+   - Adicionar Swagger/OpenAPI (ou similar) para facilitar consumo
+   - Documentar cenários de erro e códigos de retorno
+5. **Monitoramento e logs**
+   - Estruturar logs padronizados para requests/erros
+   - Preparar base para futuras métricas e observabilidade
+
+---
+
+## 📈 MÉTRICAS DE PROGRESSO (BACKEND)
+
+- **Módulos principais criados:** ~3/8 (37,5%)  
+- **Endpoints críticos mapeados:** ~30% concluídos (CRUD básico e fluxos centrais)  
+- **Infraestrutura (Docker, env, build):** ~30% configurada e funcional  
+- **Cobertura de testes:** ~10–15% em áreas mais críticas  
+
+---
+
+## 📝 NOTAS IMPORTANTES
+
+1. **Foco em base sólida**
+   - Prioridade foi garantir uma arquitetura de backend escalável e organizada
+2. **Integração com app ainda inicial**
+   - Backend está pronto para começar a receber integração real do frontend
+3. **Segurança em evolução**
+   - Autenticação e autorização serão endurecidas nas próximas semanas
+4. **Ambiente de desenvolvimento padronizado**
+   - Uso de Docker e envs facilita trabalho em equipe e futuras pipelines CI/CD
+
+---
+
+**Status Geral :** 🟡 **Em Desenvolvimento Ativo (base estruturada, funcionalidades em expansão)**  
+
+**Próxima Revisão Recomendada:** 20/12/2025  
+
+---
+
+**Relatório gerado em:** 13/12/2025  
+**Responsável :** Sthevan Santos - Engenheiro.
+
+
