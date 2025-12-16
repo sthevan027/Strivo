@@ -1,14 +1,13 @@
 // app/_layout.tsx
 import AccountSwitcher, { Account } from '@/src/components/account-swittcher';
+import { loadProfileData } from '@/src/utils/profileStorage';
 import { Tabs } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Clapperboard, Home, Search, User, Video } from 'lucide-react-native';
-import { useState } from 'react';
-import { Image, TouchableOpacity } from 'react-native';
+import { useEffect, useState } from 'react';
+import { AppState, Image, TouchableOpacity } from 'react-native';
 
 export default function RootLayout() {
-  const     avatar = 'https://avatars.githubusercontent.com/u/60237326?v=4'
-
   const [showSwitcher, setShowSwitcher] = useState(false);
   const [currentAccount, setCurrentAccount] = useState<Account>({
     id: '1',
@@ -16,6 +15,44 @@ export default function RootLayout() {
     avatar: 'https://avatars.githubusercontent.com/u/60237326?v=4',
     isActive: true,
   });
+
+  // Carregar avatar do perfil salvo
+  const loadProfileAvatar = async () => {
+    try {
+      const profileData = await loadProfileData();
+      if (profileData.avatar) {
+        setCurrentAccount((prev) => ({
+          ...prev,
+          avatar: profileData.avatar,
+          username: profileData.username || prev.username,
+        }));
+      }
+    } catch (error) {
+      console.error('Erro ao carregar avatar do perfil:', error);
+    }
+  };
+
+  // Carregar avatar quando o componente montar e verificar atualizações periodicamente
+  useEffect(() => {
+    loadProfileAvatar();
+    
+    // Verificar atualizações a cada 2 segundos (para pegar mudanças feitas em outras telas)
+    const interval = setInterval(() => {
+      loadProfileAvatar();
+    }, 2000);
+    
+    // Recarregar quando o app voltar ao foreground
+    const subscription = AppState.addEventListener('change', (nextAppState) => {
+      if (nextAppState === 'active') {
+        loadProfileAvatar();
+      }
+    });
+
+    return () => {
+      clearInterval(interval);
+      subscription.remove();
+    };
+  }, []);
 
 
   const accounts: Account[] = [
@@ -221,6 +258,10 @@ export default function RootLayout() {
         <Tabs.Screen
           name="screens/suport-creator"
           options={{ href: null }}
+        />
+        <Tabs.Screen
+          name="screens/edit-profile"
+          options={{ href: null, tabBarStyle: { display: 'none' } }}
         />
       </Tabs>
        {/* Modal de troca de contas */}

@@ -1,7 +1,8 @@
+import { loadProfileData } from '@/src/utils/profileStorage';
 import { CameraType, CameraView, useCameraPermissions } from 'expo-camera';
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { Camera, Circle, RefreshCw, RotateCw, Send, Type, X } from 'lucide-react-native';
-import React, { useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Alert, Image, StatusBar, Text, TouchableOpacity, View } from 'react-native';
 
 export default function StoryCamera() {
@@ -9,8 +10,33 @@ export default function StoryCamera() {
   const [permission, requestPermission] = useCameraPermissions();
   const [capturedPhoto, setCapturedPhoto] = useState<string | null>(null);
   const [isCameraReady, setIsCameraReady] = useState(false);
+  const [userAvatar, setUserAvatar] = useState<string | null>(null);
   const cameraRef = useRef<CameraView>(null);
   const navigation = useRouter();
+
+  // Carregar avatar do perfil
+  const loadUserAvatar = useCallback(async () => {
+    try {
+      const profileData = await loadProfileData();
+      if (profileData.avatar) {
+        setUserAvatar(profileData.avatar);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar avatar do perfil:', error);
+    }
+  }, []);
+
+  // Carregar avatar quando o componente montar
+  useEffect(() => {
+    loadUserAvatar();
+  }, [loadUserAvatar]);
+
+  // Recarregar avatar quando a tela ganhar foco
+  useFocusEffect(
+    useCallback(() => {
+      loadUserAvatar();
+    }, [loadUserAvatar])
+  );
 
 
   const onCameraReady = () => {
@@ -114,9 +140,16 @@ export default function StoryCamera() {
         <View className="flex-row items-center justify-between">
           <View className="flex-row items-center gap-3">
             {/* Foto do usuário */}
-            <View className="w-9 h-9 rounded-full bg-gray-700 items-center justify-center">
-              <Text className="text-white text-sm font-medium">U</Text>
-            </View>
+            {userAvatar ? (
+              <Image
+                source={{ uri: userAvatar }}
+                className="w-9 h-9 rounded-full"
+              />
+            ) : (
+              <View className="w-9 h-9 rounded-full bg-gray-700 items-center justify-center">
+                <Text className="text-white text-sm font-medium">U</Text>
+              </View>
+            )}
             <Text className="text-white font-medium text-[15px]">Seu story</Text>
           </View>
           

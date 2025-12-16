@@ -3,10 +3,11 @@ import CreateModal from '@/src/components/create-post';
 import FeedOptions from '@/src/components/feed-options';
 import ShareModal from '@/src/components/share-modal';
 import { recentContacts } from '@/src/utils/contact-mock';
+import { loadProfileData } from '@/src/utils/profileStorage';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { Bell, Bookmark, Heart, MessageCircle, MessageSquareMoreIcon, Plus, Share2 } from 'lucide-react-native';
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   Dimensions,
   Image,
@@ -46,13 +47,39 @@ export default function Feed() {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalCreateVisible, setModalCreateVisible] = useState(false);
   const [showShare, setShowShare] = useState(false);
+  const [userAvatar, setUserAvatar] = useState<string>('https://api.dicebear.com/7.x/avataaars/svg?seed=User');
 
   const router = useRouter();
+
+  // Carregar avatar do perfil
+  const loadUserAvatar = useCallback(async () => {
+    try {
+      const profileData = await loadProfileData();
+      if (profileData.avatar) {
+        setUserAvatar(profileData.avatar);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar avatar do perfil:', error);
+    }
+  }, []);
+
+  // Carregar avatar quando o componente montar
+  useEffect(() => {
+    loadUserAvatar();
+  }, [loadUserAvatar]);
+
+  // Recarregar avatar quando a tela ganhar foco
+  useFocusEffect(
+    useCallback(() => {
+      loadUserAvatar();
+    }, [loadUserAvatar])
+  );
+
   const stories: Story[] = [
     { 
       id: 1, 
       username: 'Seu story', 
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=User', 
+      avatar: userAvatar, 
       isUser: true 
     },
     { id: 2, username: 'joaogamer', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Joao' },

@@ -1,8 +1,9 @@
 import ShareProfile from '@/src/components/share-profile';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { ChevronDown, Clapperboard, Grid3X3, Heart, Menu, MessageCircle, Play, Plus, Repeat2, Send, SquareKanban, X } from 'lucide-react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { loadProfileData } from '@/src/utils/profileStorage';
 import {
   Animated,
   Dimensions,
@@ -94,6 +95,56 @@ const ProfileScreen = () => {
   });
 
   const [editForm, setEditForm] = useState<ProfileData>(profileData);
+
+  // Carregar dados salvos quando a tela ganhar foco (voltar da edição)
+  useFocusEffect(
+    useCallback(() => {
+      const loadSavedProfile = async () => {
+        try {
+          const savedData = await loadProfileData();
+          if (savedData) {
+            console.log('Carregando perfil salvo:', savedData);
+            setProfileData((prev) => ({
+              ...prev,
+              username: savedData.username || prev.username,
+              name: savedData.name || prev.name,
+              bio: savedData.bio || prev.bio,
+              // Sempre usar o avatar salvo se existir, mesmo que seja diferente do padrão
+              avatar: savedData.avatar ? savedData.avatar : prev.avatar,
+              website: savedData.website || savedData.youtube || savedData.instagram || savedData.twitter || prev.website,
+            }));
+          }
+        } catch (error) {
+          console.error('Erro ao carregar perfil salvo:', error);
+        }
+      };
+      loadSavedProfile();
+    }, [])
+  );
+
+  // Carregar dados iniciais
+  useEffect(() => {
+    const loadInitialProfile = async () => {
+      try {
+        const savedData = await loadProfileData();
+        if (savedData) {
+          console.log('Carregando perfil inicial:', savedData);
+          setProfileData((prev) => ({
+            ...prev,
+            username: savedData.username || prev.username,
+            name: savedData.name || prev.name,
+            bio: savedData.bio || prev.bio,
+            // Sempre usar o avatar salvo se existir, mesmo que seja diferente do padrão
+            avatar: savedData.avatar ? savedData.avatar : prev.avatar,
+            website: savedData.website || savedData.youtube || savedData.instagram || savedData.twitter || prev.website,
+          }));
+        }
+      } catch (error) {
+        console.error('Erro ao carregar perfil inicial:', error);
+      }
+    };
+    loadInitialProfile();
+  }, []);
 
   const handleSave = () => {
     setProfileData(editForm);
@@ -239,7 +290,7 @@ const ProfileScreen = () => {
         {/* Botões de Ação */}
         <View className="flex-row justify-center gap-4 px-6 mb-2">
           <TouchableOpacity
-            onPress={() => setIsEditModalVisible(true)}
+            onPress={() => router.push('/screens/edit-profile')}
             className="flex-1 border-2 bg-[#25292e] rounded-xl py-3"
           >
             <Text className="text-[#00FF40] text-center font-semibold text-base">Editar Perfil</Text>

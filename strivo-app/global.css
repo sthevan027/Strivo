@@ -1,3 +1,14 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Cor de seleção verde para campos de texto */
+::selection {
+  background-color: #00FF40;
+  color: #000;
+}
+
+::-moz-selection {
+  background-color: #00FF40;
+  color: #000;
+}
