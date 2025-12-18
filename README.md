@@ -1,163 +1,100 @@
-# Strivo - Plataforma de Streaming
+# Strivo Admin — Painel Administrativo
 
-## 📱 Sobre o Projeto
+Painel administrativo do **Strivo** para acompanhar métricas e moderar conteúdos/ações da rede social e das lives.
 
-O **Strivo** é um protótipo de plataforma de streaming que tem como objetivo se tornar referência no mercado de streaming, com forte integração social e ferramentas inovadoras para criadores e espectadores.
+> Referências de UI: anexos enviados (tema escuro, cards, badges e botões de ação).
+> A documentação do protótipo antigo (legado) está em `docs/LEGADO-prototipo-streaming.md`.
 
-## 🎯 Funcionalidades Implementadas
+## 🎯 Objetivo
 
-### ✅ Versão Beta (MVP)
+Centralizar, em um único painel:
 
-- **Página Inicial**: Top streamers do mês, lives em destaque e categorias principais
-- **Perfil de Usuário**: Interface similar ao Instagram com estatísticas e abas
-- **Categorias**: Principais categorias ao vivo e seção de interações
-- **Sistema de Apoio**: Doações diretas aos streamers com valores fixos
-- **Ranking**: Top 5 streamers mais populares e ranking geral
-- **Configurações**: Interface de configurações inspirada no Meta
-- **Busca**: Página de busca com categorias e streamers populares
+- Revisão/moderação de conteúdo (posts, comentários, mídia)
+- Gestão de denúncias e fila de revisão
+- Acompanhamento de métricas (lives e rede social)
+- Registro de ações e configurações do painel
 
-### 🎨 Design
+## 🧩 Escopo (MVP deste repositório)
 
-- **Tema Escuro**: Interface moderna com cores escuras
-- **Cor Primária**: Verde vibrante (#53fc18) para elementos de destaque
-- **Responsivo**: Adaptado para desktop e mobile
-- **Animações**: Transições suaves e efeitos hover
+### Telas
 
-## 📁 Estrutura do Projeto
+- **Home**: resumo rápido do painel (cards e contadores)
+- **Denúncias**: lista de denúncias recentes e categorias (com CTA “Analisar”)
+- **Detalhe da denúncia**: visualização do conteúdo denunciado + motivo + ações (Remover / Manter / Avisar usuário)
+- **Ações**: pendências (recursos, verificações, etc.)
+- **Insights**: métricas e gráfico de atividade (últimos 7 dias)
+- **Config**: configurações do painel (moderadores, regras, registro, alertas, suporte, versão)
+
+### Navegação
+
+- **Mobile**: bottom navigation (Home / Denúncias / Ações / Insights / Config)
+- **Desktop**: sidebar (mesmas rotas)
+
+### Dados (por enquanto)
+
+- MVP usa **dados mock** (estáticos) para montar UI/fluxo.
+- Integração com API/BD fica para a próxima etapa (definindo autenticação e permissões).
+
+## 🛠️ Stack
+
+- **React + TypeScript**
+- **Vite**
+- **Tailwind CSS**
+- **React Router**
+
+## 🧭 Rotas
+
+- `/` → Home
+- `/denuncias` → Lista de denúncias
+- `/denuncias/:id` → Detalhe da denúncia
+- `/acoes` → Ações pendentes
+- `/insights` → Insights/Métricas
+- `/config` → Configurações
+
+## 📁 Estrutura de pastas (proposta)
 
 ```
-strivo-1/
-├── index.html          # Página inicial
-├── profile.html        # Perfil do usuário
-├── categories.html     # Categorias e interações
-├── support.html        # Sistema de apoio/doação
-├── ranking.html        # Ranking de streamers
-├── settings.html       # Configurações
-├── search.html         # Página de busca
-├── styles.css          # Estilos principais
-├── profile.css         # Estilos específicos do perfil
-└── README.md           # Documentação
+src/
+  app/                # rotas e composição do app
+  components/         # componentes reutilizáveis (cards, badges, botões, etc.)
+  features/           # telas por domínio (denuncias, insights, config...)
+  lib/                # helpers (formatadores, constantes, etc.)
+  styles/             # tema / tokens
+  mocks/              # dados mock do MVP
 ```
 
-## 🚀 Como Usar
+## ▶️ Como rodar
 
-1. Abra o arquivo `index.html` em qualquer navegador moderno
-2. Navegue entre as páginas usando os links e botões
-3. Explore as diferentes funcionalidades implementadas
+Instalar dependências:
 
-## 🛠️ Tecnologias Utilizadas
+```bash
+pnpm install
+```
 
-- **HTML5**: Estrutura semântica
-- **CSS3**: Estilos e animações
-- **Tailwind CSS**: Framework CSS para estilização rápida
-- **JavaScript**: Interatividade básica
+Rodar em desenvolvimento:
 
-## 📱 Páginas Implementadas
+```bash
+pnpm dev
+```
 
-### 1. Página Inicial (`index.html`)
-- Top 5 streamers do mês
-- Lives em destaque (GTA V, Minecraft, League of Legends)
-- Principais categorias de lives
-- Seção de jogos de tiro
+Build:
 
-### 2. Perfil (`profile.html`)
-- Avatar circular com borda verde
-- Estatísticas (seguidores, seguindo, posts)
-- Abas (Posts, Klips, Lives)
-- Botões de ação (mensagens, editar, notificações)
+```bash
+pnpm build
+```
 
-### 3. Categorias (`categories.html`)
-- Principais categorias ao vivo (GTA, PUBG, Valorant)
-- Seção "Apenas Interação" com cards coloridos
-- Artes Visuais & Sons com DJ Set ao vivo
+Preview do build:
 
-### 4. Apoio (`support.html`)
-- Interface de doação com valores fixos (R$ 5, 10, 25, 50)
-- Campo para mensagem personalizada
-- Histórico de apoios recentes
+```bash
+pnpm preview
+```
 
-### 5. Ranking (`ranking.html`)
-- Top 5 streamers mais populares
-- Ranking geral com badges e ícones
-- Estatísticas de audiência diária
+## ✅ Próximos passos (pós-MVP)
 
-### 6. Configurações (`settings.html`)
-- Seção "Também da Meta" com apps relacionados
-- WhatsApp, Edits, Threads, Facebook, Messenger
-- Meta AI
+- Autenticação (admin/moderador) e autorização por permissões
+- Integração com API (denúncias, ações, métricas, usuários)
+- Upload/preview de mídia e histórico completo de moderação
+- Filtros avançados e busca (status, categoria, usuário, período)
+- Auditoria (registro de ações) com paginação e exportação
 
-### 7. Busca (`search.html`)
-- Barra de pesquisa
-- Buscas em alta
-- Categorias populares
-- Streamers populares
 
-## 🎨 Paleta de Cores
-
-- **Primária**: #53fc18 (Verde vibrante)
-- **Primária Escura**: #45d614
-- **Fundo Escuro**: #0f0f0f
-- **Card Escuro**: #1a1a1a
-- **Borda Escura**: #2a2a2a
-
-## 📱 Responsividade
-
-O projeto foi desenvolvido com foco na responsividade:
-- **Desktop**: Layout completo com todas as funcionalidades
-- **Tablet**: Adaptações para telas médias
-- **Mobile**: Layout otimizado para dispositivos móveis
-
-## 🔮 Funcionalidades Futuras
-
-- Lives em tempo real com chat interativo
-- Sistema de assinaturas recorrentes
-- Clips automáticos (highlights)
-- Replays (VOD)
-- Feed social com posts e stories
-- Notificações push
-- Gamificação com selos e conquistas
-- Dashboard para streamers
-
-## 👥 Equipe
-
-Este protótipo foi desenvolvido para apresentação e aprovação de design, seguindo as especificações e imagens de referência fornecidas.
-
-## 📄 Licença
-
-Este projeto está sob licença proprietária. Todos os direitos reservados.
-
-### Direitos de Propriedade Intelectual
-
-**© 2024 Strivo. Todos os direitos reservados.**
-
-Este software e sua documentação são propriedade exclusiva da Strivo. É proibida a reprodução, distribuição, modificação ou uso comercial sem autorização expressa por escrito.
-
-### Proteção de Código
-
-- **Código Fonte**: Propriedade exclusiva da Strivo
-- **Design e Interface**: Direitos autorais protegidos
-- **Marca e Identidade Visual**: Marca registrada
-- **Algoritmos e Lógica de Negócio**: Segredos comerciais
-
-### Direitos de Imagem
-
-- **Imagens de Protótipo**: Propriedade da Strivo
-- **Assets de Design**: Direitos autorais protegidos
-- **Ícones e Elementos Visuais**: Marca registrada
-- **Screenshots e Demos**: Uso restrito
-
-### Uso Permitido
-
-- **Visualização**: Apenas para fins de demonstração
-- **Desenvolvimento**: Apenas para a equipe autorizada
-- **Documentação**: Uso interno da empresa
-
-### Contato
-
-Para questões sobre licenciamento ou uso comercial, entre em contato:
-- **Email**: legal@strivo.com
-- **Website**: https://strivo.com
-
----
-
-**AVISO LEGAL**: Este projeto contém informações proprietárias e confidenciais. O acesso não autorizado é estritamente proibido e pode resultar em ações legais.
