@@ -310,5 +310,5 @@
 ---
 
 **Mantido por:** Equipe de Desenvolvimento Strivo  
-**Atualizar:** Semanalmente ou conforme progresso
+**Atualizar:** Diaria
 
