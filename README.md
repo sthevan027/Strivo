@@ -1,8 +1,28 @@
 # Strivo - Plataforma de Streaming
 
+[![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=fff)](https://developer.mozilla.org/en-US/docs/Web/HTML)
+[![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=fff)](https://developer.mozilla.org/en-US/docs/Web/CSS)
+[![Tailwind](https://img.shields.io/badge/Tailwind-38B2AC?style=flat&logo=tailwind-css&logoColor=fff)](https://tailwindcss.com/)
+[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=000)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+
+> Protótipo de plataforma de streaming com integração social e ferramentas para criadores e espectadores.
+
+---
+
 ## 📱 Sobre o Projeto
 
 O **Strivo** é um protótipo de plataforma de streaming que tem como objetivo se tornar referência no mercado de streaming, com forte integração social e ferramentas inovadoras para criadores e espectadores.
+
+## 🚀 Como rodar
+
+1. Clone o repositório:
+```bash
+git clone https://github.com/sthevan027/Strivo.git
+cd Strivo
+```
+
+2. Abra o arquivo `index.html` em qualquer navegador moderno
+3. Navegue entre as páginas usando os links e botões
 
 ## 🎯 Funcionalidades Implementadas
 
@@ -23,10 +43,19 @@ O **Strivo** é um protótipo de plataforma de streaming que tem como objetivo s
 - **Responsivo**: Adaptado para desktop e mobile
 - **Animações**: Transições suaves e efeitos hover
 
+## 🛠️ Tecnologias
+
+| Tecnologia | Uso |
+|------------|-----|
+| HTML5 | Estrutura semântica |
+| CSS3 | Estilos e animações |
+| Tailwind CSS | Framework CSS |
+| JavaScript | Interatividade |
+
 ## 📁 Estrutura do Projeto
 
 ```
-strivo-1/
+Strivo/
 ├── index.html          # Página inicial
 ├── profile.html        # Perfil do usuário
 ├── categories.html     # Categorias e interações
@@ -35,62 +64,10 @@ strivo-1/
 ├── settings.html       # Configurações
 ├── search.html         # Página de busca
 ├── styles.css          # Estilos principais
-├── profile.css         # Estilos específicos do perfil
-└── README.md           # Documentação
+├── profile.css         # Estilos do perfil
+├── Acompanhamento-Semanal/
+└── README.md
 ```
-
-## 🚀 Como Usar
-
-1. Abra o arquivo `index.html` em qualquer navegador moderno
-2. Navegue entre as páginas usando os links e botões
-3. Explore as diferentes funcionalidades implementadas
-
-## 🛠️ Tecnologias Utilizadas
-
-- **HTML5**: Estrutura semântica
-- **CSS3**: Estilos e animações
-- **Tailwind CSS**: Framework CSS para estilização rápida
-- **JavaScript**: Interatividade básica
-
-## 📱 Páginas Implementadas
-
-### 1. Página Inicial (`index.html`)
-- Top 5 streamers do mês
-- Lives em destaque (GTA V, Minecraft, League of Legends)
-- Principais categorias de lives
-- Seção de jogos de tiro
-
-### 2. Perfil (`profile.html`)
-- Avatar circular com borda verde
-- Estatísticas (seguidores, seguindo, posts)
-- Abas (Posts, Klips, Lives)
-- Botões de ação (mensagens, editar, notificações)
-
-### 3. Categorias (`categories.html`)
-- Principais categorias ao vivo (GTA, PUBG, Valorant)
-- Seção "Apenas Interação" com cards coloridos
-- Artes Visuais & Sons com DJ Set ao vivo
-
-### 4. Apoio (`support.html`)
-- Interface de doação com valores fixos (R$ 5, 10, 25, 50)
-- Campo para mensagem personalizada
-- Histórico de apoios recentes
-
-### 5. Ranking (`ranking.html`)
-- Top 5 streamers mais populares
-- Ranking geral com badges e ícones
-- Estatísticas de audiência diária
-
-### 6. Configurações (`settings.html`)
-- Seção "Também da Meta" com apps relacionados
-- WhatsApp, Edits, Threads, Facebook, Messenger
-- Meta AI
-
-### 7. Busca (`search.html`)
-- Barra de pesquisa
-- Buscas em alta
-- Categorias populares
-- Streamers populares
 
 ## 🎨 Paleta de Cores
 
@@ -100,64 +77,14 @@ strivo-1/
 - **Card Escuro**: #1a1a1a
 - **Borda Escura**: #2a2a2a
 
-## 📱 Responsividade
-
-O projeto foi desenvolvido com foco na responsividade:
-- **Desktop**: Layout completo com todas as funcionalidades
-- **Tablet**: Adaptações para telas médias
-- **Mobile**: Layout otimizado para dispositivos móveis
-
-## 🔮 Funcionalidades Futuras
+## 🔮 Roadmap
 
 - Lives em tempo real com chat interativo
 - Sistema de assinaturas recorrentes
-- Clips automáticos (highlights)
-- Replays (VOD)
+- Clips automáticos e VOD
 - Feed social com posts e stories
-- Notificações push
-- Gamificação com selos e conquistas
 - Dashboard para streamers
-
-## 👥 Equipe
-
-Este protótipo foi desenvolvido para apresentação e aprovação de design, seguindo as especificações e imagens de referência fornecidas.
-
-## 📄 Licença
-
-Este projeto está sob licença proprietária. Todos os direitos reservados.
-
-### Direitos de Propriedade Intelectual
-
-**© 2024 Strivo. Todos os direitos reservados.**
-
-Este software e sua documentação são propriedade exclusiva da Strivo. É proibida a reprodução, distribuição, modificação ou uso comercial sem autorização expressa por escrito.
-
-### Proteção de Código
-
-- **Código Fonte**: Propriedade exclusiva da Strivo
-- **Design e Interface**: Direitos autorais protegidos
-- **Marca e Identidade Visual**: Marca registrada
-- **Algoritmos e Lógica de Negócio**: Segredos comerciais
-
-### Direitos de Imagem
-
-- **Imagens de Protótipo**: Propriedade da Strivo
-- **Assets de Design**: Direitos autorais protegidos
-- **Ícones e Elementos Visuais**: Marca registrada
-- **Screenshots e Demos**: Uso restrito
-
-### Uso Permitido
-
-- **Visualização**: Apenas para fins de demonstração
-- **Desenvolvimento**: Apenas para a equipe autorizada
-- **Documentação**: Uso interno da empresa
-
-### Contato
-
-Para questões sobre licenciamento ou uso comercial, entre em contato:
-- **Email**: legal@strivo.com
-- **Website**: https://strivo.com
 
 ---
 
-**AVISO LEGAL**: Este projeto contém informações proprietárias e confidenciais. O acesso não autorizado é estritamente proibido e pode resultar em ações legais.
+**© 2024 Strivo. Desenvolvido por [Sthevan Santos](https://github.com/sthevan027).**
