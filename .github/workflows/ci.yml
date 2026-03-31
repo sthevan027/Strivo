@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main,]
   pull_request:
-    branches: [main, develop]
+    branches: [main,]
 
 jobs:
   lint-and-test:
@@ -12,6 +12,7 @@ jobs:
     defaults:
       run:
         working-directory: strivo-server
+        
     steps:
       - uses: actions/checkout@v4
 
@@ -25,6 +26,7 @@ jobs:
         with:
           node-version: "20"
           cache: "pnpm"
+          cache-dependency-path: strivo-server/pnpm-lock.yaml
 
       - name: Instalar dependências
         run: pnpm install --frozen-lockfile
