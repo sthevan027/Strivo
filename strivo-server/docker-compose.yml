@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:alpine
+    container_name: strivo-db
+    environment:
+      POSTGRES_USER: strivo
+      POSTGRES_PASSWORD: postgresstrivo
+    volumes:
+      - data:/var/lib/postgresql/data
+      - ./.docker/scripts:/docker-entrypoint-initdb.d/scripts
+      - ./.docker/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5433:5432"
+    restart: always
+volumes:
+  data:

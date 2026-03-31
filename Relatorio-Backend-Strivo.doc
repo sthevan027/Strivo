@@ -1,0 +1,109 @@
+{\rtf1\ansi\deff0
+{\fonttbl{\f0 Calibri;}{\f1 Consolas;}}
+\fs36\b Strivo \emdash\  Relat\'f3rio de Backend (Status e An\'e1lise)\b0\par
+\fs22 Data: 31/03/2026\par
+\fs22 Branch base de trabalho: \b Backend\b0\par
+\par
+
+\fs28\b 1) Resumo executivo\b0\par
+\fs22 Neste ciclo, a linha de backend saiu do \i skeleton\i0  (NestJS "Hello World") para uma base funcional de \b Postagens\b0  com:\par
+- Autentica\'e7\'e3o via \b JWT (Bearer)\b0\par
+- Integra\'e7\'e3o com \b Supabase Storage\b0  para upload \b direto do cliente\b0  via URL assinada\par
+- Persist\'eancia via \b Postgres + Prisma\b0  (com migra\'e7\'f5es aplicadas)\par
+- Endpoints de Postagens (\f1 /posts/uploads\f0, \f1 /posts\f0, \f1 /posts/feed\f0, \f1 /posts/:id\f0)\par
+- Testes unit\'e1rios b\'e1sicos (Jest)\par
+\par
+
+\fs28\b 2) Estrutura do reposit\'f3rio (alto n\'edvel)\b0\par
+\fs22 Diret\'f3rios principais:\par
+- \f1 strivo-server/\f0 : backend NestJS/TypeScript\par
+- \f1 docs/\f0 : documenta\'e7\'e3o (Backend.md e TODO-Backend.md)\par
+\par
+\fs22 Observa\'e7\'e3o: o \f1 README.md\f0  na raiz ainda est\'e1 como template do NestJS e n\'e3o reflete o estado atual do Strivo.\par
+\par
+
+\fs28\b 3) Stack confirmada (backend)\b0\par
+\fs22 - Runtime: Node.js (20.x)\par
+- Framework: NestJS\par
+- DB: PostgreSQL (local via Docker)\par
+- ORM: Prisma \b v7\b0\par
+- Auth: Passport-JWT (Nest)\par
+- Storage: Supabase Storage (\f1 @supabase/supabase-js\f0)\par
+\par
+
+\fs28\b 4) O que foi implementado agora\b0\par
+\fs22 \b 4.1) Banco e modelagem (Prisma)\b0\par
+\fs22 Foi criado/atualizado o schema do Prisma com as entidades:\par
+- \b user\b0  (j\'e1 existia)\par
+- \b post\b0  (autor, caption, timestamps)\par
+- \b media\b0  (owner, bucket, path, kind photo|video, mime, size, status)\par
+- \b post_media\b0  (jun\'e7\'e3o post x media com ordena\'e7\'e3o)\par
+\par
+\fs22 Mudan\'e7as necess\'e1rias por conta do Prisma v7:\par
+- URL de conex\'e3o n\'e3o pode mais ficar no \f1 schema.prisma\f0 ; foi criado \f1 prisma.config.ts\f0\par
+- Prisma Client gerado para \f1 strivo-server/src/database/generated/prisma/\f0\par
+\par
+
+\fs22 \b 4.2) M\'f3dulo de banco (NestJS)\b0\par
+\fs22 Foi criado o \b PrismaModule/PrismaService\b0  para acesso ao banco, usando adapter PG do Prisma v7.\par
+\par
+
+\fs22 \b 4.3) Autentica\'e7\'e3o (JWT)\b0\par
+\fs22 Foi estruturado o \b AuthModule\b0  com:\par
+- \f1 JwtStrategy\f0 (Passport JWT)\par
+- \f1 JwtAuthGuard\f0\par
+- decorator \f1 @CurrentUser()\f0  que exp\'f5e \f1 userId\f0  a partir de \f1 sub\f0  do token\par
+\par
+
+\fs22 \b 4.4) Supabase Storage\b0\par
+\fs22 Foi criado um \b SupabaseService\b0  com:\par
+- Leitura de \f1 SUPABASE_URL\f0, \f1 SUPABASE_KEY\f0, \f1 BUCKET_NAME\f0\par
+- Gera\'e7\'e3o de \b signed upload URL\b0  via \f1 createSignedUploadUrl(path, { upsert: false })\f0\par
+\par
+
+\fs22 \b 4.5) Postagens (PostsModule)\b0\par
+\fs22 Endpoints implementados (JWT obrigat\'f3rio):\par
+- \f1 POST /posts/uploads\f0 : cria registro de \b Media\b0  (status pending) e devolve signedUrl\par
+- \f1 POST /posts\f0 : cria \b Post\b0  e associa \b Media\b0 ; valida ownership; marca m\'eddias como ready\par
+- \f1 GET /posts/feed\f0 : feed paginado por cursor (createdAt + id)\par
+- \f1 GET /posts/:id\f0 : detalhe do post\par
+\par
+
+\fs22 \b 4.6) Valida\'e7\'e3o e testes\b0\par
+\fs22 - \b ValidationPipe global\b0  ativado (whitelist, transform, forbidNonWhitelisted)\par
+- Testes Jest adicionados para \f1 PostsService\f0  (upload e regras de ownership)\par
+\par
+
+\fs28\b 5) Status operacional (o que foi validado)\b0\par
+\fs22 - \b Build\b0 : ok (\f1 npm run build\f0)\par
+- \b Testes\b0 : ok (\f1 npm test\f0)\par
+\par
+
+\fs28\b 6) Pend\'eancias e riscos\b0\par
+\fs22 - \b Docker Compose\b0 : ambiente n\'e3o tem \f1 docker compose\f0 / \f1 docker-compose\f0 ; foi usado \f1 docker run\f0  para Postgres.\par
+- \b README da raiz\b0 : ainda \'e9 template; sugere-se atualizar com instru\'e7\'f5es do Strivo.\par
+- \b Vulnerabilidades npm audit\b0 : foram reportadas (moderate/high/critical); n\'e3o foi aplicado \f1 npm audit fix --force\f0  por risco de breaking changes.\par
+- \b Auth de usu\'e1rio\b0 : o guard valida assinatura do JWT e extrai \f1 sub\f0 ; n\'e3o h\'e1 ainda fluxos de login/cadastro no backend.\par
+\par
+
+\fs28\b 7) Como rodar local (resumo)\b0\par
+\fs22 1) Banco (Postgres):\par
+\f1 docker run -d --name strivo-db -e POSTGRES_USER=strivo -e POSTGRES_PASSWORD=postgresstrivo -e POSTGRES_DB=desenvolvimento -p 5433:5432 postgres:17-alpine\f0\par
+\par
+\fs22 2) Backend:\par
+\f1 cd strivo-server\par
+npm ci\par
+npm run build\par
+npm run start:dev\f0\par
+\par
+\fs22 3) Vari\'e1veis de ambiente: usar \f1 strivo-server/env.example\f0  como base (JWT, DATABASE_URL, SUPABASE_*).\par
+\par
+
+\fs28\b 8) Pr\'f3ximos passos recomendados\b0\par
+\fs22 - Implementar \b Auth completo\b0  (signup/login/refresh) e persist\'eancia do usu\'e1rio\par
+- Definir pol\'edticas de \b RLS\b0  no Supabase Storage e regras para upload\par
+- (Opcional) Endpoint \f1 POST /posts/uploads/:mediaId/complete\f0  para confirmar upload e marcar ready s\'f3 ap\'f3s confirma\'e7\'e3o\par
+- Preparar \b Swagger/OpenAPI\b0  para documentar contratos\par
+\par
+}
+
