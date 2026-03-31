@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { SupabaseService } from '../supabase/supabase.service';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -92,7 +96,9 @@ export class PostsService {
     }
     const invalidOwner = media.find((m) => m.owner_id !== userId);
     if (invalidOwner) {
-      throw new BadRequestException('Uma ou mais mídias não pertencem ao usuário.');
+      throw new BadRequestException(
+        'Uma ou mais mídias não pertencem ao usuário.',
+      );
     }
 
     return this.prisma.$transaction(async (tx) => {
@@ -102,7 +108,10 @@ export class PostsService {
           caption: dto.caption,
           media: {
             createMany: {
-              data: dto.mediaIds.map((id, idx) => ({ media_id: id, order: idx })),
+              data: dto.mediaIds.map((id, idx) => ({
+                media_id: id,
+                order: idx,
+              })),
             },
           },
         },
@@ -203,4 +212,3 @@ export class PostsService {
     return { items, nextCursor };
   }
 }
-

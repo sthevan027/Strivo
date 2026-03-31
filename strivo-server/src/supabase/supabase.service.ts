@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
 
 @Injectable()
 export class SupabaseService {
-  private readonly client: SupabaseClient;
+  private readonly client: ReturnType<typeof createClient>;
   private readonly bucket: string;
 
   constructor() {
@@ -12,7 +12,9 @@ export class SupabaseService {
     const bucket = process.env.BUCKET_NAME;
 
     if (!url || !key || !bucket) {
-      throw new Error('SUPABASE_URL/SUPABASE_KEY/BUCKET_NAME não configurados.');
+      throw new Error(
+        'SUPABASE_URL/SUPABASE_KEY/BUCKET_NAME não configurados.',
+      );
     }
 
     this.client = createClient(url, key, {
@@ -37,4 +39,3 @@ export class SupabaseService {
     return data; // { signedUrl, path, token }
   }
 }
-

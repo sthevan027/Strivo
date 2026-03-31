@@ -12,4 +12,3 @@ export class CreateUploadDto {
   @Max(1024 * 1024 * 1024) // 1GB hard cap (MVP)
   size!: number;
 }
-

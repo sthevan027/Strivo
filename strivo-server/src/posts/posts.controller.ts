@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -11,7 +19,10 @@ export class PostsController {
   constructor(private readonly posts: PostsService) {}
 
   @Post('uploads')
-  createUpload(@CurrentUser() user: CurrentUser, @Body() body: CreateUploadDto) {
+  createUpload(
+    @CurrentUser() user: CurrentUser,
+    @Body() body: CreateUploadDto,
+  ) {
     return this.posts.createUpload(user.userId, body);
   }
 
@@ -30,4 +41,3 @@ export class PostsController {
     return this.posts.getPostById(Number(id));
   }
 }
-
