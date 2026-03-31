@@ -7,7 +7,7 @@ on:
     branches: [main]
   schedule:
     - cron: "0 9 * * 1" # Toda segunda-feira
-
+ 
 jobs:
   audit:
     runs-on: ubuntu-latest
@@ -23,7 +23,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "9"
           cache: "pnpm"
           cache-dependency-path: strivo-server/pnpm-lock.yaml
 
