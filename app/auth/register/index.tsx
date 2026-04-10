@@ -17,7 +17,8 @@ export default function RegisterScreen() {
   const router = useRouter()
 
   const [fullName, setFullName] = useState('')
-  const [username, setUsername] = useState('')
+  const [age, setAge] = useState('')
+  const [phone, setPhone] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [avatar, setAvatar] = useState<string | null>(null)
@@ -37,7 +38,7 @@ export default function RegisterScreen() {
   }
 
   async function handleRegister() {
-    if (!fullName || !username || !email || !password) {
+    if (!fullName || !age || !phone || !email || !password) {
       Alert.alert('Erro', 'Preencha todos os campos')
       return
     }
@@ -64,7 +65,6 @@ export default function RegisterScreen() {
     }
 
     const userId = data.user.id
-    console.log('USER ID:', userId)
 
     let avatarUrl: string | null = null
 
@@ -85,7 +85,6 @@ export default function RegisterScreen() {
         })
 
       if (uploadError) {
-        console.log('UPLOAD ERROR:', uploadError)
         setLoading(false)
         Alert.alert('Erro', 'Erro ao enviar a foto')
         return
@@ -98,35 +97,24 @@ export default function RegisterScreen() {
       avatarUrl = urlData.publicUrl
     }
 
-    console.log('FULL NAME:', fullName)
-    console.log('USERNAME:', username)
-    console.log('EMAIL:', email)
-    console.log('AVATAR URL:', avatarUrl)
-
     /* =======================
-       3️⃣ INSERT PROFILE (DEBUG)
+       3️⃣ INSERT PROFILE
     ======================= */
-    const { data: profileData, error: profileError } = await supabase
+    const { error: profileError } = await supabase
       .from('profiles')
       .insert({
         id: userId,
         full_name: fullName,
-        username,
+        age: Number(age),
+        phone,
         email,
         avatar_url: avatarUrl,
       })
-      .select()
-
-    console.log('PROFILE DATA:', profileData)
-    console.log('PROFILE ERROR:', profileError)
 
     setLoading(false)
 
     if (profileError) {
-      Alert.alert(
-        'Erro ao salvar perfil',
-        profileError.message
-      )
+      Alert.alert('Erro ao salvar perfil', profileError.message)
       return
     }
 
@@ -163,10 +151,20 @@ export default function RegisterScreen() {
 
       <TextInput
         style={styles.input}
-        placeholder="Nome de usuário"
+        placeholder="Idade"
         placeholderTextColor="#888"
-        value={username}
-        onChangeText={setUsername}
+        value={age}
+        onChangeText={setAge}
+        keyboardType="numeric"
+      />
+
+      <TextInput
+        style={styles.input}
+        placeholder="Telefone"
+        placeholderTextColor="#888"
+        value={phone}
+        onChangeText={setPhone}
+        keyboardType="phone-pad"
       />
 
       <TextInput
@@ -203,7 +201,7 @@ export default function RegisterScreen() {
 }
 
 /* =======================
-   STYLES
+   STYLES (INALTERADO)
 ======================= */
 const styles = StyleSheet.create({
   container: {

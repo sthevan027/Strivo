@@ -1,165 +1,165 @@
-import CreateModal from '@/src/components/create-post'
-import FeedOptions from '@/src/components/feed-options'
-import ShareModal from '@/src/components/share-modal'
-import { recentContacts } from '@/src/utils/contact-mock'
-import { loadProfileData } from '@/src/utils/profileStorage'
-import { LinearGradient } from 'expo-linear-gradient'
-import { useFocusEffect, useRouter } from 'expo-router'
+ import { router } from 'expo-router'
+import { useState } from 'react'
 import {
-  Bell,
-  MessageSquareMore,
-  Plus,
-} from 'lucide-react-native'
-import React, { useCallback, useState } from 'react'
-import {
-  Image,
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native'
+import { supabase } from '../src/lib/supabase'
 
-interface Story {
-  id: number
-  username: string
-  avatar: string
-  isUser?: boolean
-}
+export default function Login() {
+  const [email, setEmail] = useState('')
+  const [senha, setSenha] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [errorMsg, setErrorMsg] = useState('')
 
-export default function Feed() {
-  const router = useRouter()
+  async function handleLogin() {
+    setErrorMsg('')
 
-  const [modalVisible, setModalVisible] = useState(false)
-  const [modalCreateVisible, setModalCreateVisible] = useState(false)
-  const [showShare, setShowShare] = useState(false)
-
-  const defaultAvatar =
-    'https://api.dicebear.com/7.x/avataaars/png?seed=User'
-
-  const [stories, setStories] = useState<Story[]>([])
-
-  /* =======================
-     LOAD STORIES
-  ======================= */
-  const loadStories = useCallback(async () => {
-    const profile = await loadProfileData()
-
-    const userStory: Story = {
-      id: 1,
-      username: profile?.username ?? 'Seu story',
-      avatar: profile?.avatar_url ?? defaultAvatar,
-      isUser: true,
+    // 1️⃣ valida campos
+    if (!email.trim() || !senha.trim()) {
+      setErrorMsg('Preencha email e senha')
+      return
     }
 
-    const otherStories: Story[] = [
-      {
-        id: 2,
-        username: 'joaogamer',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/png?seed=Joao',
-      },
-      {
-        id: 3,
-        username: 'maristreams',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/png?seed=Mari',
-      },
-      {
-        id: 4,
-        username: 'pedrolive',
-        avatar: 'https://api.dicebear.com/7.x/avataaars/png?seed=Pedro',
-      },
-    ]
+    setLoading(true)
 
-    setStories([userStory, ...otherStories])
-  }, [])
+    // 2️⃣ login no Supabase Auth
+    const { error } = await supabase.auth.signInWithPassword({
+      email: email.trim(),
+      password: senha,
+    })
 
-  useFocusEffect(
-    useCallback(() => {
-      loadStories()
-    }, [loadStories])
-  )
+    setLoading(false)
+
+    // 3️⃣ erro de login
+    if (error) {
+      setErrorMsg('Usuário ou senha incorretos')
+      return
+    }
+
+    // ✅ sucesso
+    router.replace('/')
+  }
 
   return (
-    <SafeAreaView className="flex-1 bg-black">
-      <StatusBar barStyle="light-content" />
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      <View style={styles.container}>
+        <Text style={styles.logo}>S</Text>
+        <Text style={styles.title}>Strivo</Text>
+        <Text style={styles.subtitle}>Entrar na sua conta</Text>
 
-      {/* HEADER */}
-      <View className="flex-row justify-between items-center px-4 py-3">
-        <Text className="text-[#00FF40] text-3xl font-bold">Strivo</Text>
+        {errorMsg !== '' && (
+          <Text style={styles.error}>{errorMsg}</Text>
+        )}
 
-        <View className="flex-row items-center gap-4">
-          <TouchableOpacity onPress={() => setModalCreateVisible(true)}>
-            <Plus size={28} color="#fff" />
-          </TouchableOpacity>
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          placeholderTextColor="#777"
+          autoCapitalize="none"
+          keyboardType="email-address"
+          value={email}
+          onChangeText={setEmail}
+        />
 
-          <TouchableOpacity
-            onPress={() => router.push('/screens/notifications')}
+        <TextInput
+          style={styles.input}
+          placeholder="Senha"
+          placeholderTextColor="#777"
+          secureTextEntry
+          value={senha}
+          onChangeText={setSenha}
+        />
+
+        <TouchableOpacity
+          style={styles.button}
+          onPress={handleLogin}
+          disabled={loading}
+        >
+          <Text style={styles.buttonText}>
+            {loading ? 'Entrando...' : 'Entrar'}
+          </Text>
+        </TouchableOpacity>
+
+        <Text style={styles.footer}>
+          Não tem uma conta?{' '}
+          <Text
+            style={styles.linkGreen}
+            onPress={() => router.push('/auth/register')}
           >
-            <Bell size={28} color="#fff" />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => router.push('/screens/chat/message-screen')}
-          >
-            <MessageSquareMore size={28} color="#fff" />
-          </TouchableOpacity>
-        </View>
+            Inscrever-se
+          </Text>
+        </Text>
       </View>
-
-      {/* STORIES */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        className="px-2 py-3"
-      >
-        {stories.map((story) => (
-          <TouchableOpacity
-            key={story.id}
-            className="items-center mx-2"
-            onPress={() =>
-              story.isUser && router.push('/screens/profile')
-            }
-          >
-            {story.isUser ? (
-              <LinearGradient
-                colors={['#16a34a', '#4ade80', '#d9f99d']}
-                style={{ padding: 3, borderRadius: 999 }}
-              >
-                <Image
-                  source={{ uri: story.avatar }}
-                  className="w-20 h-20 rounded-full"
-                />
-              </LinearGradient>
-            ) : (
-              <Image
-                source={{ uri: story.avatar }}
-                className="w-20 h-20 rounded-full border border-gray-700"
-              />
-            )}
-
-            <Text className="text-white text-xs mt-1">
-              {story.isUser ? 'Seu story' : story.username}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-
-      <FeedOptions
-        visible={modalVisible}
-        onClose={() => setModalVisible(false)}
-      />
-
-      <CreateModal
-        visible={modalCreateVisible}
-        onClose={() => setModalCreateVisible(false)}
-      />
-
-      <ShareModal
-        visible={showShare}
-        onClose={() => setShowShare(false)}
-        recentContacts={recentContacts}
-      />
-    </SafeAreaView>
+    </KeyboardAvoidingView>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#0F0F0F',
+    justifyContent: 'center',
+    padding: 24,
+  },
+  logo: {
+    color: '#4CAF50',
+    fontSize: 64,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  title: {
+    color: '#4CAF50',
+    fontSize: 32,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  subtitle: {
+    color: '#999',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  error: {
+    color: '#ff5555',
+    textAlign: 'center',
+    marginBottom: 16,
+    fontWeight: 'bold',
+  },
+  input: {
+    backgroundColor: '#1C1C1C',
+    borderRadius: 10,
+    padding: 16,
+    color: '#FFF',
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#4CAF50',
+  },
+  button: {
+    backgroundColor: '#4CAF50',
+    padding: 16,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#FFF',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  footer: {
+    color: '#999',
+    textAlign: 'center',
+    marginTop: 24,
+  },
+  linkGreen: {
+    color: '#4CAF50',
+    fontWeight: 'bold',
+  },
+})
