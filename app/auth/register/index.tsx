@@ -50,83 +50,83 @@ export default function RegisterScreen() {
 
     setLoading(true)
 
-    /* =======================
-       1️⃣ AUTH
-    ======================= */
-    const { data, error } = await supabase.auth.signUp({
-      email: email.trim(),
-      password,
-    })
-
-    if (error || !data.user) {
-      setLoading(false)
-      Alert.alert('Erro', error?.message || 'Erro ao criar usuário')
-      return
-    }
-
-    const userId = data.user.id
-
-    let avatarUrl: string | null = null
-
-    /* =======================
-       2️⃣ AVATAR
-    ======================= */
-    if (avatar) {
-      const response = await fetch(avatar)
-      const blob = await response.blob()
-
-      const fileName = `${userId}.jpg`
-
-      const { error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(fileName, blob, {
-          upsert: true,
-          contentType: 'image/jpeg',
-        })
-
-      if (uploadError) {
-        setLoading(false)
-        Alert.alert('Erro', 'Erro ao enviar a foto')
-        return
-      }
-
-      const { data: urlData } = supabase.storage
-        .from('avatars')
-        .getPublicUrl(fileName)
-
-      avatarUrl = urlData.publicUrl
-    }
-
-    /* =======================
-       3️⃣ INSERT PROFILE
-    ======================= */
-    const { error: profileError } = await supabase
-      .from('profiles')
-      .insert({
-        id: userId,
-        full_name: fullName,
-        age: Number(age),
-        phone,
-        email,
-        avatar_url: avatarUrl,
+    try {
+      /* =======================
+         1️⃣ AUTH (AGORA CORRETO)
+      ======================= */
+      const { data, error } = await supabase.auth.signUp({
+        email: email.trim(),
+        password,
+        options: {
+          data: {
+            nome: fullName, // 🔥 ESSENCIAL pro trigger
+          },
+        },
       })
 
-    setLoading(false)
+      if (error || !data.user) {
+        throw new Error(error?.message || 'Erro ao criar usuário')
+      }
 
-    if (profileError) {
-      Alert.alert('Erro ao salvar perfil', profileError.message)
-      return
+      const userId = data.user.id
+
+      let avatarUrl: string | null = null
+
+      /* =======================
+         2️⃣ AVATAR
+      ======================= */
+      if (avatar) {
+        const response = await fetch(avatar)
+        const blob = await response.blob()
+
+        const fileName = `${userId}.jpg`
+
+        const { error: uploadError } = await supabase.storage
+          .from('avatars')
+          .upload(fileName, blob, {
+            upsert: true,
+            contentType: 'image/jpeg',
+          })
+
+        if (uploadError) throw uploadError
+
+        const { data: urlData } = supabase.storage
+          .from('avatars')
+          .getPublicUrl(fileName)
+
+        avatarUrl = urlData.publicUrl
+      }
+
+      /* =======================
+         3️⃣ PROFILE (UPDATE ✔)
+      ======================= */
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({
+  nome: fullName,
+  age: Number(age),
+  phone,
+  ...(avatarUrl && { avatar_url: avatarUrl }),
+})
+        .eq('id', userId)
+
+      if (profileError) throw profileError
+
+      /* =======================
+         4️⃣ SUCESSO
+      ======================= */
+      Alert.alert('Sucesso 🎉', 'Conta criada com sucesso!', [
+        {
+          text: 'OK',
+          onPress: () => router.replace('/auth/login'),
+        },
+      ])
+
+    } catch (err: any) {
+      Alert.alert('Erro', err.message || 'Erro inesperado')
+    } finally {
+      setLoading(false)
     }
-
-    /* =======================
-       4️⃣ SUCESSO
-    ======================= */
-    Alert.alert('Sucesso 🎉', 'Conta criada com sucesso!', [
-      {
-        text: 'OK',
-        onPress: () => router.replace('/auth/login'),
-      },
-    ])
   }
 
   return (
@@ -201,7 +201,7 @@ export default function RegisterScreen() {
 }
 
 /* =======================
-   STYLES (INALTERADO)
+   STYLES
 ======================= */
 const styles = StyleSheet.create({
   container: {
