@@ -24,7 +24,7 @@ export default function RegisterScreen() {
   const [avatar, setAvatar] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
-  // 🔥 PEDIR PERMISSÃO + ESCOLHER IMAGEM
+  // 🔥 ESCOLHER IMAGEM
   async function pickImage() {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync()
 
@@ -60,11 +60,14 @@ export default function RegisterScreen() {
 
     try {
       // =========================
-      // 1️⃣ CRIAR USUÁRIO
+      // 1️⃣ CRIAR USUÁRIO (COM DEEP LINK)
       // =========================
       const { data, error } = await supabase.auth.signUp({
         email: email.trim(),
         password,
+        options: {
+          emailRedirectTo: 'strivoapp://auth/callback',
+        },
       })
 
       if (error || !data.user) {
@@ -75,12 +78,10 @@ export default function RegisterScreen() {
       let avatarUrl: string | null = null
 
       // =========================
-      // 2️⃣ UPLOAD AVATAR (CORRETO)
+      // 2️⃣ UPLOAD AVATAR
       // =========================
       if (avatar) {
         try {
-          console.log('URI:', avatar)
-
           const response = await fetch(avatar)
           const arrayBuffer = await response.arrayBuffer()
 
@@ -93,10 +94,7 @@ export default function RegisterScreen() {
               upsert: true,
             })
 
-          if (uploadError) {
-            console.log('ERRO UPLOAD:', uploadError)
-            throw uploadError
-          }
+          if (uploadError) throw uploadError
 
           const { data: urlData } = supabase.storage
             .from('avatars')
@@ -104,15 +102,13 @@ export default function RegisterScreen() {
 
           avatarUrl = urlData.publicUrl
 
-          console.log('URL FINAL:', avatarUrl)
-
         } catch (err) {
-          console.log('ERRO AVATAR:', err)
+          console.log('Erro avatar:', err)
         }
       }
 
       // =========================
-      // 3️⃣ SALVAR PROFILE (GARANTIDO)
+      // 3️⃣ SALVAR PROFILE
       // =========================
       const { error: profileError } = await supabase
         .from('profiles')
@@ -124,20 +120,19 @@ export default function RegisterScreen() {
           avatar_url: avatarUrl,
         })
 
-      if (profileError) {
-        console.log('ERRO PROFILE:', profileError)
-        throw profileError
-      }
+      if (profileError) throw profileError
 
       // =========================
-      // 4️⃣ SUCESSO
+      // 4️⃣ SUCESSO (MENSAGEM CORRETA)
       // =========================
-      Alert.alert('Sucesso 🎉', 'Conta criada!', [
-        { text: 'OK', onPress: () => router.replace('/login') },
-      ])
+      Alert.alert(
+        'Verifique seu email 📩',
+        'Enviamos um link de confirmação. Clique nele para ativar sua conta.',
+        [{ text: 'OK', onPress: () => router.replace('/login') }]
+      )
 
     } catch (err: any) {
-      console.log('ERRO GERAL:', err)
+      console.log('ERRO:', err)
       Alert.alert('Erro', err.message || 'Erro inesperado')
     } finally {
       setLoading(false)
