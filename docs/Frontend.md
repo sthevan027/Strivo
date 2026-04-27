@@ -35,7 +35,12 @@ O frontend entrega experiências de autenticação, lives, exploração, engajam
 - Push/OTA: `expo-notifications` e `expo-updates`
 - Qualidade: ESLint, Prettier, Husky, lint-staged; Jest + @testing-library/react-native; E2E com Detox/Maestro
 
-## Execução Local
+## Execução Local (app da raiz)
+
+Na estrutura atual, o app Expo fica **na raiz** do repositório (pastas `app/`, `src/`, `assets/`).
+
+Instalar dependências:
+
 ```bash
 pnpm install
 ```
@@ -49,13 +54,13 @@ EXPO_PUBLIC_CDN_URL=http://localhost:8080
 
 Executar (Expo):
 ```bash
-pnpm expo start
+pnpm start
 ```
 
 Rodar em dispositivos/emuladores:
 ```bash
-pnpm expo run:android
-pnpm expo run:ios
+pnpm android
+pnpm ios
 ```
 
 ## Estrutura de Pastas (sugerida)
@@ -83,9 +88,12 @@ src/
 - **Proteção de rotas**: guards com Expo Router e revalidação automática
 
 ### Componentes/Rotas
-- `app/(auth)/login`, `app/(auth)/signup`
-- `app/profile/[username]`
-- `ProfileHeader`, `FollowButton`, `Avatar`, `BioEditor`, `FollowersList`
+- **Rotas atuais (raiz)**:
+  - `app/login.tsx` (login)
+  - `app/verify-email.tsx` (verificação de e-mail)
+  - `app/auth/callback.tsx` (callback de auth/OAuth)
+  - `app/(tabs)/*` (tabs principais)
+  - `app/screens/*` (telas secundárias)
 
 ## 📺 2. Lives (MVP)
 
@@ -98,7 +106,7 @@ src/
 - **Listagem**: lives em destaque e populares na home
 
 ### Componentes/Rotas
-- `app/live/[id]` (público para espectador, controles para streamer)
+- `app/live.tsx` (estado atual no projeto; pode evoluir para rota dinâmica depois)
 - `LivePlayer`, `LiveControls`, `ChatPanel`, `ViewerCount`, `ReactionBar`
 - `CategoryFilter`, `LiveCard`, `LiveList`
 
@@ -111,7 +119,7 @@ src/
 - **Categorias**: navegação por jogos/temas populares
 
 ### Componentes/Rotas
-- `app/` (Home), `app/search`
+- `app/(tabs)/home.tsx` (Home atual), `app/screens/searchScreen.tsx` (Busca atual)
 - `LiveCard`, `CategoryPill`, `TopStreamersCarousel`, `SearchBar`
 - `FeaturedLives`, `CategoryGrid`
 

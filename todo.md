@@ -1,6 +1,6 @@
-# 📋 TODO - Frontend (strivo-app)
+# 📋 TODO - Frontend (app na raiz)
 
-**Última atualização:** 13/12/2025  
+**Última atualização:** 27/04/2026  
 **Status geral:** 🟡 Em desenvolvimento ativo
 
 ---
@@ -9,10 +9,11 @@
 
 ### 🔐 Autenticação e Segurança
 - [ ] Criar telas de autenticação
-  - [ ] Tela de Login (`app/screens/auth/login.tsx`)
-  - [ ] Tela de Cadastro (`app/screens/auth/register.tsx`)
-  - [ ] Tela de Recuperação de Senha (`app/screens/auth/forgot-password.tsx`)
-  - [ ] Tela de Verificação de Email (`app/screens/auth/verify-email.tsx`)
+  - [x] Tela de Login (`app/login.tsx`)
+  - [ ] Tela de Cadastro (a definir)
+  - [ ] Tela de Recuperação de Senha (a definir)
+  - [x] Tela de Verificação de Email (`app/verify-email.tsx`)
+  - [x] Callback de auth/OAuth (`app/auth/callback.tsx`)
 
 - [ ] Implementar sistema de autenticação
   - [ ] Instalar `expo-secure-store` para armazenar tokens
@@ -239,6 +240,11 @@
 
 - [ ] Analytics
   - [ ] Instalar biblioteca de analytics (opcional)
+
+---
+
+## 🧱 Padronização do repo (dev workflow)
+- [ ] Padronizar dependências com pnpm (remover `package-lock.json` e gerar `pnpm-lock.yaml`)
 
 ---
 

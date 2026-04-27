@@ -1,6 +1,6 @@
 # TODO - Status do Frontend Strivo
 
-**Última atualização:** 04/12/2025
+**Última atualização:** 27/04/2026
 
 ---
 
@@ -16,7 +16,7 @@
 
 ### 📱 Telas Implementadas (UI)
 
-#### 1. Feed Principal (`app/index.tsx`)
+#### 1. Feed Principal (`app/(tabs)/home.tsx`)
 - [x] Header com logo e ícones de notificações
 - [x] Stories horizontais com avatares
 - [x] Feed de posts com imagens
@@ -94,11 +94,11 @@
 
 ### 🔐 Autenticação & Perfis
 
-- [ ] Tela de login (`app/(auth)/login`)
-- [ ] Tela de cadastro (`app/(auth)/signup`)
-- [ ] Integração com `expo-auth-session` para OAuth
+- [x] Tela de login (`app/login.tsx`)
+- [ ] Tela de cadastro (a definir)
+- [ ] Integração com OAuth (callback em `app/auth/callback.tsx` já existe; falta fluxo completo)
 - [ ] Armazenamento seguro de tokens (`expo-secure-store`)
-- [ ] Guards de rotas protegidas
+- [ ] Guards de rotas protegidas (Expo Router)
 - [ ] Context/Store de autenticação
 - [ ] Integração de perfil com API real
 - [ ] Upload de foto de perfil
@@ -157,7 +157,10 @@
 - [ ] OTA updates (`expo-updates`)
 - [ ] Sincronização offline/online
 - [ ] Performance monitoring
-- [ ] Configuração de variáveis de ambiente (`.env`)
+- [ ] Configuração e documentação de variáveis de ambiente (`.env`)
+
+### 📦 Padronização de dependências (repo)
+- [ ] Padronizar gerenciador para pnpm (remover `package-lock.json` e gerar `pnpm-lock.yaml`)
 
 ### 🧪 Testes Frontend
 
