@@ -1,7 +1,8 @@
 // SearchScreen.tsx
-import { Search, X } from 'lucide-react-native';
-import React, { useState } from 'react';
+import { Search, X } from 'lucide-react-native'
+import React, { useEffect, useState } from 'react'
 import {
+  ActivityIndicator,
   Image,
   SafeAreaView,
   ScrollView,
@@ -9,196 +10,200 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View,
-} from 'react-native';
+  View
+} from 'react-native'
 
-interface SearchResult {
-  id: number;
-  type: 'account' | 'hashtag';
-  name: string;
-  username?: string;
-  avatar?: string;
-  followers?: string;
-  posts?: string;
-}
+import { supabase } from '@/src/lib/supabase'
 
 export default function SearchScreen() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isSearching, setIsSearching] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('')
+  const [isSearching, setIsSearching] = useState(false)
+  const [results, setResults] = useState<any[]>([])
+  const [loading, setLoading] = useState(false)
 
-  // Dados mockados
-  const mockResults: SearchResult[] = [
-    {
-      id: 1,
-      type: 'account',
-      name: 'João Gamer',
-      username: '@joaogamer',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Joao',
-      followers: '15.2k',
-    },
-    {
-      id: 2,
-      type: 'account',
-      name: 'Mari Streams',
-      username: '@maristreams',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Mari',
-      followers: '8.5k',
-    },
-    {
-      id: 3,
-      type: 'hashtag',
-      name: '#gaming',
-      posts: '1.2M posts',
-    },
-    {
-      id: 4,
-      type: 'account',
-      name: 'Pedro Live',
-      username: '@pedrolive',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Pedro',
-      followers: '23.8k',
-    },
-    {
-      id: 5,
-      type: 'hashtag',
-      name: '#streamer',
-      posts: '856k posts',
-    },
-    {
-      id: 6,
-      type: 'account',
-      name: 'Ana Play',
-      username: '@anaplay',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ana',
-      followers: '12.3k',
-    },
-    {
-      id: 7,
-      type: 'hashtag',
-      name: '#gameplay',
-      posts: '654k posts',
-    },
-    {
-      id: 8,
-      type: 'account',
-      name: 'GR6 Explode',
-      username: '@gr6explode',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=gr6',
-      followers: '45.7k',
-    },
-  ];
+  const [userId, setUserId] = useState<string | null>(null)
+  const [following, setFollowing] = useState<string[]>([])
 
-  // Filtrar resultados baseado na busca
-  const filteredResults = searchQuery.trim()
-    ? mockResults.filter(
-        (result) =>
-          result.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          (result.username?.toLowerCase().includes(searchQuery.toLowerCase()))
-      )
-    : [];
+  // 🔥 pegar usuário logado
+  useEffect(() => {
+    const getUser = async () => {
+      const { data } = await supabase.auth.getUser()
+      setUserId(data.user?.id || null)
+    }
 
-  const handleSearch = (text: string) => {
-    setSearchQuery(text);
-    setIsSearching(text.length > 0);
-  };
+    getUser()
+  }, [])
+
+  // 🔥 buscar quem eu sigo
+  const fetchFollowing = async () => {
+    if (!userId) return
+
+    const { data } = await supabase
+      .from('follows')
+      .select('following_id')
+      .eq('follower_id', userId)
+
+    setFollowing(data?.map(f => f.following_id) || [])
+  }
+
+  useEffect(() => {
+    if (userId) fetchFollowing()
+  }, [userId])
+
+  // 🔥 FOLLOW / UNFOLLOW
+  const toggleFollow = async (targetId: string) => {
+    if (!userId) return
+
+    const isFollowing = following.includes(targetId)
+
+    if (isFollowing) {
+      await supabase
+        .from('follows')
+        .delete()
+        .eq('follower_id', userId)
+        .eq('following_id', targetId)
+
+      setFollowing(prev => prev.filter(id => id !== targetId))
+    } else {
+      await supabase.from('follows').insert({
+        follower_id: userId,
+        following_id: targetId,
+      })
+
+      setFollowing(prev => [...prev, targetId])
+    }
+  }
+
+  // 🔍 BUSCA
+  const searchUsers = async (text: string) => {
+    setSearchQuery(text)
+    setIsSearching(text.length > 0)
+
+    if (text.length < 2) {
+      setResults([])
+      return
+    }
+
+    setLoading(true)
+
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('id, nome, avatar_url')
+      .ilike('nome', `%${text}%`)
+      .limit(20)
+
+    if (error) {
+      console.log('Erro busca:', error)
+      setResults([])
+    } else {
+      setResults(data || [])
+    }
+
+    setLoading(false)
+  }
 
   const clearSearch = () => {
-    setSearchQuery('');
-    setIsSearching(false);
-  };
+    setSearchQuery('')
+    setIsSearching(false)
+    setResults([])
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-black">
       <StatusBar barStyle="light-content" backgroundColor="#000" />
 
-      {/* Search Bar */}
-      <View className="px-4 py-3 bg-black border-b border-gray-800 mt-4">
+      {/* 🔍 SEARCH */}
+      <View className="px-4 py-3 border-b border-gray-800 mt-4">
         <View className="flex-row items-center bg-gray-900 rounded-full px-4 py-2">
           <Search size={20} color="#39FF14" />
+
           <TextInput
-            className="flex-1 ml-3 text-white text-base"
-            placeholder="Pesquisar contas..."
+            className="flex-1 ml-3 text-white"
+            placeholder="Pesquisar usuários..."
             placeholderTextColor="#39FF14"
             value={searchQuery}
-            onChangeText={handleSearch}
-            autoCapitalize="none"
-            autoCorrect={false}
+            onChangeText={searchUsers}
           />
+
           {searchQuery.length > 0 && (
-            <TouchableOpacity onPress={clearSearch} className="ml-2">
+            <TouchableOpacity onPress={clearSearch}>
               <X size={20} color="#6b7280" />
             </TouchableOpacity>
           )}
         </View>
       </View>
 
-      {/* Results */}
-      <ScrollView className="flex-1 bg-black">
+      {/* RESULTADOS */}
+      <ScrollView>
+
         {!isSearching ? (
-          // Estado inicial - sem pesquisa
-          <View className="flex-1 items-center justify-center px-6 py-20">
-            <Search size={64} color="#fff" strokeWidth={1.5} />
-            <Text className="text-white/80 text-lg mt-4 text-center">
-              Pesquise por contas e hashtags
-            </Text>
-            <Text className="text-white/50 text-sm mt-2 text-center">
-              Encontre pessoas e tópicos que você gosta
+          <View className="items-center justify-center py-20">
+            <Search size={64} color="#fff" />
+            <Text className="text-white mt-4">
+              Pesquise por usuários
             </Text>
           </View>
-        ) : filteredResults.length > 0 ? (
-          // Resultados encontrados
-          <View className="py-2">
-            {filteredResults.map((result) => (
-              <TouchableOpacity
-                key={result.id}
-                className="flex-row items-center px-4 py-3 active:bg-gray-900"
+        ) : loading ? (
+          <ActivityIndicator size="large" color="#00FF40" style={{ marginTop: 40 }} />
+        ) : results.length > 0 ? (
+          results.map((user) => {
+            const isFollowing = following.includes(user.id)
+
+            return (
+              <View
+                key={user.id}
+                className="flex-row items-center justify-between px-4 py-3"
               >
-                {result.type === 'account' ? (
-                  <>
-                    <Image
-                      source={{ uri: result.avatar }}
-                      className="w-12 h-12 rounded-full border-2 border-[#00FF40]"
-                    />
-                    <View className="flex-1 ml-3">
-                      <Text className="text-white font-semibold text-base">
-                        {result.name}
-                      </Text>
-                      <Text className="text-gray-400 text-sm">
-                        {result.username} • {result.followers} seguidores
-                      </Text>
-                    </View>
-                  </>
-                ) : (
-                  <>
-                    <View className="w-12 h-12 rounded-full bg-gray-800 items-center justify-center">
-                      <Text className="text-[#00FF40] text-xl font-bold">#</Text>
-                    </View>
-                    <View className="flex-1 ml-3">
-                      <Text className="text-white font-semibold text-base">
-                        {result.name}
-                      </Text>
-                      <Text className="text-gray-400 text-sm">
-                        {result.posts}
-                      </Text>
-                    </View>
-                  </>
+                {/* USER */}
+                <View className="flex-row items-center">
+                  <Image
+                    source={{
+                      uri:
+                        user.avatar_url ||
+                        'https://api.dicebear.com/7.x/avataaars/svg?seed=user',
+                    }}
+                    className="w-12 h-12 rounded-full border-2 border-[#00FF40]"
+                  />
+
+                  <View className="ml-3">
+                    <Text className="text-white font-semibold">
+                      {user.nome}
+                    </Text>
+                    <Text className="text-gray-400 text-sm">
+                      @{user.id.slice(0, 8)}
+                    </Text>
+                  </View>
+                </View>
+
+                {/* BOTÃO */}
+                {userId !== user.id && (
+                  <TouchableOpacity
+                    onPress={() => toggleFollow(user.id)}
+                    className={`px-4 py-2 rounded-xl ${
+                      isFollowing ? 'bg-gray-700' : 'bg-[#00FF40]'
+                    }`}
+                  >
+                    <Text
+                      className={`text-xs font-bold ${
+                        isFollowing ? 'text-white' : 'text-black'
+                      }`}
+                    >
+                      {isFollowing ? 'Seguindo' : 'Seguir'}
+                    </Text>
+                  </TouchableOpacity>
                 )}
-              </TouchableOpacity>
-            ))}
-          </View>
+              </View>
+            )
+          })
         ) : (
-          // Nenhum resultado encontrado
-          <View className="flex-1 items-center justify-center px-6 py-20">
-            <Search size={64} color="#374151" strokeWidth={1.5} />
-            <Text className="text-gray-400 text-lg mt-4 text-center">
-              Nenhum resultado encontrado
-            </Text>
-            <Text className="text-gray-600 text-sm mt-2 text-center">
-              Tente pesquisar por outro termo
+          <View className="items-center justify-center py-20">
+            <Text className="text-gray-400">
+              Nenhum usuário encontrado
             </Text>
           </View>
         )}
+
       </ScrollView>
     </SafeAreaView>
-  );
+  )
 }

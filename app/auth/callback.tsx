@@ -11,8 +11,8 @@ export default function Callback() {
       try {
         await supabase.auth.refreshSession()
 
-        const { data } = await supabase.auth.getUser()
-        const user = data?.user
+        const { data: sessionData } = await supabase.auth.getSession()
+        const user = sessionData?.session?.user
 
         // 🔐 usuário não logado
         if (!user) {
@@ -20,7 +20,7 @@ export default function Callback() {
           return
         }
 
-        // 🔐 verifica confirmação (SEM ERRO DE TIPAGEM)
+        // 🔐 VERIFICA CONFIRMAÇÃO (CORRIGIDO TIPAGEM)
         const isConfirmed = (user as any)?.email_confirmed_at
 
         if (!isConfirmed) {
@@ -28,26 +28,23 @@ export default function Callback() {
           return
         }
 
-        // 📦 dados do cadastro
         const metadata = user.user_metadata
 
-        // 🔎 verifica se já existe profile (SEM quebrar se não existir)
-        const { data: existingProfile, error: profileError } = await supabase
+        // 🔎 verifica se já existe profile (sem quebrar)
+        const { data: existingProfile } = await supabase
           .from('profiles')
           .select('id')
           .eq('id', user.id)
           .maybeSingle()
 
-        // =========================
         // 🔥 só cria se não existir
-        // =========================
         if (!existingProfile) {
           const { error } = await supabase
             .from('profiles')
             .insert({
               id: user.id,
               nome: metadata?.full_name || '',
-              age: Number(metadata?.age) || null,
+              age: metadata?.age ? Number(metadata.age) : null,
               phone: metadata?.phone || '',
               avatar_url: null,
             })

@@ -1,243 +1,205 @@
-import * as ImagePicker from 'expo-image-picker';
-import { useRouter } from 'expo-router';
-import { ArrowLeft, Image as ImageIcon, Plus, Video } from 'lucide-react-native';
-import React, { useState } from 'react';
+import * as ImagePicker from 'expo-image-picker'
+import { useRouter } from 'expo-router'
+import { ArrowLeft, Image as ImageIcon, Send, Video } from 'lucide-react-native'
+import React, { useState } from 'react'
 import {
+  ActivityIndicator,
   Alert,
   Image,
-  ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
   View,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+} from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import { supabase } from '../../../src/lib/supabase'
 
-interface MediaFile {
-  type: 'image' | 'video';
-  uri: string;
-  fileName?: string;
-}
+export default function CreatePostScreen() {
+  const router = useRouter()
 
-const CreatePostScreen = () => {
-  const router = useRouter();
-  const [caption, setCaption] = useState('');
-  const [selectedMedia, setSelectedMedia] = useState<MediaFile | null>(null);
-  const [allowComments, setAllowComments] = useState(true);
-  const [allowLikes, setAllowLikes] = useState(true);
+  const [media, setMedia] = useState<any>(null)
+  const [caption, setCaption] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [showCaption, setShowCaption] = useState(false)
 
-  const pickImage = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    
-    if (status !== 'granted') {
-      Alert.alert('Permissão necessária', 'Precisamos de acesso à galeria!');
-      return;
-    }
+  // 📸 PICK MEDIA
+  async function pickMedia(type: 'image' | 'video') {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync()
+    if (!permission.granted) return Alert.alert('Permissão necessária')
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 4],
+      mediaTypes:
+        type === 'image'
+          ? ImagePicker.MediaTypeOptions.Images
+          : ImagePicker.MediaTypeOptions.Videos,
       quality: 1,
-    });
+    })
 
     if (!result.canceled) {
-      setSelectedMedia({
-        type: 'image',
-        uri: result.assets[0].uri,
-        fileName: result.assets[0].fileName || 'image.jpg',
-      });
+      const file = result.assets[0]
+
+      // 🔥 adiciona tipo manual (IMPORTANTE)
+      file.type = type
+
+      setMedia(file)
     }
-  };
+  }
 
-  const pickVideo = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    
-    if (status !== 'granted') {
-      Alert.alert('Permissão necessária', 'Precisamos de acesso à galeria!');
-      return;
+  // 🚀 POST
+  async function handlePost() {
+    if (!media) return Alert.alert('Selecione uma mídia')
+
+    setLoading(true)
+
+    try {
+      const { data: userData } = await supabase.auth.getUser()
+      const user = userData.user
+
+      if (!user) {
+        Alert.alert('Usuário não autenticado')
+        return
+      }
+
+      const fileExt = media.uri.split('.').pop()
+      const fileName = `${Date.now()}.${fileExt}`
+
+      // converter
+      const blob = await (await fetch(media.uri)).blob()
+
+      // 📤 upload
+      const { error: uploadError } = await supabase.storage
+        .from('posts')
+        .upload(fileName, blob, {
+          contentType:
+            media.type === 'video' ? 'video/mp4' : 'image/jpeg',
+        })
+
+      if (uploadError) {
+        console.log(uploadError)
+        Alert.alert('Erro no upload')
+        return
+      }
+
+      // 🔗 pegar URL
+      const { data } = supabase.storage
+        .from('posts')
+        .getPublicUrl(fileName)
+
+      const publicUrl = data.publicUrl
+
+      // 💾 INSERT NA TABELA
+      const { error: dbError } = await supabase.from('posts').insert({
+        user_id: user.id,
+        content: caption,
+        media_url: publicUrl,
+        media_type: media.type === 'video' ? 'video' : 'image',
+        likes: 0,
+      })
+
+      if (dbError) {
+        console.log(dbError)
+        Alert.alert('Erro ao salvar no banco')
+        return
+      }
+
+      Alert.alert('Post publicado 🚀')
+      router.back()
+
+    } catch (e) {
+      console.log(e)
+      Alert.alert('Erro inesperado')
     }
 
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Videos,
-      allowsEditing: true,
-      quality: 1,
-    });
-
-    if (!result.canceled) {
-      setSelectedMedia({
-        type: 'video',
-        uri: result.assets[0].uri,
-        fileName: result.assets[0].fileName || 'video.mp4',
-      });
-    }
-  };
-
-  const handlePost = () => {
-    if (!selectedMedia) {
-      Alert.alert('Atenção', 'Selecione uma foto ou vídeo');
-      return;
-    }
-
-    Alert.alert('Sucesso', 'Post criado com sucesso!', [
-      { text: 'OK', onPress: () => router.back() }
-    ]);
-  };
+    setLoading(false)
+  }
 
   return (
-    <SafeAreaView  className="flex-1 bg-black">
+    <SafeAreaView className="flex-1 bg-black">
+
       <View className="flex-1">
-        {/* Header */}
-        <View className="flex-row items-center justify-between px-6 py-4 border-b border-gray-800">
+
+        {/* PREVIEW */}
+        {media ? (
+          <Image
+            source={{ uri: media.uri }}
+            className="w-full h-full"
+            resizeMode="cover"
+          />
+        ) : (
+          <View className="flex-1 items-center justify-center">
+            <Text className="text-gray-500 text-lg">
+              Escolha uma mídia
+            </Text>
+          </View>
+        )}
+
+        {/* HEADER */}
+        <View className="absolute top-0 left-0 right-0 px-5 py-3">
           <TouchableOpacity onPress={() => router.back()}>
             <ArrowLeft size={28} color="#fff" />
           </TouchableOpacity>
-          <Text className="text-white text-xl font-bold">Criar Post</Text>
-          <View style={{ width: 28 }} />
         </View>
 
-        <ScrollView 
-          className="flex-1 px-6 py-6"
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Media Upload Area */}
-          {!selectedMedia ? (
-            <View className="bg-zinc-900 rounded-2xl mb-6 overflow-hidden">
-              <View className="aspect-square items-center justify-center p-8 border-2 border-dashed border-gray-700">
-                <View className="bg-zinc-800 rounded-full p-6 mb-4">
-                  <Plus size={48} color="#9ca3af" />
-                </View>
-                <Text className="text-gray-400 text-center mb-2 text-base">
-                  Toque para adicionar foto ou vídeo
-                </Text>
-                <Text className="text-gray-500 text-sm text-center mb-6">
-                  Formatos: JPG, PNG, MP4, MOV
-                </Text>
-                
-                {/* Botões de seleção */}
-                <View className="flex-row gap-3">
-                  <TouchableOpacity
-                    onPress={pickImage}
-                    className="flex-row items-center gap-2 bg-zinc-800 px-6 py-3 rounded-lg"
-                  >
-                    <ImageIcon size={20} color="#00FF40" />
-                    <Text className="text-white font-semibold">Foto</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={pickVideo}
-                    className="flex-row items-center gap-2 bg-zinc-800 px-6 py-3 rounded-lg"
-                  >
-                    <Video size={20} color="#00FF40" />
-                    <Text className="text-white font-semibold">Vídeo</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </View>
-          ) : (
-            <View className="relative bg-zinc-900 rounded-2xl mb-6 overflow-hidden">
-              <Image
-                source={{ uri: selectedMedia.uri }}
-                className="w-full aspect-square"
-                resizeMode="cover"
-              />
-              <TouchableOpacity
-                onPress={() => setSelectedMedia(null)}
-                className="absolute top-3 right-3 bg-black/70 rounded-full w-10 h-10 items-center justify-center"
-              >
-                <Text className="text-white text-xl">✕</Text>
-              </TouchableOpacity>
-              <View className="absolute bottom-3 left-3 bg-black/70 px-3 py-2 rounded-full">
-                <Text className="text-white text-sm">
-                  {selectedMedia.type === 'image' ? '📷 Foto' : '🎥 Vídeo'}
-                </Text>
-              </View>
-            </View>
-          )}
-
-          {/* Caption Input */}
-          <View className="mb-6">
-            <Text className="text-gray-400 text-sm mb-3 font-medium">
-              Escreva uma legenda...
-            </Text>
+        {/* CAPTION */}
+        {showCaption && (
+          <View className="absolute bottom-32 left-4 right-4 bg-black/70 rounded-2xl p-4">
             <TextInput
+              placeholder="Escreva algo..."
+              placeholderTextColor="#aaa"
               value={caption}
               onChangeText={setCaption}
-              placeholder="O que você quer compartilhar?"
-              placeholderTextColor="#666"
+              className="text-white text-lg"
               multiline
-              numberOfLines={4}
-              className="bg-zinc-900 text-white rounded-xl px-4 py-4 text-base"
-              style={{ textAlignVertical: 'top' }}
             />
           </View>
+        )}
 
-          {/* Configurações */}
-          <View className="space-y-4">
-            {/* Permitir comentários */}
-            <View className="flex-row items-center justify-between bg-zinc-900 rounded-xl px-5 py-4">
-              <Text className="text-white text-base font-medium">
-                Permitir comentários
-              </Text>
-              <TouchableOpacity
-                onPress={() => setAllowComments(!allowComments)}
-                className={`w-14 h-8 rounded-full justify-center ${
-                  allowComments ? 'bg-green-500' : 'bg-gray-600'
-                }`}
-              >
-                <View
-                  className={`w-6 h-6 rounded-full bg-white shadow-lg ${
-                    allowComments ? 'ml-7' : 'ml-1'
-                  }`}
-                />
-              </TouchableOpacity>
+        {/* TOOLBAR */}
+        <View className="absolute bottom-24 left-0 right-0 flex-row justify-center gap-6">
+
+          <TouchableOpacity onPress={() => pickMedia('image')} className="items-center">
+            <View className="bg-black/70 p-4 rounded-full">
+              <ImageIcon size={22} color="#00FF40" />
             </View>
+            <Text className="text-white text-xs mt-1">Foto</Text>
+          </TouchableOpacity>
 
-            {/* Permitir curtidas */}
-            <View className="flex-row items-center justify-between bg-zinc-900 rounded-xl px-5 py-4">
-              <Text className="text-white text-base font-medium">
-                Permitir curtidas
-              </Text>
-              <TouchableOpacity
-                onPress={() => setAllowLikes(!allowLikes)}
-                className={`w-14 h-8 rounded-full justify-center ${
-                  allowLikes ? 'bg-green-500' : 'bg-gray-600'
-                }`}
-              >
-                <View
-                  className={`w-6 h-6 rounded-full bg-white shadow-lg ${
-                    allowLikes ? 'ml-7' : 'ml-1'
-                  }`}
-                />
-              </TouchableOpacity>
+          <TouchableOpacity onPress={() => pickMedia('video')} className="items-center">
+            <View className="bg-black/70 p-4 rounded-full">
+              <Video size={22} color="#00FF40" />
             </View>
-          </View>
-
-          {/* Espaço extra no final */}
-          <View className="h-6" />
-        </ScrollView>
-
-        {/* Botões de Ação */}
-        <View className="flex-row gap-3 px-6 py-4 border-t border-gray-800">
-          <TouchableOpacity
-            onPress={() => router.back()}
-            className="flex-1 bg-zinc-900 rounded-xl py-4"
-          >
-            <Text className="text-gray-400 text-center font-semibold text-base">
-              Cancelar
-            </Text>
+            <Text className="text-white text-xs mt-1">Vídeo</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={handlePost}
-            className="flex-1 bg-green-500 rounded-xl py-4"
-          >
-            <Text className="text-black text-center font-bold text-base">
-              Compartilhar
-            </Text>
+
+          <TouchableOpacity onPress={() => setShowCaption(!showCaption)} className="items-center">
+            <View className="bg-black/70 p-4 rounded-full">
+              <Text className="text-white text-lg">Aa</Text>
+            </View>
+            <Text className="text-white text-xs mt-1">Texto</Text>
           </TouchableOpacity>
+
         </View>
-      </View>
-    </SafeAreaView>
-  );
-};
 
-export default CreatePostScreen;
+        {/* BOTÃO PUBLICAR */}
+        <TouchableOpacity
+          onPress={handlePost}
+          disabled={loading}
+          className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-[#00FF40] px-10 py-4 rounded-full flex-row items-center gap-2"
+        >
+          {loading ? (
+            <ActivityIndicator color="#000" />
+          ) : (
+            <>
+              <Send size={18} color="#000" />
+              <Text className="text-black font-bold">
+                Publicar
+              </Text>
+            </>
+          )}
+        </TouchableOpacity>
+
+      </View>
+
+    </SafeAreaView>
+  )
+}
