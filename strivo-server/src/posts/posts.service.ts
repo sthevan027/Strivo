@@ -100,6 +100,12 @@ export class PostsService {
         'Uma ou mais mídias não pertencem ao usuário.',
       );
     }
+    const invalidStatus = media.find((m) => m.status !== 'pending');
+    if (invalidStatus) {
+      throw new BadRequestException(
+        'Uma ou mais mídias já foram utilizadas ou não estão pendentes.',
+      );
+    }
 
     return this.prisma.$transaction(async (tx) => {
       const post = await tx.post.create({

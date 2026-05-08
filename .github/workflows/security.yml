@@ -34,4 +34,4 @@ jobs:
 
       - name: Auditoria de dependências
         run: pnpm audit --audit-level=high
-        continue-on-error: true
+        continue-on-error: false
