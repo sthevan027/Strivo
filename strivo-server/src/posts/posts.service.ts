@@ -108,6 +108,21 @@ export class PostsService {
     }
 
     return this.prisma.$transaction(async (tx) => {
+      const mediaUpdate = await tx.media.updateMany({
+        where: {
+          id: { in: dto.mediaIds },
+          owner_id: userId,
+          status: 'pending',
+        },
+        data: { status: 'ready' },
+      });
+
+      if (mediaUpdate.count !== dto.mediaIds.length) {
+        throw new BadRequestException(
+          'Uma ou mais mídias já foram utilizadas ou não estão pendentes.',
+        );
+      }
+
       const post = await tx.post.create({
         data: {
           author_id: userId,
@@ -123,20 +138,6 @@ export class PostsService {
         },
         select: { id: true },
       });
-
-      const mediaUpdate = await tx.media.updateMany({
-        where: {
-          id: { in: dto.mediaIds },
-          owner_id: userId,
-          status: 'pending',
-        },
-        data: { status: 'ready' },
-      });
-      if (mediaUpdate.count !== dto.mediaIds.length) {
-        throw new BadRequestException(
-          'Uma ou mais mídias já foram utilizadas ou não estão pendentes.',
-        );
-      }
 
       return this.getPostById(post.id);
     });

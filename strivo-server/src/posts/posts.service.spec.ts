@@ -142,4 +142,28 @@ describe('PostsService', () => {
     expect(res.id).toBe(99);
     expect(prisma.$transaction).toHaveBeenCalled();
   });
+
+  it('createPost rejeita quando media não está pending', async () => {
+    prisma.media.findMany.mockResolvedValue([
+      { id: 1, owner_id: 1, status: 'pending' },
+      { id: 2, owner_id: 1, status: 'pending' },
+    ]);
+
+    prisma.$transaction.mockImplementation((fn: (tx: unknown) => unknown) => {
+      const tx = {
+        post: { create: jest.fn() },
+        media: { updateMany: jest.fn().mockResolvedValue({ count: 1 }) },
+      };
+      return fn(tx);
+    });
+
+    const svc = new PostsService(
+      prisma as unknown as PrismaService,
+      supabase as unknown as SupabaseService,
+    );
+
+    await expect(
+      svc.createPost(1, { caption: 'oi', mediaIds: [1, 2] }),
+    ).rejects.toBeInstanceOf(BadRequestException);
+  });
 });
