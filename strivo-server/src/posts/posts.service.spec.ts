@@ -107,7 +107,7 @@ describe('PostsService', () => {
     prisma.$transaction.mockImplementation((fn: (tx: unknown) => unknown) => {
       const tx = {
         post: { create: jest.fn().mockResolvedValue({ id: 99 }) },
-        media: { updateMany: jest.fn() },
+        media: { updateMany: jest.fn().mockResolvedValue({ count: 2 }) },
       };
       return fn(tx);
     });
