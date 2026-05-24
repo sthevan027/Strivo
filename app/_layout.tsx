@@ -9,7 +9,11 @@ function RouteGuard({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (isLoading) return;
 
-    const inAuthGroup = segments[0] === "login" || segments[0] === "register";
+    const inAuthGroup =
+      segments[0] === "login" ||
+      segments[0] === "register" ||
+      segments[0] === "verify-email" ||
+      segments[0] === "auth"; // covers auth/callback OAuth flow
 
     if (!user && !inAuthGroup) {
       router.replace("/login");
