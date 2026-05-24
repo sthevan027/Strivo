@@ -1,162 +1,183 @@
- import { router } from 'expo-router'
-import { useState } from 'react'
+import { useAuth } from "@/src/contexts/AuthContext";
+import { api } from "@/src/lib/api";
+import { useEffect, useState } from "react";
 import {
-  KeyboardAvoidingView,
-  Platform,
+  ActivityIndicator,
+  FlatList,
+  Image,
+  RefreshControl,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
-} from 'react-native'
-import { supabase } from '../../src/lib/supabase'
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function Login() {
-  const [email, setEmail] = useState('')
-  const [senha, setSenha] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [errorMsg, setErrorMsg] = useState('')
+interface MediaItem {
+  id: number;
+  path: string;
+  kind: "photo" | "video";
+  bucket: string;
+}
 
-  async function handleLogin() {
-    setErrorMsg('')
+interface FeedPost {
+  id: number;
+  caption: string | null;
+  createdAt: string;
+  author: { id: number; name: string; avatar: string | null };
+  media: MediaItem[];
+}
 
-    // 1️⃣ valida campos
-    if (!email.trim() || !senha.trim()) {
-      setErrorMsg('Preencha email e senha')
-      return
+interface FeedResponse {
+  items: FeedPost[];
+  nextCursor?: string;
+}
+
+export default function HomeScreen() {
+  const { logout } = useAuth();
+  const [posts, setPosts] = useState<FeedPost[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [cursor, setCursor] = useState<string | undefined>();
+  const [hasMore, setHasMore] = useState(true);
+
+  async function loadFeed(reset = false) {
+    try {
+      const cursorParam = reset || !cursor ? "" : `&cursor=${cursor}`;
+      const res = await api.get<FeedResponse>(
+        `/posts/feed?limit=20${cursorParam}`,
+      );
+      if (reset) {
+        setPosts(res.items);
+      } else {
+        setPosts((prev) => [...prev, ...res.items]);
+      }
+      setCursor(res.nextCursor);
+      setHasMore(!!res.nextCursor);
+    } catch (err) {
+      console.log("Erro feed:", err);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
     }
+  }
 
-    setLoading(true)
+  useEffect(() => {
+    loadFeed(true);
+  }, []);
 
-    // 2️⃣ login no Supabase Auth
-    const { error } = await supabase.auth.signInWithPassword({
-      email: email.trim(),
-      password: senha,
-    })
+  function onRefresh() {
+    setRefreshing(true);
+    setCursor(undefined);
+    loadFeed(true);
+  }
 
-    setLoading(false)
+  function onEndReached() {
+    if (hasMore && !loading) loadFeed();
+  }
 
-    // 3️⃣ erro de login
-   
-
-    // ✅ sucesso
-    router.replace('/')
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.center}>
+        <ActivityIndicator color="#4CAF50" size="large" />
+      </SafeAreaView>
+    );
   }
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
-      <View style={styles.container}>
-        <Text style={styles.logo}>S</Text>
-        <Text style={styles.title}>Strivo</Text>
-        <Text style={styles.subtitle}>Entrar na sua conta</Text>
-
-        {errorMsg !== '' && (
-          <Text style={styles.error}>{errorMsg}</Text>
-        )}
-
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          placeholderTextColor="#777"
-          autoCapitalize="none"
-          keyboardType="email-address"
-          value={email}
-          onChangeText={setEmail}
-        />
-
-        <TextInput
-          style={styles.input}
-          placeholder="Senha"
-          placeholderTextColor="#777"
-          secureTextEntry
-          value={senha}
-          onChangeText={setSenha}
-        />
-
-        <TouchableOpacity
-          style={styles.button}
-          onPress={handleLogin}
-          disabled={loading}
-        >
-          <Text style={styles.buttonText}>
-            {loading ? 'Entrando...' : 'Entrar'}
-          </Text>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Strivo</Text>
+        <TouchableOpacity onPress={logout}>
+          <Text style={styles.logoutBtn}>Sair</Text>
         </TouchableOpacity>
-
-        <Text style={styles.footer}>
-          Não tem uma conta?{' '}
-          <Text
-            style={styles.linkGreen}
-            onPress={() => router.push('/auth/register')}
-          >
-            Inscrever-se
-          </Text>
-        </Text>
       </View>
-    </KeyboardAvoidingView>
-  )
+
+      <FlatList
+        data={posts}
+        keyExtractor={(item) => String(item.id)}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#4CAF50"
+          />
+        }
+        onEndReached={onEndReached}
+        onEndReachedThreshold={0.3}
+        ListEmptyComponent={
+          <View style={styles.center}>
+            <Text style={styles.emptyText}>Nenhum post ainda.</Text>
+            <Text style={styles.emptySubText}>Seja o primeiro a publicar!</Text>
+          </View>
+        }
+        renderItem={({ item }) => (
+          <View style={styles.postCard}>
+            <View style={styles.postHeader}>
+              <Image
+                source={{
+                  uri: item.author.avatar ?? "https://i.pravatar.cc/150",
+                }}
+                style={styles.avatar}
+              />
+              <Text style={styles.authorName}>{item.author.name}</Text>
+            </View>
+            {item.media[0] && (
+              <Image
+                source={{ uri: `https://picsum.photos/seed/${item.id}/500` }}
+                style={styles.postImage}
+                resizeMode="cover"
+              />
+            )}
+            {item.caption ? (
+              <Text style={styles.caption}>{item.caption}</Text>
+            ) : null}
+          </View>
+        )}
+      />
+    </SafeAreaView>
+  );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  container: { flex: 1, backgroundColor: "#0F0F0F" },
+  center: {
     flex: 1,
-    backgroundColor: '#0F0F0F',
-    justifyContent: 'center',
-    padding: 24,
+    backgroundColor: "#0F0F0F",
+    justifyContent: "center",
+    alignItems: "center",
   },
-  logo: {
-    color: '#4CAF50',
-    fontSize: 64,
-    fontWeight: 'bold',
-    textAlign: 'center',
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#1a1a1a",
   },
-  title: {
-    color: '#4CAF50',
-    fontSize: 32,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  subtitle: {
-    color: '#999',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  error: {
-    color: '#ff5555',
-    textAlign: 'center',
+  headerTitle: { color: "#4CAF50", fontSize: 22, fontWeight: "bold" },
+  logoutBtn: { color: "#777", fontSize: 14 },
+  emptyText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
+  emptySubText: { color: "#666", fontSize: 13, marginTop: 4 },
+  postCard: {
     marginBottom: 16,
-    fontWeight: 'bold',
+    borderBottomWidth: 1,
+    borderBottomColor: "#1a1a1a",
   },
-  input: {
-    backgroundColor: '#1C1C1C',
-    borderRadius: 10,
-    padding: 16,
-    color: '#FFF',
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: '#4CAF50',
+  postHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 12,
+    paddingVertical: 10,
   },
-  button: {
-    backgroundColor: '#4CAF50',
-    padding: 16,
-    borderRadius: 10,
-    alignItems: 'center',
+  avatar: { width: 36, height: 36, borderRadius: 18, marginRight: 10 },
+  authorName: { color: "#fff", fontWeight: "bold" },
+  postImage: { width: "100%", aspectRatio: 1 },
+  caption: {
+    color: "#ddd",
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    fontSize: 14,
   },
-  buttonText: {
-    color: '#FFF',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  footer: {
-    color: '#999',
-    textAlign: 'center',
-    marginTop: 24,
-  },
-  linkGreen: {
-    color: '#4CAF50',
-    fontWeight: 'bold',
-  },
-})
+});

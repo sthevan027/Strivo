@@ -1,30 +1,38 @@
-import { supabase } from '@/src/lib/supabase'
+/**
+ * profileStorage.ts
+ * Shim de compatibilidade — delega para o backend NestJS.
+ * Mantemos a mesma interface para não quebrar chamadas existentes.
+ */
+import { api } from "@/src/lib/api";
 
-export async function loadProfileData() {
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser()
+export interface ProfileData {
+  id?: number;
+  username?: string;
+  name?: string;
+  bio?: string;
+  email?: string;
+  avatar?: string;
+  phone?: string;
+  youtube?: string;
+  twitch?: string;
+  instagram?: string;
+  twitter?: string;
+}
 
-  if (authError || !user) {
-    console.log('Erro auth ou usuário não logado:', authError)
-    return null
+export async function loadProfileData(): Promise<ProfileData | null> {
+  try {
+    return await api.get<ProfileData>("/users/me");
+  } catch {
+    return null;
   }
+}
 
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .limit(1)
-
-  if (error) {
-    console.log('Erro ao carregar profile:', error)
-    return null
-  }
-
-  if (!data || data.length === 0) {
-    return null
-  }
-
-  return data[0]
+export async function saveProfileData(data: ProfileData): Promise<void> {
+  await api.patch("/users/me", {
+    name: data.name,
+    username: data.username,
+    bio: data.bio,
+    avatar: data.avatar,
+    phone: data.phone,
+  });
 }

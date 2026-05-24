@@ -1,9 +1,10 @@
+import { useAuth } from '@/src/contexts/AuthContext';
+import { api } from '@/src/lib/api';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import { ArrowLeft, Camera, Check, X } from 'lucide-react-native';
 import React, { useEffect, useRef, useState } from 'react';
-import { loadProfileData, saveProfileData, ProfileData } from '@/src/utils/profileStorage';
 import {
   Animated,
   Dimensions,
@@ -43,6 +44,7 @@ interface ProfileForm {
 
 export default function EditProfileScreen() {
   const router = useRouter();
+  const { user, refreshUser } = useAuth();
   const [profileImage, setProfileImage] = useState<string>(
     'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'
   );
@@ -79,32 +81,22 @@ export default function EditProfileScreen() {
     twitter: '',
   });
 
-  // Carregar dados do perfil quando a tela abrir
+  // Carregar dados do perfil a partir do AuthContext
   useEffect(() => {
-    const loadProfile = async () => {
-      try {
-        const profileData = await loadProfileData();
-        setForm({
-          username: profileData.username || 'strivo',
-          fullname: profileData.name || 'Strivo Creator',
-          bio: profileData.bio || 'Connecting creators',
-          email: profileData.email || 'contato@strivo.com',
-          youtube: profileData.youtube || '',
-          twitch: profileData.twitch || '',
-          instagram: profileData.instagram || '',
-          twitter: profileData.twitter || '',
-        });
-        if (profileData.avatar) {
-          setProfileImage(profileData.avatar);
-        }
-      } catch (error) {
-        console.error('Erro ao carregar perfil:', error);
-      } finally {
-        setIsLoading(false);
+    if (user) {
+      setForm((prev) => ({
+        ...prev,
+        username: user.username ?? '',
+        fullname: user.name ?? '',
+        bio: user.bio ?? '',
+        email: user.email ?? '',
+      }));
+      if (user.avatar) {
+        setProfileImage(user.avatar);
       }
-    };
-    loadProfile();
-  }, []);
+    }
+    setIsLoading(false);
+  }, [user]);
 
   // Animação da linha do header
   const handleHeaderHover = (isHover: boolean) => {
@@ -210,45 +202,13 @@ export default function EditProfileScreen() {
     if (!selectedImageUri) return;
 
     try {
-      // Aplicar a imagem selecionada diretamente
-      // O crop circular será feito visualmente pela borda do avatar
       setProfileImage(selectedImageUri);
-      
-      // Salvar a foto imediatamente no storage
-      try {
-        const currentProfile = await loadProfileData();
-        const updatedProfile: ProfileData = {
-          ...currentProfile,
-          avatar: selectedImageUri,
-        };
-        console.log('Salvando foto de perfil:', {
-          uri: selectedImageUri,
-          currentProfile: currentProfile,
-          updatedProfile: updatedProfile,
-        });
-        await saveProfileData(updatedProfile);
-        
-        // Verificar se foi salvo corretamente
-        const verify = await loadProfileData();
-        console.log('Foto de perfil verificada após salvar:', verify.avatar);
-        
-        if (verify.avatar !== selectedImageUri) {
-          console.warn('Aviso: A foto pode não ter sido salva corretamente');
-        }
-      } catch (error) {
-        console.error('Erro ao salvar foto no storage:', error);
-        showNotification('Erro', 'Não foi possível salvar a foto de perfil', 'error');
-        return;
-      }
-      
       setIsCropModalVisible(false);
       setSelectedImageUri(null);
       setZoom(1);
       setImagePosition({ x: 0, y: 0 });
       lastPanPosition.current = { x: 0, y: 0 };
-      
-      // Mostrar notificação de sucesso
-      showNotification('Sucesso', 'Foto de perfil atualizada com sucesso!', 'success', false);
+      showNotification('Sucesso', 'Foto de perfil atualizada!', 'success', false);
     } catch (error) {
       console.error('Erro ao aplicar imagem:', error);
       showNotification('Erro', 'Não foi possível processar a imagem', 'error');
@@ -301,14 +261,8 @@ export default function EditProfileScreen() {
   };
 
   const handleSave = async () => {
-    // Validações
     if (!form.username.trim()) {
       showNotification('Erro', 'O nome de usuário é obrigatório!', 'error');
-      return;
-    }
-
-    if (!form.email.trim() || !form.email.includes('@')) {
-      showNotification('Erro', 'Por favor, insira um e-mail válido!', 'error');
       return;
     }
 
@@ -318,24 +272,16 @@ export default function EditProfileScreen() {
     }
 
     try {
-      // Salvar dados do perfil
-      const profileData: ProfileData = {
-        username: form.username.trim(),
-        name: form.fullname.trim(),
-        bio: form.bio.trim(),
-        email: form.email.trim(),
-        avatar: profileImage,
-        youtube: form.youtube.trim(),
-        twitch: form.twitch.trim(),
-        instagram: form.instagram.trim(),
-        twitter: form.twitter.trim(),
-      };
-
-      await saveProfileData(profileData);
+      await api.patch('/users/me', {
+        name: form.fullname.trim() || undefined,
+        username: form.username.trim() || undefined,
+        bio: form.bio.trim() || undefined,
+      });
+      await refreshUser();
       showNotification('Sucesso!', 'Perfil atualizado com sucesso!', 'success', true);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao salvar perfil:', error);
-      showNotification('Erro', 'Não foi possível salvar o perfil. Tente novamente.', 'error');
+      showNotification('Erro', error.message ?? 'Não foi possível salvar o perfil. Tente novamente.', 'error');
     }
   };
 
