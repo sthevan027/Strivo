@@ -1,176 +1,91 @@
-# Strivo — Documentação Oficial
+# Strivo - Plataforma de Streaming
 
-Este repositório contém a documentação completa do projeto Strivo, incluindo frontend mobile (React Native/Expo) e backend (Node.js/TypeScript).
+[![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=fff)](https://developer.mozilla.org/en-US/docs/Web/HTML)
+[![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=fff)](https://developer.mozilla.org/en-US/docs/Web/CSS)
+[![Tailwind](https://img.shields.io/badge/Tailwind-38B2AC?style=flat&logo=tailwind-css&logoColor=fff)](https://tailwindcss.com/)
+[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=000)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 
-▶ Consulte a versão detalhada em `docs/Frontend.md` (mobile) e `docs/Backend.md` (APIs). Lançamento prioriza experiência mobile-first.
+> Protótipo de plataforma de streaming com integração social e ferramentas para criadores e espectadores.
 
-—
+---
 
-## 🧭 Visão Geral
+## 📱 Sobre o Projeto
 
-O **Strivo** é uma plataforma de lives com forte integração social. O projeto é composto por:
+O **Strivo** é um protótipo de plataforma de streaming que tem como objetivo se tornar referência no mercado de streaming, com forte integração social e ferramentas inovadoras para criadores e espectadores.
 
-- **Frontend Mobile**: React Native/Expo para iOS e Android
-- **Backend**: Node.js/TypeScript com APIs REST e WebSockets
-- **Infraestrutura**: Streaming, CDN, banco de dados escalável
+## 🚀 Como rodar
 
-## 🎯 Funcionalidades MVP (Beta)
-
-### 🔐 1. Autenticação & Perfis
-- Login/cadastro (e-mail, Google, redes sociais)
-- Perfis básicos (nome, foto, bio, seguidores/seguindo)
-- Sistema de seguidores completo
-
-### 📺 2. Lives
-- Iniciar e encerrar live (streaming básico)
-- Chat em tempo real
-- Contador de visualizações e reações
-- Categorias de jogos/temas (GTA, LoL, Just Chatting)
-- Listagem de lives em destaque/populares
-
-### 🧭 3. Exploração
-- Página inicial com lives em alta
-- Busca por streamer/jogo
-- Destaque para top streamers do mês
-
-### 💬 4. Engajamento
-- Curtir e comentar em clipes/postagens
-- Ranking de streamers
-- Destaque para "streamers do mês"
-
-### 💸 5. Monetização (básico)
-- Sistema de apoio direto (doações R$5, R$10, R$25, R$50)
-- Histórico de apoios no perfil
-
-### 🧩 6. Infraestrutura
-- Streaming estável (WebRTC, RTMP)
-- CDN para vídeos
-- Banco de dados escalável
-- Logs e métricas de desempenho
-
-Funcionalidades pós-beta estão descritas em `docs/Frontend.md`.
-
-—
-
-## 🧱 Stack Sugerida
-
-### Frontend Mobile
-- Framework: React Native + Expo (TypeScript)
-- Navegação: Expo Router (React Navigation)
-- Estilos: NativeWind/Tamagui
-- Estado: TanStack Query + Zustand
-- Realtime: Socket.IO Client / WebSocket
-- Player: expo-av / react-native-video; WebRTC quando aplicável
-- Formulários: React Hook Form + Zod
-- Storage seguro: expo-secure-store
-- Push/OTA: expo-notifications, expo-updates
-- Qualidade: ESLint, Prettier, Husky + lint-staged
-- Testes: Jest + @testing-library/react-native; Detox/Maestro (E2E)
-
-### Backend
-- Runtime: Node.js + TypeScript
-- Framework: Express.js ou Fastify
-- Banco: PostgreSQL + Redis (cache)
-- ORM: Prisma ou TypeORM
-- Auth: JWT + refresh tokens
-- Realtime: Socket.IO
-- Streaming: WebRTC SFU, RTMP, HLS
-- CDN: CloudFlare ou AWS CloudFront
-- Deploy: Docker + Kubernetes
-- Monitoramento: Prometheus + Grafana
-
-> Gerenciador de pacotes: usamos pnpm. Todos os comandos abaixo usam pnpm.
-
-—
-
-## ▶️ Como Rodar Localmente
-
-### Frontend Mobile
-1. Requisitos: Node LTS (>=18), pnpm (>=9), Expo CLI
-2. Instalar dependências:
-
+1. Clone o repositório:
 ```bash
-pnpm install
+git clone https://github.com/sthevan027/Strivo.git
+cd Strivo
 ```
 
-3. Criar `.env` com variáveis:
+2. Abra o arquivo `index.html` em qualquer navegador moderno
+3. Navegue entre as páginas usando os links e botões
 
-```bash
-EXPO_PUBLIC_API_URL=http://localhost:4000
-EXPO_PUBLIC_SOCKET_URL=http://localhost:4000
-EXPO_PUBLIC_CDN_URL=http://localhost:8080
-```
+## 🎯 Funcionalidades Implementadas
 
-4. Executar:
+### ✅ Versão Beta (MVP)
 
-```bash
-pnpm expo start
-pnpm expo run:android
-pnpm expo run:ios
-```
+- **Página Inicial**: Top streamers do mês, lives em destaque e categorias principais
+- **Perfil de Usuário**: Interface similar ao Instagram com estatísticas e abas
+- **Categorias**: Principais categorias ao vivo e seção de interações
+- **Sistema de Apoio**: Doações diretas aos streamers com valores fixos
+- **Ranking**: Top 5 streamers mais populares e ranking geral
+- **Configurações**: Interface de configurações inspirada no Meta
+- **Busca**: Página de busca com categorias e streamers populares
 
-### Backend
-1. Requisitos: Node LTS (>=18), PostgreSQL, Redis
-2. Instalar dependências:
+### 🎨 Design
 
-```bash
-pnpm install
-```
+- **Tema Escuro**: Interface moderna com cores escuras
+- **Cor Primária**: Verde vibrante (#53fc18) para elementos de destaque
+- **Responsivo**: Adaptado para desktop e mobile
+- **Animações**: Transições suaves e efeitos hover
 
-3. Criar `.env` com variáveis:
+## 🛠️ Tecnologias
 
-```bash
-DATABASE_URL=postgresql://user:pass@localhost:5432/strivo
-REDIS_URL=redis://localhost:6379
-JWT_SECRET=your-secret-key
-API_PORT=4000
-```
+| Tecnologia | Uso |
+|------------|-----|
+| HTML5 | Estrutura semântica |
+| CSS3 | Estilos e animações |
+| Tailwind CSS | Framework CSS |
+| JavaScript | Interatividade |
 
-4. Executar:
-
-```bash
-pnpm dev
-```
-
-—
-
-## 🗂️ Estrutura de Pastas (sugerida)
+## 📁 Estrutura do Projeto
 
 ```
 Strivo/
-├─ frontend/                   # App mobile (React Native/Expo)
-│  ├─ app/                     # Rotas (Expo Router)
-│  ├─ assets/                  # Ícones, fontes, imagens
-│  └─ src/                     # Código fonte
-├─ backend/                    # APIs (Node.js/TypeScript)
-│  ├─ src/
-│  │  ├─ controllers/
-│  │  ├─ services/
-│  │  ├─ repositories/
-│  │  ├─ routes/
-│  │  └─ models/
-│  └─ tests/
-├─ docs/                       # Documentação
-│  ├─ Frontend.md
-│  └─ Backend.md
-└─ README.md
+├── index.html          # Página inicial
+├── profile.html        # Perfil do usuário
+├── categories.html     # Categorias e interações
+├── support.html        # Sistema de apoio/doação
+├── ranking.html        # Ranking de streamers
+├── settings.html       # Configurações
+├── search.html         # Página de busca
+├── styles.css          # Estilos principais
+├── profile.css         # Estilos do perfil
+├── Acompanhamento-Semanal/
+└── README.md
 ```
 
-—
+## 🎨 Paleta de Cores
 
-## 🔐 1. Autenticação & Perfis (MVP)
+- **Primária**: #53fc18 (Verde vibrante)
+- **Primária Escura**: #45d614
+- **Fundo Escuro**: #0f0f0f
+- **Card Escuro**: #1a1a1a
+- **Borda Escura**: #2a2a2a
 
-- Login/cadastro por e-mail e provedores (`expo-auth-session`)
-- Sessão com tokens (secure storage); proteção de rotas (guards)
-- Perfis: nome, foto, bio, contagens (seguidores/seguindo)
-- Ação seguir/deixar de seguir, listagens de seguidores/seguindo
+## 🔮 Roadmap
 
-Páginas/componentes:
-- `app/(auth)/login`, `app/(auth)/signup`
-- `app/profile/[username]`
-- `ProfileHeader`, `FollowButton`, `Avatar`, `BioEditor`
+- Lives em tempo real com chat interativo
+- Sistema de assinaturas recorrentes
+- Clips automáticos e VOD
+- Feed social com posts e stories
+- Dashboard para streamers
 
-—
+---
 
 ## 📺 2. Lives (MVP)
 
@@ -358,3 +273,5 @@ Este projeto está sob licença proprietária. Todos os direitos reservados.
 **© 2024 Strivo. Todos os direitos reservados.**
 
 É proibida a reprodução, distribuição, modificação ou uso comercial sem autorização expressa por escrito. Marcas, design e assets são propriedade da Strivo.
+
+**Desenvolvido por [Sthevan Santos](https://github.com/sthevan027).**
