@@ -11,8 +11,7 @@ import { JwtStrategy } from './jwt.strategy';
     JwtModule.register({
       secret: process.env.JWT_SECRET,
       signOptions: {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        expiresIn: (process.env.JWT_EXPIRES_IN ?? '1d') as any,
+        expiresIn: process.env.JWT_EXPIRES_IN ?? '1d',
       },
     }),
   ],
