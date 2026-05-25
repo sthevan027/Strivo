@@ -67,6 +67,11 @@ export class UsersService {
     if (followerId === followingId) {
       throw new BadRequestException('Não é possível seguir a si mesmo.');
     }
+    const target = await this.prisma.user.findUnique({
+      where: { id: followingId },
+      select: { id: true },
+    });
+    if (!target) throw new NotFoundException('Usuário não encontrado.');
     await this.prisma.follow.upsert({
       where: {
         follower_id_following_id: { follower_id: followerId, following_id: followingId },
