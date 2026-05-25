@@ -32,6 +32,8 @@ yarn-error.*
 
 # local env files
 .env*.local
+.dotenv
+.env
 
 # typescript
 *.tsbuildinfo
@@ -95,3 +97,5 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 .cursorrules
 .cursor
 .idea
+.vscode
+.claude
