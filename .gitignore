@@ -1,19 +1,55 @@
+# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
+
+# dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro
+.metro-health-check*
+
+# debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+*.pem
+
+# local env files
+.env*.local
+
+# typescript
+*.tsbuildinfo
+
+app-example
+
+# generated native folders
+/ios
+/android
+
 # compiled output
-/dist
-/node_modules
 /build
 
 # Logs
 logs
 *.log
-npm-debug.log*
 pnpm-debug.log*
-yarn-debug.log*
-yarn-error.log*
 lerna-debug.log*
-
-# OS
-.DS_Store
 
 # Tests
 /coverage
@@ -27,7 +63,6 @@ lerna-debug.log*
 *.launch
 .settings/
 *.sublime-workspace
-.vscode
 
 # IDE - VSCode
 .vscode/*
@@ -36,7 +71,7 @@ lerna-debug.log*
 !.vscode/launch.json
 !.vscode/extensions.json
 
-# dotenv environment variable files
+# dotenv
 .env
 .env.development.local
 .env.test.local
@@ -53,11 +88,10 @@ pids
 *.seed
 *.pid.lock
 
-# Diagnostic reports (https://nodejs.org/api/report.html)
+# Diagnostic reports
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 # IDE
 .cursorrules
 .cursor
-.vscode
 .idea

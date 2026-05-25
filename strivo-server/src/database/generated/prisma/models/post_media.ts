@@ -186,7 +186,7 @@ export type Post_mediaGroupByOutputType = {
   _max: Post_mediaMaxAggregateOutputType | null
 }
 
-type GetPost_mediaGroupByPayload<T extends post_mediaGroupByArgs> = Prisma.PrismaPromise<
+export type GetPost_mediaGroupByPayload<T extends post_mediaGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<Post_mediaGroupByOutputType, T['by']> &
       {
@@ -1222,6 +1222,11 @@ export type post_mediaFindManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Skip the first `n` post_medias.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of post_medias.
+   */
   distinct?: Prisma.Post_mediaScalarFieldEnum | Prisma.Post_mediaScalarFieldEnum[]
 }
 

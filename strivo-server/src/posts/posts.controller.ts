@@ -1,8 +1,10 @@
 import {
   Body,
   Controller,
+  DefaultValuePipe,
   Get,
   Param,
+  ParseIntPipe,
   Post,
   Query,
   UseGuards,
@@ -32,12 +34,15 @@ export class PostsController {
   }
 
   @Get('feed')
-  getFeed(@Query('limit') limit?: string, @Query('cursor') cursor?: string) {
-    return this.posts.getFeed(limit ? Number(limit) : 20, cursor);
+  getFeed(
+    @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit: number,
+    @Query('cursor') cursor?: string,
+  ) {
+    return this.posts.getFeed(limit, cursor);
   }
 
   @Get(':id')
-  getById(@Param('id') id: string) {
-    return this.posts.getPostById(Number(id));
+  getById(@Param('id', ParseIntPipe) id: number) {
+    return this.posts.getPostById(id);
   }
 }
