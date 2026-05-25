@@ -39,12 +39,12 @@ pnpm start:dev             # http://localhost:3000
 ### Frontend
 
 ```bash
-# na raiz do projeto
+cd strivo-app
 npm install
 npx expo start             # abre no Expo Go (iOS/Android) ou emulador
 ```
 
-> Configure `EXPO_PUBLIC_API_URL=http://localhost:3000` no `.env` da raiz.
+> Configure `EXPO_PUBLIC_API_URL=http://localhost:3000` no `.env` dentro de `strivo-app/`.
 
 ---
 
@@ -85,20 +85,18 @@ npx expo start             # abre no Expo Go (iOS/Android) ou emulador
 ## Estrutura do Projeto
 
 ```
-Strivo/
-├── app/                          # Frontend (Expo Router)
-│   ├── (tabs)/                   # Abas principais
-│   │   ├── home.tsx              # Feed de posts (NestJS)
-│   │   ├── screens/              # Telas nas abas
-│   │   │   ├── searchScreen.tsx  # Busca (Supabase — pendente migração)
-│   │   │   ├── streams.tsx       # Categorias e top streamers (mock)
-│   │   │   ├── reels.tsx         # Reels
-│   │   │   └── profile.tsx       # Perfil (NestJS)
-│   ├── auth/callback.tsx         # Callback OAuth
-│   ├── login.tsx                 # Login (NestJS)
-│   ├── register.tsx              # Cadastro (NestJS)
-│   └── screens/                  # Telas secundárias
-│       ├── configuration.tsx     # Configurações
+Strivo/                               # Monorepo
+├── strivo-app/                       # Frontend (React Native / Expo)
+│   ├── app/                          # Rotas (Expo Router)
+│   │   ├── (tabs)/                   # Abas principais
+│   │   │   ├── home.tsx              # Feed de posts (NestJS)
+│   │   │   └── screens/              # Telas nas abas
+│   │   │       ├── searchScreen.tsx  # Busca (Supabase — pendente migração)
+│   │   │       ├── streams.tsx       # Categorias e top streamers (mock)
+│   │   │       ├── reels.tsx         # Reels
+│   │   │       └── profile.tsx       # Perfil (NestJS)
+│   │   ├── auth/callback.tsx         # Callback OAuth
+│   │   ├── login.tsx                 # guration.tsx     # Configurações
 │       ├── edit-profile.tsx      # Editar perfil
 │       ├── suport-creator.tsx    # Apoiar streamer (UI)
 │       ├── live.tsx              # Player de live (UI)
@@ -176,6 +174,25 @@ post_media  post_id, media_id, order
 - [ ] **Lives em tempo real**: WebRTC / RTMP + chat via WebSocket
 - [ ] **VOD/Clips**: gravação e reprodução de conteúdo ao vivo
 - [ ] **Notificações push**: início de live, novas interações
+- [ ] **Dashboard do streamer**: analytics de audiência
+- [ ] **Assinaturas recorrentes**: subscribers
+
+---
+
+## Qualidade
+
+- ESLint + Prettier (pre-commit via CI)
+- Conventional Commits (`feat/`, `fix/`, `chore/`, `docs/`)
+- CI: GitHub Actions (lint + typecheck + build)
+
+---
+
+## Licença
+
+Projeto proprietário. Todos os direitos reservados.
+
+**© 2025 Strivo. Desenvolvido por [Sthevan Santos](https://github.com/sthevan027).**
+�cio de live, novas interações
 - [ ] **Dashboard do streamer**: analytics de audiência
 - [ ] **Assinaturas recorrentes**: subscribers
 
