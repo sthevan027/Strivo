@@ -11,5 +11,6 @@
 export type * from './models/user'
 export type * from './models/post'
 export type * from './models/media'
+export type * from './models/follow'
 export type * from './models/post_media'
 export type * from './commonInputTypes'

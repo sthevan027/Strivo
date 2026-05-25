@@ -1,277 +1,196 @@
-# Strivo - Plataforma de Streaming
+# Strivo — Plataforma de Streaming
 
-[![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=fff)](https://developer.mozilla.org/en-US/docs/Web/HTML)
-[![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=fff)](https://developer.mozilla.org/en-US/docs/Web/CSS)
-[![Tailwind](https://img.shields.io/badge/Tailwind-38B2AC?style=flat&logo=tailwind-css&logoColor=fff)](https://tailwindcss.com/)
-[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=000)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![React Native](https://img.shields.io/badge/React_Native-20232A?style=flat&logo=react&logoColor=61DAFB)](https://reactnative.dev/)
+[![Expo](https://img.shields.io/badge/Expo_54-000020?style=flat&logo=expo&logoColor=fff)](https://expo.dev/)
+[![NestJS](https://img.shields.io/badge/NestJS_11-E0234E?style=flat&logo=nestjs&logoColor=fff)](https://nestjs.com/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=fff)](https://www.typescriptlang.org/)
+[![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=flat&logo=prisma&logoColor=fff)](https://www.prisma.io/)
+[![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=flat&logo=supabase&logoColor=fff)](https://supabase.com/)
 
-> Protótipo de plataforma de streaming com integração social e ferramentas para criadores e espectadores.
+> Plataforma mobile de streaming com integração social, criação de conteúdo e ferramentas para criadores e espectadores.
 
 ---
 
-## 📱 Sobre o Projeto
+## Stack
 
-O **Strivo** é um protótipo de plataforma de streaming que tem como objetivo se tornar referência no mercado de streaming, com forte integração social e ferramentas inovadoras para criadores e espectadores.
+| Camada | Tecnologia |
+|--------|-----------|
+| **Frontend** | React Native 0.81 + Expo 54 + Expo Router |
+| **Estilização** | NativeWind 4 (Tailwind CSS) |
+| **Backend** | NestJS 11 + TypeScript |
+| **ORM** | Prisma 7 + PostgreSQL |
+| **Storage** | Supabase Storage (upload de mídia) |
+| **Auth** | JWT via `@nestjs/jwt` + bcryptjs |
+| **Ícones** | lucide-react-native + @expo/vector-icons |
 
-## 🚀 Como rodar
+---
 
-1. Clone o repositório:
+## Como rodar
+
+### Backend
+
 ```bash
-git clone https://github.com/sthevan027/Strivo.git
-cd Strivo
+cd strivo-server
+cp env.example .env        # preencha DATABASE_URL, JWT_SECRET, SUPABASE_*
+pnpm install
+pnpm start:dev             # http://localhost:3000
 ```
 
-2. Abra o arquivo `index.html` em qualquer navegador moderno
-3. Navegue entre as páginas usando os links e botões
+### Frontend
 
-## 🎯 Funcionalidades Implementadas
+```bash
+# na raiz do projeto
+npm install
+npx expo start             # abre no Expo Go (iOS/Android) ou emulador
+```
 
-### ✅ Versão Beta (MVP)
+> Configure `EXPO_PUBLIC_API_URL=http://localhost:3000` no `.env` da raiz.
 
-- **Página Inicial**: Top streamers do mês, lives em destaque e categorias principais
-- **Perfil de Usuário**: Interface similar ao Instagram com estatísticas e abas
-- **Categorias**: Principais categorias ao vivo e seção de interações
-- **Sistema de Apoio**: Doações diretas aos streamers com valores fixos
-- **Ranking**: Top 5 streamers mais populares e ranking geral
-- **Configurações**: Interface de configurações inspirada no Meta
-- **Busca**: Página de busca com categorias e streamers populares
+---
 
-### 🎨 Design
+## Estado do MVP
 
-- **Tema Escuro**: Interface moderna com cores escuras
-- **Cor Primária**: Verde vibrante (#53fc18) para elementos de destaque
-- **Responsivo**: Adaptado para desktop e mobile
-- **Animações**: Transições suaves e efeitos hover
+### ✅ Implementado
 
-## 🛠️ Tecnologias
+| Feature | Frontend | Backend |
+|---------|----------|---------|
+| **Autenticação** | `app/login.tsx`, `app/register.tsx` | `POST /auth/register`, `POST /auth/login` |
+| **Perfil de usuário** | `app/screens/profile.tsx`, `app/screens/edit-profile.tsx` | `GET /users/me`, `PATCH /users/me` |
+| **Feed de posts** | `app/(tabs)/home.tsx` | `GET /posts/feed`, `GET /posts/:id` |
+| **Criação de post** | `app/screens/create-post.tsx` | `POST /posts/uploads`, `POST /posts` |
+| **Categorias/Streams** | `app/screens/streams.tsx` (mock) | — |
+| **Sistema de apoio** | `app/screens/suport-creator.tsx` (UI) | — |
+| **Configurações** | `app/screens/configuration.tsx` | — |
+| **Reels** | `app/screens/reels.tsx` | — |
+| **Chat** | `app/screens/chat/` | — |
 
-| Tecnologia | Uso |
-|------------|-----|
-| HTML5 | Estrutura semântica |
-| CSS3 | Estilos e animações |
-| Tailwind CSS | Framework CSS |
-| JavaScript | Interatividade |
+### ⚠️ Parcial
 
-## 📁 Estrutura do Projeto
+| Feature | Problema |
+|---------|---------|
+| **Busca** | `app/screens/searchScreen.tsx` usa Supabase diretamente — não migrada para o NestJS |
+| **Home** | Feed ok, mas faltam seções "Top Streamers do Mês" e "Lives em Destaque" |
+| **Categorias** | Dados estáticos (mock) — sem backend |
+
+### ❌ Pendente
+
+| Feature | Situação |
+|---------|---------|
+| **Ranking** | Nenhuma tela ou endpoint criados |
+| **Doações (API)** | UI pronta, sem integração real de pagamento |
+| **Lives em tempo real** | UI de player existe, sem streaming backend (WebRTC/RTMP) |
+
+---
+
+## Estrutura do Projeto
 
 ```
 Strivo/
-├── index.html          # Página inicial
-├── profile.html        # Perfil do usuário
-├── categories.html     # Categorias e interações
-├── support.html        # Sistema de apoio/doação
-├── ranking.html        # Ranking de streamers
-├── settings.html       # Configurações
-├── search.html         # Página de busca
-├── styles.css          # Estilos principais
-├── profile.css         # Estilos do perfil
-├── Acompanhamento-Semanal/
-└── README.md
+├── app/                          # Frontend (Expo Router)
+│   ├── (tabs)/                   # Abas principais
+│   │   ├── home.tsx              # Feed de posts (NestJS)
+│   │   ├── screens/              # Telas nas abas
+│   │   │   ├── searchScreen.tsx  # Busca (Supabase — pendente migração)
+│   │   │   ├── streams.tsx       # Categorias e top streamers (mock)
+│   │   │   ├── reels.tsx         # Reels
+│   │   │   └── profile.tsx       # Perfil (NestJS)
+│   ├── auth/callback.tsx         # Callback OAuth
+│   ├── login.tsx                 # Login (NestJS)
+│   ├── register.tsx              # Cadastro (NestJS)
+│   └── screens/                  # Telas secundárias
+│       ├── configuration.tsx     # Configurações
+│       ├── edit-profile.tsx      # Editar perfil
+│       ├── suport-creator.tsx    # Apoiar streamer (UI)
+│       ├── live.tsx              # Player de live (UI)
+│       ├── notifications.tsx     # Notificações
+│       ├── chat/                 # Chat (DMs e grupos)
+│       ├── configs/              # Sub-telas de configurações
+│       └── profile/              # Métricas e outros perfis
+│
+├── src/
+│   ├── components/               # Componentes reutilizáveis
+│   ├── contexts/AuthContext.tsx  # Estado global de autenticação
+│   ├── lib/api.ts                # Cliente HTTP (JWT automático)
+│   └── services/follow.ts        # Follow/unfollow
+│
+├── assets/images/                # Imagens e ícones
+│
+└── strivo-server/                # Backend (NestJS)
+    └── src/
+        ├── auth/                 # JWT + bcrypt (register, login)
+        ├── users/                # Perfil (GET/PATCH /users/me)
+        ├── posts/                # Feed, criação e upload
+        ├── supabase/             # Storage de mídia
+        └── database/             # Prisma schema + migrations
 ```
-
-## 🎨 Paleta de Cores
-
-- **Primária**: #53fc18 (Verde vibrante)
-- **Primária Escura**: #45d614
-- **Fundo Escuro**: #0f0f0f
-- **Card Escuro**: #1a1a1a
-- **Borda Escura**: #2a2a2a
-
-## 🔮 Roadmap
-
-- Lives em tempo real com chat interativo
-- Sistema de assinaturas recorrentes
-- Clips automáticos e VOD
-- Feed social com posts e stories
-- Dashboard para streamers
 
 ---
 
-## 📺 2. Lives (MVP)
+## API — Endpoints Disponíveis
 
-- Iniciar/encerrar live (UI do streamer) com exibição do status
-- Player para espectadores (expo-av/react-native-video; WebRTC quando aplicável)
-- Chat em tempo real (mensagens, moderação básica do cliente)
-- Contadores: espectadores e reações (com throttle/debounce)
-- Categorias de jogos/temas e lives em destaque/populares
+```
+POST  /auth/register          Cadastro (name, email, password)
+POST  /auth/login             Login → { access_token }
 
-Páginas/componentes:
-- `app/live/[id]` (controles condicionais para streamer)
-- `LivePlayer`, `LiveControls`, `ReactionBar`, `ViewerCount`, `ChatPanel`
+GET   /users/me        🔒    Dados do usuário logado
+PATCH /users/me        🔒    Atualizar perfil
 
-—
+POST  /posts/uploads   🔒    Gerar URL de upload (Supabase Storage)
+POST  /posts           🔒    Criar post com mídias vinculadas
+GET   /posts/feed      🔒    Feed paginado (cursor-based)
+GET   /posts/:id       🔒    Post individual
 
-## 🧭 3. Exploração (MVP)
-
-- Home com lives em alta e destaques
-- Busca por streamer/jogo/categoria com sugestões
-- Destaque para top streamers do mês
-
-Páginas/componentes:
-- `app/(public)/` (Home)
-- `app/(public)/search`
-- `LiveCard`, `CategoryPill`, `TopStreamersCarousel`
-
-—
-
-## 💬 4. Engajamento (MVP)
-
-- Curtir e comentar em clipes/postagens relacionadas
-- Ranking de streamers e destaque de “streamers do mês”
-
-Páginas/componentes:
-- `app/(public)/ranking`
-- `ClipCard`, `LikeButton`, `CommentList`, `MonthlyHighlight`
-
-—
-
-## 💸 5. Monetização (MVP)
-
-- Apoio direto (doações) com valores fixos: R$5, R$10, R$25, R$50
-- Histórico de apoios no perfil do usuário/streamer
-
-Páginas/componentes:
-- `DonateModal`, `DonateButton`, `SupportHistory`
-
-—
-
-## 🧩 6. Infraestrutura (MVP)
-
-- **Streaming**: WebRTC, RTMP para publicação móvel
-- **CDN**: otimização de entrega de conteúdo
-- **Banco de dados**: sincronização offline/online
-- **Logs e métricas**: desempenho, erros, analytics
-- **OTA updates**: atualizações over-the-air
-- **Push notifications**: para engajamento
-
-—
-
-## 🔗 Integração (Contratos Mock do Front)
-
-Rotas/serviços que o frontend espera consumir (sujeitos a ajuste durante implementação do backend):
-
-```ts
-// Auth
-POST /auth/login { email, password }
-POST /auth/signup { name, email, password }
-POST /auth/provider/{google|...} { token }
-GET  /auth/session -> { user, tokens }
-POST /auth/logout
-
-// Perfil & social
-GET  /profiles/:username
-POST /profiles/:username/follow
-DELETE /profiles/:username/follow
-GET  /profiles/:username/followers
-GET  /profiles/:username/following
-
-// Lives
-GET  /lives?status=live|scheduled&category=...
-GET  /lives/:id -> { playbackUrl, title, category, streamer }
-POST /lives/:id/reactions { type }
-GET  /lives/:id/viewers
-
-// Exploração
-GET  /search?q=...
-GET  /top-streamers?period=month
-
-// Engajamento
-POST /clips/:id/like
-POST /clips/:id/comment { text }
-GET  /ranking?period=month
-
-// Monetização
-POST /donations { toStreamerId, amount, message? }
-GET  /donations/history?userId=...
+🔒 = requer Authorization: Bearer <token>
 ```
 
-Sockets (eventos cliente):
+---
 
-```ts
-connect -> join_live_room { liveId }
-on message:new -> { id, user, text, sentAt }
-emit message:send -> { text }
-on live:viewers -> { count }
-on live:reaction -> { type, total }
+## Banco de Dados (Prisma Schema)
+
+```
+user        id, name, email, password, username, bio, phone, avatar
+post        id, author_id, caption, created_at
+media       id, owner_id, bucket, path, kind (photo|video), status
+post_media  post_id, media_id, order
 ```
 
-—
+---
 
-## 🧑‍🎨 UI/UX
+## Design
 
-- Design system com tokens: cores, tipografia, espaçamentos e raios
-- Tema escuro padrão; modo claro como futura melhoria
-- Padrões de navegação consistentes, feedbacks em tempo real (toasts)
-- Estados de carregamento e vazios claros (skeletons)
+- **Tema**: escuro por padrão
+- **Cor primária**: `#00FF40` / `#53FC18` (verde neon)
+- **Fundo**: `#000000` / `#0F0F0F`
+- **Card**: `#1A1A1A`
+- **Borda**: `#2A2A2A`
 
-Paleta base sugerida:
-- Primária (destaques): `#53FC18`
-- Fundo escuro: `#0F0F0F`
-- Cartão: `#1A1A1A`
-- Borda: `#2A2A2A`
+---
 
-—
+## Roadmap — Próximas Entregas
 
-## 🧪 Testes
+- [ ] **Ranking**: tela + endpoint `GET /ranking` (top streamers por atividade)
+- [ ] **Busca**: migrar `searchScreen.tsx` do Supabase para `GET /search?q=`
+- [ ] **Home enriquecida**: seções "Top Streamers" e "Lives em Destaque"
+- [ ] **Follows**: `POST /users/:id/follow`, `DELETE /users/:id/follow`
+- [ ] **Doações (API)**: `POST /donations` com histórico
+- [ ] **Lives em tempo real**: WebRTC / RTMP + chat via WebSocket
+- [ ] **VOD/Clips**: gravação e reprodução de conteúdo ao vivo
+- [ ] **Notificações push**: início de live, novas interações
+- [ ] **Dashboard do streamer**: analytics de audiência
+- [ ] **Assinaturas recorrentes**: subscribers
 
-### Frontend Mobile
-- **Unitários**: componentes e hooks críticos (Jest + @testing-library/react-native)
-- **Integração**: páginas/fluxos (Testing Library)
-- **E2E**: login, live, chat, doação (Detox/Maestro)
+---
 
-### Backend
-- **Unitários**: services e repositories (Jest)
-- **Integração**: APIs completas (Supertest)
-- **E2E**: fluxos críticos (Postman/Newman)
-- **Load**: performance com Artillery
+## Qualidade
 
-Scripts:
-```bash
-pnpm test
-pnpm test:watch
-pnpm test:e2e
-pnpm test:load
-```
+- ESLint + Prettier (pre-commit via CI)
+- Conventional Commits (`feat/`, `fix/`, `chore/`, `docs/`)
+- CI: GitHub Actions (lint + typecheck + build)
 
-—
+---
 
-## 🧹 Qualidade & Padrões
+## Licença
 
-- ESLint + Prettier com checagem em pre-commit (Husky + lint-staged)
-- Mensagens de commit (Conventional Commits)
-- Nomes de branch: `feat/`, `fix/`, `chore/`, `docs/`
-- PRs com checklist: testes passam, cobertura mínima, UX revisada
+Projeto proprietário. Todos os direitos reservados.
 
-—
-
-## 🔮 Funcionalidades Futuras (pós-beta)
-
-- Clips automáticos (highlights)
-- Lives gravadas (VOD)
-- Assinaturas recorrentes (subscribers)
-- Integração social (compartilhar live/clipes)
-- Notificações push (início de live)
-- Selos/achievements de engajamento
-- Loja de créditos/moedas virtuais
-- Modo escuro/claro customizável
-- Ferramentas de moderação (banir, mutar no chat)
-- Dashboard do streamer (analytics de audiência)
-
-—
-
-## 👤 Papéis (Contexto)
-
-- **Chefe do projeto**: liderança estratégica, roadmap e monetização
-- **Engenheiro de software**: estrutura técnica, documentação, revisão de PRs, qualidade e escalabilidade do sistema completo
-
-—
-
-## 📄 Licença e Avisos
-
-Este projeto está sob licença proprietária. Todos os direitos reservados.
-
-**© 2024 Strivo. Todos os direitos reservados.**
-
-É proibida a reprodução, distribuição, modificação ou uso comercial sem autorização expressa por escrito. Marcas, design e assets são propriedade da Strivo.
-
-**Desenvolvido por [Sthevan Santos](https://github.com/sthevan027).**
+**© 2025 Strivo. Desenvolvido por [Sthevan Santos](https://github.com/sthevan027).**

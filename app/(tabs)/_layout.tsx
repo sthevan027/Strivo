@@ -130,6 +130,7 @@ export default function TabsLayout() {
         />
 
         {/* TELAS OCULTAS */}
+        <Tabs.Screen name="screens/ranking" options={{ href: null }} />
         <Tabs.Screen name="screens/story-screen" options={{ href: null }} />
         <Tabs.Screen name="screens/profile/metrics" options={{ href: null }} />
         <Tabs.Screen

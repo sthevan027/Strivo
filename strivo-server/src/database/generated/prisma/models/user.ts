@@ -258,6 +258,8 @@ export type userWhereInput = {
   updated_at?: Prisma.DateTimeNullableFilter<"user"> | Date | string | null
   posts?: Prisma.PostListRelationFilter
   media?: Prisma.MediaListRelationFilter
+  following_list?: Prisma.FollowListRelationFilter
+  followers_list?: Prisma.FollowListRelationFilter
 }
 
 export type userOrderByWithRelationInput = {
@@ -273,6 +275,8 @@ export type userOrderByWithRelationInput = {
   updated_at?: Prisma.SortOrderInput | Prisma.SortOrder
   posts?: Prisma.postOrderByRelationAggregateInput
   media?: Prisma.mediaOrderByRelationAggregateInput
+  following_list?: Prisma.followOrderByRelationAggregateInput
+  followers_list?: Prisma.followOrderByRelationAggregateInput
 }
 
 export type userWhereUniqueInput = Prisma.AtLeast<{
@@ -291,6 +295,8 @@ export type userWhereUniqueInput = Prisma.AtLeast<{
   updated_at?: Prisma.DateTimeNullableFilter<"user"> | Date | string | null
   posts?: Prisma.PostListRelationFilter
   media?: Prisma.MediaListRelationFilter
+  following_list?: Prisma.FollowListRelationFilter
+  followers_list?: Prisma.FollowListRelationFilter
 }, "id" | "email" | "username">
 
 export type userOrderByWithAggregationInput = {
@@ -339,6 +345,8 @@ export type userCreateInput = {
   updated_at?: Date | string | null
   posts?: Prisma.postCreateNestedManyWithoutAuthorInput
   media?: Prisma.mediaCreateNestedManyWithoutOwnerInput
+  following_list?: Prisma.followCreateNestedManyWithoutFollowerInput
+  followers_list?: Prisma.followCreateNestedManyWithoutFollowingInput
 }
 
 export type userUncheckedCreateInput = {
@@ -354,6 +362,8 @@ export type userUncheckedCreateInput = {
   updated_at?: Date | string | null
   posts?: Prisma.postUncheckedCreateNestedManyWithoutAuthorInput
   media?: Prisma.mediaUncheckedCreateNestedManyWithoutOwnerInput
+  following_list?: Prisma.followUncheckedCreateNestedManyWithoutFollowerInput
+  followers_list?: Prisma.followUncheckedCreateNestedManyWithoutFollowingInput
 }
 
 export type userUpdateInput = {
@@ -368,6 +378,8 @@ export type userUpdateInput = {
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   posts?: Prisma.postUpdateManyWithoutAuthorNestedInput
   media?: Prisma.mediaUpdateManyWithoutOwnerNestedInput
+  following_list?: Prisma.followUpdateManyWithoutFollowerNestedInput
+  followers_list?: Prisma.followUpdateManyWithoutFollowingNestedInput
 }
 
 export type userUncheckedUpdateInput = {
@@ -383,6 +395,8 @@ export type userUncheckedUpdateInput = {
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   posts?: Prisma.postUncheckedUpdateManyWithoutAuthorNestedInput
   media?: Prisma.mediaUncheckedUpdateManyWithoutOwnerNestedInput
+  following_list?: Prisma.followUncheckedUpdateManyWithoutFollowerNestedInput
+  followers_list?: Prisma.followUncheckedUpdateManyWithoutFollowingNestedInput
 }
 
 export type userCreateManyInput = {
@@ -523,6 +537,34 @@ export type userUpdateOneRequiredWithoutMediaNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.userUpdateToOneWithWhereWithoutMediaInput, Prisma.userUpdateWithoutMediaInput>, Prisma.userUncheckedUpdateWithoutMediaInput>
 }
 
+export type userCreateNestedOneWithoutFollowing_listInput = {
+  create?: Prisma.XOR<Prisma.userCreateWithoutFollowing_listInput, Prisma.userUncheckedCreateWithoutFollowing_listInput>
+  connectOrCreate?: Prisma.userCreateOrConnectWithoutFollowing_listInput
+  connect?: Prisma.userWhereUniqueInput
+}
+
+export type userCreateNestedOneWithoutFollowers_listInput = {
+  create?: Prisma.XOR<Prisma.userCreateWithoutFollowers_listInput, Prisma.userUncheckedCreateWithoutFollowers_listInput>
+  connectOrCreate?: Prisma.userCreateOrConnectWithoutFollowers_listInput
+  connect?: Prisma.userWhereUniqueInput
+}
+
+export type userUpdateOneRequiredWithoutFollowing_listNestedInput = {
+  create?: Prisma.XOR<Prisma.userCreateWithoutFollowing_listInput, Prisma.userUncheckedCreateWithoutFollowing_listInput>
+  connectOrCreate?: Prisma.userCreateOrConnectWithoutFollowing_listInput
+  upsert?: Prisma.userUpsertWithoutFollowing_listInput
+  connect?: Prisma.userWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.userUpdateToOneWithWhereWithoutFollowing_listInput, Prisma.userUpdateWithoutFollowing_listInput>, Prisma.userUncheckedUpdateWithoutFollowing_listInput>
+}
+
+export type userUpdateOneRequiredWithoutFollowers_listNestedInput = {
+  create?: Prisma.XOR<Prisma.userCreateWithoutFollowers_listInput, Prisma.userUncheckedCreateWithoutFollowers_listInput>
+  connectOrCreate?: Prisma.userCreateOrConnectWithoutFollowers_listInput
+  upsert?: Prisma.userUpsertWithoutFollowers_listInput
+  connect?: Prisma.userWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.userUpdateToOneWithWhereWithoutFollowers_listInput, Prisma.userUpdateWithoutFollowers_listInput>, Prisma.userUncheckedUpdateWithoutFollowers_listInput>
+}
+
 export type userCreateWithoutPostsInput = {
   name: string
   email: string
@@ -534,6 +576,8 @@ export type userCreateWithoutPostsInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   media?: Prisma.mediaCreateNestedManyWithoutOwnerInput
+  following_list?: Prisma.followCreateNestedManyWithoutFollowerInput
+  followers_list?: Prisma.followCreateNestedManyWithoutFollowingInput
 }
 
 export type userUncheckedCreateWithoutPostsInput = {
@@ -548,6 +592,8 @@ export type userUncheckedCreateWithoutPostsInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   media?: Prisma.mediaUncheckedCreateNestedManyWithoutOwnerInput
+  following_list?: Prisma.followUncheckedCreateNestedManyWithoutFollowerInput
+  followers_list?: Prisma.followUncheckedCreateNestedManyWithoutFollowingInput
 }
 
 export type userCreateOrConnectWithoutPostsInput = {
@@ -577,6 +623,8 @@ export type userUpdateWithoutPostsInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   media?: Prisma.mediaUpdateManyWithoutOwnerNestedInput
+  following_list?: Prisma.followUpdateManyWithoutFollowerNestedInput
+  followers_list?: Prisma.followUpdateManyWithoutFollowingNestedInput
 }
 
 export type userUncheckedUpdateWithoutPostsInput = {
@@ -591,6 +639,8 @@ export type userUncheckedUpdateWithoutPostsInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   media?: Prisma.mediaUncheckedUpdateManyWithoutOwnerNestedInput
+  following_list?: Prisma.followUncheckedUpdateManyWithoutFollowerNestedInput
+  followers_list?: Prisma.followUncheckedUpdateManyWithoutFollowingNestedInput
 }
 
 export type userCreateWithoutMediaInput = {
@@ -604,6 +654,8 @@ export type userCreateWithoutMediaInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   posts?: Prisma.postCreateNestedManyWithoutAuthorInput
+  following_list?: Prisma.followCreateNestedManyWithoutFollowerInput
+  followers_list?: Prisma.followCreateNestedManyWithoutFollowingInput
 }
 
 export type userUncheckedCreateWithoutMediaInput = {
@@ -618,6 +670,8 @@ export type userUncheckedCreateWithoutMediaInput = {
   created_at?: Date | string | null
   updated_at?: Date | string | null
   posts?: Prisma.postUncheckedCreateNestedManyWithoutAuthorInput
+  following_list?: Prisma.followUncheckedCreateNestedManyWithoutFollowerInput
+  followers_list?: Prisma.followUncheckedCreateNestedManyWithoutFollowingInput
 }
 
 export type userCreateOrConnectWithoutMediaInput = {
@@ -647,6 +701,8 @@ export type userUpdateWithoutMediaInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   posts?: Prisma.postUpdateManyWithoutAuthorNestedInput
+  following_list?: Prisma.followUpdateManyWithoutFollowerNestedInput
+  followers_list?: Prisma.followUpdateManyWithoutFollowingNestedInput
 }
 
 export type userUncheckedUpdateWithoutMediaInput = {
@@ -661,6 +717,164 @@ export type userUncheckedUpdateWithoutMediaInput = {
   created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   posts?: Prisma.postUncheckedUpdateManyWithoutAuthorNestedInput
+  following_list?: Prisma.followUncheckedUpdateManyWithoutFollowerNestedInput
+  followers_list?: Prisma.followUncheckedUpdateManyWithoutFollowingNestedInput
+}
+
+export type userCreateWithoutFollowing_listInput = {
+  name: string
+  email: string
+  password: string
+  avatar?: string | null
+  username?: string | null
+  bio?: string | null
+  phone?: string | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  posts?: Prisma.postCreateNestedManyWithoutAuthorInput
+  media?: Prisma.mediaCreateNestedManyWithoutOwnerInput
+  followers_list?: Prisma.followCreateNestedManyWithoutFollowingInput
+}
+
+export type userUncheckedCreateWithoutFollowing_listInput = {
+  id?: number
+  name: string
+  email: string
+  password: string
+  avatar?: string | null
+  username?: string | null
+  bio?: string | null
+  phone?: string | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  posts?: Prisma.postUncheckedCreateNestedManyWithoutAuthorInput
+  media?: Prisma.mediaUncheckedCreateNestedManyWithoutOwnerInput
+  followers_list?: Prisma.followUncheckedCreateNestedManyWithoutFollowingInput
+}
+
+export type userCreateOrConnectWithoutFollowing_listInput = {
+  where: Prisma.userWhereUniqueInput
+  create: Prisma.XOR<Prisma.userCreateWithoutFollowing_listInput, Prisma.userUncheckedCreateWithoutFollowing_listInput>
+}
+
+export type userCreateWithoutFollowers_listInput = {
+  name: string
+  email: string
+  password: string
+  avatar?: string | null
+  username?: string | null
+  bio?: string | null
+  phone?: string | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  posts?: Prisma.postCreateNestedManyWithoutAuthorInput
+  media?: Prisma.mediaCreateNestedManyWithoutOwnerInput
+  following_list?: Prisma.followCreateNestedManyWithoutFollowerInput
+}
+
+export type userUncheckedCreateWithoutFollowers_listInput = {
+  id?: number
+  name: string
+  email: string
+  password: string
+  avatar?: string | null
+  username?: string | null
+  bio?: string | null
+  phone?: string | null
+  created_at?: Date | string | null
+  updated_at?: Date | string | null
+  posts?: Prisma.postUncheckedCreateNestedManyWithoutAuthorInput
+  media?: Prisma.mediaUncheckedCreateNestedManyWithoutOwnerInput
+  following_list?: Prisma.followUncheckedCreateNestedManyWithoutFollowerInput
+}
+
+export type userCreateOrConnectWithoutFollowers_listInput = {
+  where: Prisma.userWhereUniqueInput
+  create: Prisma.XOR<Prisma.userCreateWithoutFollowers_listInput, Prisma.userUncheckedCreateWithoutFollowers_listInput>
+}
+
+export type userUpsertWithoutFollowing_listInput = {
+  update: Prisma.XOR<Prisma.userUpdateWithoutFollowing_listInput, Prisma.userUncheckedUpdateWithoutFollowing_listInput>
+  create: Prisma.XOR<Prisma.userCreateWithoutFollowing_listInput, Prisma.userUncheckedCreateWithoutFollowing_listInput>
+  where?: Prisma.userWhereInput
+}
+
+export type userUpdateToOneWithWhereWithoutFollowing_listInput = {
+  where?: Prisma.userWhereInput
+  data: Prisma.XOR<Prisma.userUpdateWithoutFollowing_listInput, Prisma.userUncheckedUpdateWithoutFollowing_listInput>
+}
+
+export type userUpdateWithoutFollowing_listInput = {
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  posts?: Prisma.postUpdateManyWithoutAuthorNestedInput
+  media?: Prisma.mediaUpdateManyWithoutOwnerNestedInput
+  followers_list?: Prisma.followUpdateManyWithoutFollowingNestedInput
+}
+
+export type userUncheckedUpdateWithoutFollowing_listInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  posts?: Prisma.postUncheckedUpdateManyWithoutAuthorNestedInput
+  media?: Prisma.mediaUncheckedUpdateManyWithoutOwnerNestedInput
+  followers_list?: Prisma.followUncheckedUpdateManyWithoutFollowingNestedInput
+}
+
+export type userUpsertWithoutFollowers_listInput = {
+  update: Prisma.XOR<Prisma.userUpdateWithoutFollowers_listInput, Prisma.userUncheckedUpdateWithoutFollowers_listInput>
+  create: Prisma.XOR<Prisma.userCreateWithoutFollowers_listInput, Prisma.userUncheckedCreateWithoutFollowers_listInput>
+  where?: Prisma.userWhereInput
+}
+
+export type userUpdateToOneWithWhereWithoutFollowers_listInput = {
+  where?: Prisma.userWhereInput
+  data: Prisma.XOR<Prisma.userUpdateWithoutFollowers_listInput, Prisma.userUncheckedUpdateWithoutFollowers_listInput>
+}
+
+export type userUpdateWithoutFollowers_listInput = {
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  posts?: Prisma.postUpdateManyWithoutAuthorNestedInput
+  media?: Prisma.mediaUpdateManyWithoutOwnerNestedInput
+  following_list?: Prisma.followUpdateManyWithoutFollowerNestedInput
+}
+
+export type userUncheckedUpdateWithoutFollowers_listInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  updated_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  posts?: Prisma.postUncheckedUpdateManyWithoutAuthorNestedInput
+  media?: Prisma.mediaUncheckedUpdateManyWithoutOwnerNestedInput
+  following_list?: Prisma.followUncheckedUpdateManyWithoutFollowerNestedInput
 }
 
 
@@ -671,11 +885,15 @@ export type userUncheckedUpdateWithoutMediaInput = {
 export type UserCountOutputType = {
   posts: number
   media: number
+  following_list: number
+  followers_list: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   posts?: boolean | UserCountOutputTypeCountPostsArgs
   media?: boolean | UserCountOutputTypeCountMediaArgs
+  following_list?: boolean | UserCountOutputTypeCountFollowing_listArgs
+  followers_list?: boolean | UserCountOutputTypeCountFollowers_listArgs
 }
 
 /**
@@ -702,6 +920,20 @@ export type UserCountOutputTypeCountMediaArgs<ExtArgs extends runtime.Types.Exte
   where?: Prisma.mediaWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountFollowing_listArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.followWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountFollowers_listArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.followWhereInput
+}
+
 
 export type userSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -716,6 +948,8 @@ export type userSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   updated_at?: boolean
   posts?: boolean | Prisma.user$postsArgs<ExtArgs>
   media?: boolean | Prisma.user$mediaArgs<ExtArgs>
+  following_list?: boolean | Prisma.user$following_listArgs<ExtArgs>
+  followers_list?: boolean | Prisma.user$followers_listArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -762,6 +996,8 @@ export type userOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = run
 export type userInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   posts?: boolean | Prisma.user$postsArgs<ExtArgs>
   media?: boolean | Prisma.user$mediaArgs<ExtArgs>
+  following_list?: boolean | Prisma.user$following_listArgs<ExtArgs>
+  followers_list?: boolean | Prisma.user$followers_listArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type userIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -772,6 +1008,8 @@ export type $userPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   objects: {
     posts: Prisma.$postPayload<ExtArgs>[]
     media: Prisma.$mediaPayload<ExtArgs>[]
+    following_list: Prisma.$followPayload<ExtArgs>[]
+    followers_list: Prisma.$followPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1180,6 +1418,8 @@ export interface Prisma__userClient<T, Null = never, ExtArgs extends runtime.Typ
   readonly [Symbol.toStringTag]: "PrismaPromise"
   posts<T extends Prisma.user$postsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.user$postsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$postPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   media<T extends Prisma.user$mediaArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.user$mediaArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$mediaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  following_list<T extends Prisma.user$following_listArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.user$following_listArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$followPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  followers_list<T extends Prisma.user$followers_listArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.user$followers_listArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$followPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1657,6 +1897,54 @@ export type user$mediaArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
   take?: number
   skip?: number
   distinct?: Prisma.MediaScalarFieldEnum | Prisma.MediaScalarFieldEnum[]
+}
+
+/**
+ * user.following_list
+ */
+export type user$following_listArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the follow
+   */
+  select?: Prisma.followSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the follow
+   */
+  omit?: Prisma.followOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.followInclude<ExtArgs> | null
+  where?: Prisma.followWhereInput
+  orderBy?: Prisma.followOrderByWithRelationInput | Prisma.followOrderByWithRelationInput[]
+  cursor?: Prisma.followWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.FollowScalarFieldEnum | Prisma.FollowScalarFieldEnum[]
+}
+
+/**
+ * user.followers_list
+ */
+export type user$followers_listArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the follow
+   */
+  select?: Prisma.followSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the follow
+   */
+  omit?: Prisma.followOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.followInclude<ExtArgs> | null
+  where?: Prisma.followWhereInput
+  orderBy?: Prisma.followOrderByWithRelationInput | Prisma.followOrderByWithRelationInput[]
+  cursor?: Prisma.followWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.FollowScalarFieldEnum | Prisma.FollowScalarFieldEnum[]
 }
 
 /**

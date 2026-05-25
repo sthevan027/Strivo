@@ -387,6 +387,7 @@ export const ModelName = {
   user: 'user',
   post: 'post',
   media: 'media',
+  follow: 'follow',
   post_media: 'post_media'
 } as const
 
@@ -403,7 +404,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "post" | "media" | "post_media"
+    modelProps: "user" | "post" | "media" | "follow" | "post_media"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -629,6 +630,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    follow: {
+      payload: Prisma.$followPayload<ExtArgs>
+      fields: Prisma.followFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.followFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$followPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.followFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$followPayload>
+        }
+        findFirst: {
+          args: Prisma.followFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$followPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.followFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$followPayload>
+        }
+        findMany: {
+          args: Prisma.followFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$followPayload>[]
+        }
+        create: {
+          args: Prisma.followCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$followPayload>
+        }
+        createMany: {
+          args: Prisma.followCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.followCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$followPayload>[]
+        }
+        delete: {
+          args: Prisma.followDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$followPayload>
+        }
+        update: {
+          args: Prisma.followUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$followPayload>
+        }
+        deleteMany: {
+          args: Prisma.followDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.followUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.followUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$followPayload>[]
+        }
+        upsert: {
+          args: Prisma.followUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$followPayload>
+        }
+        aggregate: {
+          args: Prisma.FollowAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateFollow>
+        }
+        groupBy: {
+          args: Prisma.followGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.FollowGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.followCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.FollowCountAggregateOutputType> | number
+        }
+      }
+    }
     post_media: {
       payload: Prisma.$post_mediaPayload<ExtArgs>
       fields: Prisma.post_mediaFieldRefs
@@ -782,6 +857,15 @@ export const MediaScalarFieldEnum = {
 } as const
 
 export type MediaScalarFieldEnum = (typeof MediaScalarFieldEnum)[keyof typeof MediaScalarFieldEnum]
+
+
+export const FollowScalarFieldEnum = {
+  follower_id: 'follower_id',
+  following_id: 'following_id',
+  created_at: 'created_at'
+} as const
+
+export type FollowScalarFieldEnum = (typeof FollowScalarFieldEnum)[keyof typeof FollowScalarFieldEnum]
 
 
 export const Post_mediaScalarFieldEnum = {
@@ -1019,6 +1103,7 @@ export type GlobalOmitConfig = {
   user?: Prisma.userOmit
   post?: Prisma.postOmit
   media?: Prisma.mediaOmit
+  follow?: Prisma.followOmit
   post_media?: Prisma.post_mediaOmit
 }
 
