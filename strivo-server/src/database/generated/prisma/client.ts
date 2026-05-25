@@ -55,6 +55,11 @@ export type post = Prisma.postModel
  */
 export type media = Prisma.mediaModel
 /**
+ * Model follow
+ * 
+ */
+export type follow = Prisma.followModel
+/**
  * Model post_media
  * 
  */

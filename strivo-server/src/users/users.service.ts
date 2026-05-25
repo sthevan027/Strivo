@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -26,6 +27,66 @@ export class UsersService {
     });
     if (!user) throw new NotFoundException('Usuário não encontrado.');
     return user;
+  }
+
+  async search(q: string, currentUserId: number) {
+    const term = q?.trim() ?? '';
+    if (term.length < 2) return [];
+
+    const users = await this.prisma.user.findMany({
+      where: {
+        id: { not: currentUserId },
+        OR: [
+          { name: { contains: term, mode: 'insensitive' } },
+          { username: { contains: term, mode: 'insensitive' } },
+        ],
+      },
+      select: {
+        id: true,
+        name: true,
+        username: true,
+        avatar: true,
+        followers_list: {
+          where: { follower_id: currentUserId },
+          select: { follower_id: true },
+        },
+      },
+      take: 20,
+    });
+
+    return users.map((u) => ({
+      id: u.id,
+      name: u.name,
+      username: u.username,
+      avatar: u.avatar,
+      isFollowing: u.followers_list.length > 0,
+    }));
+  }
+
+  async follow(followerId: number, followingId: number) {
+    if (followerId === followingId) {
+      throw new BadRequestException('Não é possível seguir a si mesmo.');
+    }
+    const target = await this.prisma.user.findUnique({
+      where: { id: followingId },
+      select: { id: true },
+    });
+    if (!target) throw new NotFoundException('Usuário não encontrado.');
+    await this.prisma.follow.upsert({
+      where: {
+        follower_id_following_id: { follower_id: followerId, following_id: followingId },
+      },
+      create: { follower_id: followerId, following_id: followingId },
+      update: {},
+    });
+    return { message: 'ok' };
+  }
+
+  async unfollow(followerId: number, followingId: number) {
+    await this.prisma.follow.deleteMany({
+      where: { follower_id: followerId, following_id: followingId },
+    });
+    return { message: 'ok' };
   }
 
   async updateMe(userId: number, dto: UpdateProfileDto) {

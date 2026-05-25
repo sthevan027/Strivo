@@ -54,6 +54,7 @@ export const ModelName = {
   user: 'user',
   post: 'post',
   media: 'media',
+  follow: 'follow',
   post_media: 'post_media'
 } as const
 
@@ -113,6 +114,15 @@ export const MediaScalarFieldEnum = {
 } as const
 
 export type MediaScalarFieldEnum = (typeof MediaScalarFieldEnum)[keyof typeof MediaScalarFieldEnum]
+
+
+export const FollowScalarFieldEnum = {
+  follower_id: 'follower_id',
+  following_id: 'following_id',
+  created_at: 'created_at'
+} as const
+
+export type FollowScalarFieldEnum = (typeof FollowScalarFieldEnum)[keyof typeof FollowScalarFieldEnum]
 
 
 export const Post_mediaScalarFieldEnum = {
