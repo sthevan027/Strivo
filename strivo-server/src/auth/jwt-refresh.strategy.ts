@@ -31,7 +31,7 @@ export class JwtRefreshStrategy extends PassportStrategy(
     if (!payload?.sub) {
       throw new UnauthorizedException('Refresh token inválido.');
     }
-    const token = req.headers.authorization?.replace('Bearer ', '');
+    const token = req.headers.authorization?.replace(/^bearer\s+/i, '');
     return { userId: Number(payload.sub), refreshToken: token };
   }
 }
