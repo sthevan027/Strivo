@@ -11,7 +11,9 @@ export class HomeController {
   constructor(private readonly home: HomeService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Retornar dados da home enriquecida (posts + ranking)' })
+  @ApiOperation({
+    summary: 'Retornar dados da home enriquecida (posts + ranking)',
+  })
   getHome() {
     return this.home.getHome();
   }

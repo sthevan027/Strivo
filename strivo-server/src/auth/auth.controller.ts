@@ -1,5 +1,18 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, Req, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { Request } from 'express';
 import { AuthService } from './auth.service';
@@ -16,7 +29,11 @@ export class AuthController {
 
   @Post('register')
   @ApiOperation({ summary: 'Criar nova conta' })
-  @ApiResponse({ status: 201, description: 'Usuário criado com sucesso, retorna access_token e refresh_token' })
+  @ApiResponse({
+    status: 201,
+    description:
+      'Usuário criado com sucesso, retorna access_token e refresh_token',
+  })
   @ApiResponse({ status: 409, description: 'Email já cadastrado' })
   register(@Body() dto: RegisterDto) {
     return this.auth.register(dto);
@@ -25,7 +42,10 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Autenticar e obter tokens JWT' })
-  @ApiResponse({ status: 200, description: 'Login bem-sucedido, retorna access_token e refresh_token' })
+  @ApiResponse({
+    status: 200,
+    description: 'Login bem-sucedido, retorna access_token e refresh_token',
+  })
   @ApiResponse({ status: 401, description: 'Credenciais inválidas' })
   login(@Body() dto: LoginDto) {
     return this.auth.login(dto);
@@ -36,9 +56,17 @@ export class AuthController {
   @UseGuards(JwtRefreshGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Renovar access token usando refresh token' })
-  @ApiResponse({ status: 200, description: 'Retorna novo access_token e refresh_token' })
-  @ApiResponse({ status: 401, description: 'Refresh token inválido ou expirado' })
-  refresh(@Req() req: Request & { user: { userId: number; refreshToken: string } }) {
+  @ApiResponse({
+    status: 200,
+    description: 'Retorna novo access_token e refresh_token',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Refresh token inválido ou expirado',
+  })
+  refresh(
+    @Req() req: Request & { user: { userId: number; refreshToken: string } },
+  ) {
     return this.auth.refreshTokens(req.user.userId, req.user.refreshToken);
   }
 

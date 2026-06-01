@@ -18,8 +18,20 @@ describe('RankingService', () => {
 
   it('retorna ranking com rank atribuído por índice', async () => {
     prisma.user.findMany.mockResolvedValue([
-      { id: 2, name: 'B', username: 'b', avatar: null, _count: { posts: 10, followers_list: 50 } },
-      { id: 1, name: 'A', username: 'a', avatar: null, _count: { posts: 5, followers_list: 20 } },
+      {
+        id: 2,
+        name: 'B',
+        username: 'b',
+        avatar: null,
+        _count: { posts: 10, followers_list: 50 },
+      },
+      {
+        id: 1,
+        name: 'A',
+        username: 'a',
+        avatar: null,
+        _count: { posts: 5, followers_list: 20 },
+      },
     ]);
 
     const result = await makeSvc().getRanking(10);

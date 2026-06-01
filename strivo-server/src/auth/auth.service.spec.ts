@@ -67,7 +67,9 @@ describe('AuthService', () => {
       });
 
       expect(prisma.user.create).toHaveBeenCalled();
-      const createCall = prisma.user.create.mock.calls[0][0] as { data: { password: string } };
+      const createCall = (
+        prisma.user.create.mock.calls as Array<[{ data: { password: string } }]>
+      )[0][0];
       const storedPassword = createCall.data.password;
       expect(storedPassword).not.toBe('senha123');
       expect(await bcrypt.compare('senha123', storedPassword)).toBe(true);
@@ -86,11 +88,16 @@ describe('AuthService', () => {
       });
       prisma.user.update.mockResolvedValue({});
 
-      await makeSvc().register({ name: 'B', email: 'b@b.com', password: 'pass' });
+      await makeSvc().register({
+        name: 'B',
+        email: 'b@b.com',
+        password: 'pass',
+      });
 
       expect(prisma.user.update).toHaveBeenCalledWith(
         expect.objectContaining({
           where: { id: 42 },
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           data: expect.objectContaining({ refresh_token: expect.any(String) }),
         }),
       );
@@ -134,7 +141,10 @@ describe('AuthService', () => {
       });
       prisma.user.update.mockResolvedValue({});
 
-      const result = await makeSvc().login({ email: 'x@x.com', password: 'correta' });
+      const result = await makeSvc().login({
+        email: 'x@x.com',
+        password: 'correta',
+      });
 
       expect(result.access_token).toBeDefined();
       expect(result.refresh_token).toBeDefined();

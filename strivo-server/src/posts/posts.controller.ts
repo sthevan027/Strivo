@@ -9,7 +9,12 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -25,7 +30,10 @@ export class PostsController {
 
   @Post('uploads')
   @ApiOperation({ summary: 'Solicitar URL de upload de mídia' })
-  @ApiResponse({ status: 201, description: 'URL assinada para upload no Supabase' })
+  @ApiResponse({
+    status: 201,
+    description: 'URL assinada para upload no Supabase',
+  })
   createUpload(
     @CurrentUser() user: CurrentUser,
     @Body() body: CreateUploadDto,
@@ -36,7 +44,10 @@ export class PostsController {
   @Post()
   @ApiOperation({ summary: 'Criar post com mídias previamente enviadas' })
   @ApiResponse({ status: 201, description: 'Post criado com sucesso' })
-  @ApiResponse({ status: 400, description: 'Mídia inválida ou não pertence ao usuário' })
+  @ApiResponse({
+    status: 400,
+    description: 'Mídia inválida ou não pertence ao usuário',
+  })
   createPost(@CurrentUser() user: CurrentUser, @Body() body: CreatePostDto) {
     return this.posts.createPost(user.userId, body);
   }

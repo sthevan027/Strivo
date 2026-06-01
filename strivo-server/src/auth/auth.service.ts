@@ -86,7 +86,10 @@ export class AuthService {
     }
 
     const tokens = this.signTokens(user.id, user.email);
-    const hashedRefresh = await bcrypt.hash(tokens.refresh_token, this.getSaltRounds());
+    const hashedRefresh = await bcrypt.hash(
+      tokens.refresh_token,
+      this.getSaltRounds(),
+    );
     await this.prisma.user.update({
       where: { id: user.id },
       data: { refresh_token: hashedRefresh },
@@ -116,7 +119,10 @@ export class AuthService {
     }
 
     const tokens = this.signTokens(user.id, user.email);
-    const hashedRefresh = await bcrypt.hash(tokens.refresh_token, this.getSaltRounds());
+    const hashedRefresh = await bcrypt.hash(
+      tokens.refresh_token,
+      this.getSaltRounds(),
+    );
     await this.prisma.user.update({
       where: { id: user.id },
       data: { refresh_token: hashedRefresh },

@@ -18,8 +18,20 @@ describe('HomeService', () => {
 
   it('retorna topStreamers com rank e featuredLives vazio', async () => {
     prisma.user.findMany.mockResolvedValue([
-      { id: 1, name: 'A', username: 'a', avatar: null, _count: { posts: 5, followers_list: 10 } },
-      { id: 2, name: 'B', username: 'b', avatar: null, _count: { posts: 3, followers_list: 7 } },
+      {
+        id: 1,
+        name: 'A',
+        username: 'a',
+        avatar: null,
+        _count: { posts: 5, followers_list: 10 },
+      },
+      {
+        id: 2,
+        name: 'B',
+        username: 'b',
+        avatar: null,
+        _count: { posts: 3, followers_list: 7 },
+      },
     ]);
 
     const result = await makeSvc().getHome();

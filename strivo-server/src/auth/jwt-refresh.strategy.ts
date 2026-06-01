@@ -9,7 +9,10 @@ export type JwtRefreshPayload = {
 };
 
 @Injectable()
-export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
+export class JwtRefreshStrategy extends PassportStrategy(
+  Strategy,
+  'jwt-refresh',
+) {
   constructor() {
     const secret = process.env.JWT_REFRESH_SECRET ?? process.env.JWT_SECRET;
     if (!secret) {
