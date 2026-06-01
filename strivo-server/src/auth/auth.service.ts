@@ -16,6 +16,23 @@ export class AuthService {
     private readonly jwt: JwtService,
   ) {}
 
+  private getSaltRounds() {
+    return Number(process.env.BCRYPT_SALT_ROUNDS ?? 10);
+  }
+
+  private getRefreshSecret() {
+    return process.env.JWT_REFRESH_SECRET ?? process.env.JWT_SECRET ?? '';
+  }
+
+  private signTokens(userId: number, email: string) {
+    const access_token = this.jwt.sign({ sub: userId, email });
+    const refresh_token = this.jwt.sign(
+      { sub: userId, email },
+      { secret: this.getRefreshSecret(), expiresIn: '7d' },
+    );
+    return { access_token, refresh_token };
+  }
+
   async register(dto: RegisterDto) {
     const exists = await this.prisma.user.findUnique({
       where: { email: dto.email },
@@ -24,7 +41,7 @@ export class AuthService {
       throw new ConflictException('E-mail já cadastrado.');
     }
 
-    const saltRounds = Number(process.env.BCRYPT_SALT_ROUNDS ?? 10);
+    const saltRounds = this.getSaltRounds();
     const hashed = await bcrypt.hash(dto.password, saltRounds);
 
     const user = await this.prisma.user.create({
@@ -44,8 +61,14 @@ export class AuthService {
       },
     });
 
-    const access_token = this.jwt.sign({ sub: user.id, email: user.email });
-    return { access_token, user };
+    const tokens = this.signTokens(user.id, user.email);
+    const hashedRefresh = await bcrypt.hash(tokens.refresh_token, saltRounds);
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { refresh_token: hashedRefresh },
+    });
+
+    return { ...tokens, user };
   }
 
   async login(dto: LoginDto) {
@@ -62,9 +85,18 @@ export class AuthService {
       throw new UnauthorizedException('Credenciais inválidas.');
     }
 
-    const access_token = this.jwt.sign({ sub: user.id, email: user.email });
+    const tokens = this.signTokens(user.id, user.email);
+    const hashedRefresh = await bcrypt.hash(
+      tokens.refresh_token,
+      this.getSaltRounds(),
+    );
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { refresh_token: hashedRefresh },
+    });
+
     return {
-      access_token,
+      ...tokens,
       user: {
         id: user.id,
         name: user.name,
@@ -73,5 +105,36 @@ export class AuthService {
         avatar: user.avatar,
       },
     };
+  }
+
+  async refreshTokens(userId: number, rawRefreshToken: string) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user?.refresh_token) {
+      throw new UnauthorizedException('Refresh token inválido.');
+    }
+
+    const matches = await bcrypt.compare(rawRefreshToken, user.refresh_token);
+    if (!matches) {
+      throw new UnauthorizedException('Refresh token inválido.');
+    }
+
+    const tokens = this.signTokens(user.id, user.email);
+    const hashedRefresh = await bcrypt.hash(
+      tokens.refresh_token,
+      this.getSaltRounds(),
+    );
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { refresh_token: hashedRefresh },
+    });
+
+    return tokens;
+  }
+
+  async logout(userId: number) {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { refresh_token: null },
+    });
   }
 }
