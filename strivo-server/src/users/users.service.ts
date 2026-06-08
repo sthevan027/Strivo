@@ -74,7 +74,10 @@ export class UsersService {
     if (!target) throw new NotFoundException('Usuário não encontrado.');
     await this.prisma.follow.upsert({
       where: {
-        follower_id_following_id: { follower_id: followerId, following_id: followingId },
+        follower_id_following_id: {
+          follower_id: followerId,
+          following_id: followingId,
+        },
       },
       create: { follower_id: followerId, following_id: followingId },
       update: {},
