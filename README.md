@@ -1,4 +1,6 @@
-# Strivo — Plataforma de Streaming
+# Strivo â€” Plataforma de Streaming
+
+![Status](https://img.shields.io/badge/status-em%20desenvolvimento-yellow)
 
 [![React Native](https://img.shields.io/badge/React_Native-20232A?style=flat&logo=react&logoColor=61DAFB)](https://reactnative.dev/)
 [![Expo](https://img.shields.io/badge/Expo_54-000020?style=flat&logo=expo&logoColor=fff)](https://expo.dev/)
@@ -7,7 +9,7 @@
 [![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=flat&logo=prisma&logoColor=fff)](https://www.prisma.io/)
 [![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=flat&logo=supabase&logoColor=fff)](https://supabase.com/)
 
-> Plataforma mobile de streaming com integração social, criação de conteúdo e ferramentas para criadores e espectadores.
+> Plataforma mobile de streaming com integraÃ§Ã£o social, criaÃ§Ã£o de conteÃºdo e ferramentas para criadores e espectadores.
 
 ---
 
@@ -16,12 +18,12 @@
 | Camada | Tecnologia |
 |--------|-----------|
 | **Frontend** | React Native 0.81 + Expo 54 + Expo Router |
-| **Estilização** | NativeWind 4 (Tailwind CSS) |
+| **EstilizaÃ§Ã£o** | NativeWind 4 (Tailwind CSS) |
 | **Backend** | NestJS 11 + TypeScript |
 | **ORM** | Prisma 7 + PostgreSQL |
-| **Storage** | Supabase Storage (upload de mídia) |
+| **Storage** | Supabase Storage (upload de mÃ­dia) |
 | **Auth** | JWT via `@nestjs/jwt` + bcryptjs |
-| **Ícones** | lucide-react-native + @expo/vector-icons |
+| **Ãcones** | lucide-react-native + @expo/vector-icons |
 
 ---
 
@@ -50,34 +52,34 @@ npx expo start             # abre no Expo Go (iOS/Android) ou emulador
 
 ## Estado do MVP
 
-### ✅ Implementado
+### âœ… Implementado
 
 | Feature | Frontend | Backend |
 |---------|----------|---------|
-| **Autenticação** | `app/login.tsx`, `app/register.tsx` | `POST /auth/register`, `POST /auth/login` |
-| **Perfil de usuário** | `app/screens/profile.tsx`, `app/screens/edit-profile.tsx` | `GET /users/me`, `PATCH /users/me` |
+| **AutenticaÃ§Ã£o** | `app/login.tsx`, `app/register.tsx` | `POST /auth/register`, `POST /auth/login` |
+| **Perfil de usuÃ¡rio** | `app/screens/profile.tsx`, `app/screens/edit-profile.tsx` | `GET /users/me`, `PATCH /users/me` |
 | **Feed de posts** | `app/(tabs)/home.tsx` | `GET /posts/feed`, `GET /posts/:id` |
-| **Criação de post** | `app/screens/create-post.tsx` | `POST /posts/uploads`, `POST /posts` |
-| **Categorias/Streams** | `app/screens/streams.tsx` (mock) | — |
-| **Sistema de apoio** | `app/screens/suport-creator.tsx` (UI) | — |
-| **Configurações** | `app/screens/configuration.tsx` | — |
-| **Reels** | `app/screens/reels.tsx` | — |
-| **Chat** | `app/screens/chat/` | — |
+| **CriaÃ§Ã£o de post** | `app/screens/create-post.tsx` | `POST /posts/uploads`, `POST /posts` |
+| **Categorias/Streams** | `app/screens/streams.tsx` (mock) | â€” |
+| **Sistema de apoio** | `app/screens/suport-creator.tsx` (UI) | â€” |
+| **ConfiguraÃ§Ãµes** | `app/screens/configuration.tsx` | â€” |
+| **Reels** | `app/screens/reels.tsx` | â€” |
+| **Chat** | `app/screens/chat/` | â€” |
 
-### ⚠️ Parcial
+### âš ï¸ Parcial
 
 | Feature | Problema |
 |---------|---------|
-| **Busca** | `app/screens/searchScreen.tsx` usa Supabase diretamente — não migrada para o NestJS |
-| **Home** | Feed ok, mas faltam seções "Top Streamers do Mês" e "Lives em Destaque" |
-| **Categorias** | Dados estáticos (mock) — sem backend |
+| **Busca** | `app/screens/searchScreen.tsx` usa Supabase diretamente â€” nÃ£o migrada para o NestJS |
+| **Home** | Feed ok, mas faltam seÃ§Ãµes "Top Streamers do MÃªs" e "Lives em Destaque" |
+| **Categorias** | Dados estÃ¡ticos (mock) â€” sem backend |
 
-### ❌ Pendente
+### âŒ Pendente
 
-| Feature | Situação |
+| Feature | SituaÃ§Ã£o |
 |---------|---------|
 | **Ranking** | Nenhuma tela ou endpoint criados |
-| **Doações (API)** | UI pronta, sem integração real de pagamento |
+| **DoaÃ§Ãµes (API)** | UI pronta, sem integraÃ§Ã£o real de pagamento |
 | **Lives em tempo real** | UI de player existe, sem streaming backend (WebRTC/RTMP) |
 
 ---
@@ -86,59 +88,59 @@ npx expo start             # abre no Expo Go (iOS/Android) ou emulador
 
 ```
 Strivo/                               # Monorepo
-├── strivo-app/                       # Frontend (React Native / Expo)
-│   ├── app/                          # Rotas (Expo Router)
-│   │   ├── (tabs)/                   # Abas principais
-│   │   │   ├── home.tsx              # Feed de posts (NestJS)
-│   │   │   └── screens/              # Telas nas abas
-│   │   │       ├── searchScreen.tsx  # Busca (Supabase — pendente migração)
-│   │   │       ├── streams.tsx       # Categorias e top streamers (mock)
-│   │   │       ├── reels.tsx         # Reels
-│   │   │       └── profile.tsx       # Perfil (NestJS)
-│   │   ├── auth/callback.tsx         # Callback OAuth
-│   │   ├── login.tsx                 # guration.tsx     # Configurações
-│       ├── edit-profile.tsx      # Editar perfil
-│       ├── suport-creator.tsx    # Apoiar streamer (UI)
-│       ├── live.tsx              # Player de live (UI)
-│       ├── notifications.tsx     # Notificações
-│       ├── chat/                 # Chat (DMs e grupos)
-│       ├── configs/              # Sub-telas de configurações
-│       └── profile/              # Métricas e outros perfis
-│
-├── src/
-│   ├── components/               # Componentes reutilizáveis
-│   ├── contexts/AuthContext.tsx  # Estado global de autenticação
-│   ├── lib/api.ts                # Cliente HTTP (JWT automático)
-│   └── services/follow.ts        # Follow/unfollow
-│
-├── assets/images/                # Imagens e ícones
-│
-└── strivo-server/                # Backend (NestJS)
-    └── src/
-        ├── auth/                 # JWT + bcrypt (register, login)
-        ├── users/                # Perfil (GET/PATCH /users/me)
-        ├── posts/                # Feed, criação e upload
-        ├── supabase/             # Storage de mídia
-        └── database/             # Prisma schema + migrations
+â”œâ”€â”€ strivo-app/                       # Frontend (React Native / Expo)
+â”‚   â”œâ”€â”€ app/                          # Rotas (Expo Router)
+â”‚   â”‚   â”œâ”€â”€ (tabs)/                   # Abas principais
+â”‚   â”‚   â”‚   â”œâ”€â”€ home.tsx              # Feed de posts (NestJS)
+â”‚   â”‚   â”‚   â””â”€â”€ screens/              # Telas nas abas
+â”‚   â”‚   â”‚       â”œâ”€â”€ searchScreen.tsx  # Busca (Supabase â€” pendente migraÃ§Ã£o)
+â”‚   â”‚   â”‚       â”œâ”€â”€ streams.tsx       # Categorias e top streamers (mock)
+â”‚   â”‚   â”‚       â”œâ”€â”€ reels.tsx         # Reels
+â”‚   â”‚   â”‚       â””â”€â”€ profile.tsx       # Perfil (NestJS)
+â”‚   â”‚   â”œâ”€â”€ auth/callback.tsx         # Callback OAuth
+â”‚   â”‚   â”œâ”€â”€ login.tsx                 # guration.tsx     # ConfiguraÃ§Ãµes
+â”‚       â”œâ”€â”€ edit-profile.tsx      # Editar perfil
+â”‚       â”œâ”€â”€ suport-creator.tsx    # Apoiar streamer (UI)
+â”‚       â”œâ”€â”€ live.tsx              # Player de live (UI)
+â”‚       â”œâ”€â”€ notifications.tsx     # NotificaÃ§Ãµes
+â”‚       â”œâ”€â”€ chat/                 # Chat (DMs e grupos)
+â”‚       â”œâ”€â”€ configs/              # Sub-telas de configuraÃ§Ãµes
+â”‚       â””â”€â”€ profile/              # MÃ©tricas e outros perfis
+â”‚
+â”œâ”€â”€ src/
+â”‚   â”œâ”€â”€ components/               # Componentes reutilizÃ¡veis
+â”‚   â”œâ”€â”€ contexts/AuthContext.tsx  # Estado global de autenticaÃ§Ã£o
+â”‚   â”œâ”€â”€ lib/api.ts                # Cliente HTTP (JWT automÃ¡tico)
+â”‚   â””â”€â”€ services/follow.ts        # Follow/unfollow
+â”‚
+â”œâ”€â”€ assets/images/                # Imagens e Ã­cones
+â”‚
+â””â”€â”€ strivo-server/                # Backend (NestJS)
+    â””â”€â”€ src/
+        â”œâ”€â”€ auth/                 # JWT + bcrypt (register, login)
+        â”œâ”€â”€ users/                # Perfil (GET/PATCH /users/me)
+        â”œâ”€â”€ posts/                # Feed, criaÃ§Ã£o e upload
+        â”œâ”€â”€ supabase/             # Storage de mÃ­dia
+        â””â”€â”€ database/             # Prisma schema + migrations
 ```
 
 ---
 
-## API — Endpoints Disponíveis
+## API â€” Endpoints DisponÃ­veis
 
 ```
 POST  /auth/register          Cadastro (name, email, password)
-POST  /auth/login             Login → { access_token }
+POST  /auth/login             Login â†’ { access_token }
 
-GET   /users/me        🔒    Dados do usuário logado
-PATCH /users/me        🔒    Atualizar perfil
+GET   /users/me        ðŸ”’    Dados do usuÃ¡rio logado
+PATCH /users/me        ðŸ”’    Atualizar perfil
 
-POST  /posts/uploads   🔒    Gerar URL de upload (Supabase Storage)
-POST  /posts           🔒    Criar post com mídias vinculadas
-GET   /posts/feed      🔒    Feed paginado (cursor-based)
-GET   /posts/:id       🔒    Post individual
+POST  /posts/uploads   ðŸ”’    Gerar URL de upload (Supabase Storage)
+POST  /posts           ðŸ”’    Criar post com mÃ­dias vinculadas
+GET   /posts/feed      ðŸ”’    Feed paginado (cursor-based)
+GET   /posts/:id       ðŸ”’    Post individual
 
-🔒 = requer Authorization: Bearer <token>
+ðŸ”’ = requer Authorization: Bearer <token>
 ```
 
 ---
@@ -156,25 +158,25 @@ post_media  post_id, media_id, order
 
 ## Design
 
-- **Tema**: escuro por padrão
-- **Cor primária**: `#00FF40` / `#53FC18` (verde neon)
+- **Tema**: escuro por padrÃ£o
+- **Cor primÃ¡ria**: `#00FF40` / `#53FC18` (verde neon)
 - **Fundo**: `#000000` / `#0F0F0F`
 - **Card**: `#1A1A1A`
 - **Borda**: `#2A2A2A`
 
 ---
 
-## Roadmap — Próximas Entregas
+## Roadmap â€” PrÃ³ximas Entregas
 
 - [ ] **Ranking**: tela + endpoint `GET /ranking` (top streamers por atividade)
 - [ ] **Busca**: migrar `searchScreen.tsx` do Supabase para `GET /search?q=`
-- [ ] **Home enriquecida**: seções "Top Streamers" e "Lives em Destaque"
+- [ ] **Home enriquecida**: seÃ§Ãµes "Top Streamers" e "Lives em Destaque"
 - [ ] **Follows**: `POST /users/:id/follow`, `DELETE /users/:id/follow`
-- [ ] **Doações (API)**: `POST /donations` com histórico
+- [ ] **DoaÃ§Ãµes (API)**: `POST /donations` com histÃ³rico
 - [ ] **Lives em tempo real**: WebRTC / RTMP + chat via WebSocket
-- [ ] **VOD/Clips**: gravação e reprodução de conteúdo ao vivo
-- [ ] **Notificações push**: início de live, novas interações
-- [ ] **Dashboard do streamer**: analytics de audiência
+- [ ] **VOD/Clips**: gravaÃ§Ã£o e reproduÃ§Ã£o de conteÃºdo ao vivo
+- [ ] **NotificaÃ§Ãµes push**: inÃ­cio de live, novas interaÃ§Ãµes
+- [ ] **Dashboard do streamer**: analytics de audiÃªncia
 - [ ] **Assinaturas recorrentes**: subscribers
 
 ---
@@ -187,13 +189,13 @@ post_media  post_id, media_id, order
 
 ---
 
-## Licença
+## LicenÃ§a
 
-Projeto proprietário. Todos os direitos reservados.
+Projeto proprietÃ¡rio. Todos os direitos reservados.
 
-**© 2025 Strivo. Desenvolvido por [Sthevan Santos](https://github.com/sthevan027).**
-�cio de live, novas interações
-- [ ] **Dashboard do streamer**: analytics de audiência
+**Â© 2025 Strivo. Desenvolvido por [Sthevan Santos](https://github.com/sthevan027).**
+­cio de live, novas interaÃ§Ãµes
+- [ ] **Dashboard do streamer**: analytics de audiÃªncia
 - [ ] **Assinaturas recorrentes**: subscribers
 
 ---
@@ -206,8 +208,8 @@ Projeto proprietário. Todos os direitos reservados.
 
 ---
 
-## Licença
+## LicenÃ§a
 
-Projeto proprietário. Todos os direitos reservados.
+Projeto proprietÃ¡rio. Todos os direitos reservados.
 
-**© 2025 Strivo. Desenvolvido por [Sthevan Santos](https://github.com/sthevan027).**
+**Â© 2025 Strivo. Desenvolvido por [Sthevan Santos](https://github.com/sthevan027).**
