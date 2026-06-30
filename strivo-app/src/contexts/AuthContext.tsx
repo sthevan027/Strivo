@@ -1,4 +1,3 @@
-import * as SecureStore from "expo-secure-store";
 import React, {
   createContext,
   useCallback,
@@ -6,10 +5,10 @@ import React, {
   useEffect,
   useState,
 } from "react";
-import { api } from "../lib/api";
+import { supabase } from "../lib/supabase";
 
 export interface AuthUser {
-  id: number;
+  id: string;
   name: string;
   email: string;
   username?: string | null;
@@ -37,60 +36,89 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-const TOKEN_KEY = "strivo_jwt";
+async function fetchProfile(userId: string): Promise<AuthUser | null> {
+  const { data: { session } } = await supabase.auth.getSession();
+  const email = session?.user.email ?? "";
+  const { data } = await supabase
+    .from("user_profile")
+    .select("id, name, username, avatar, bio, phone")
+    .eq("id", userId)
+    .single();
+  if (!data) return null;
+  return { ...data, email };
+}
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const refreshUser = useCallback(async () => {
-    try {
-      const me = await api.get<AuthUser>("/users/me");
-      setUser(me);
-    } catch {
-      setUser(null);
-      await SecureStore.deleteItemAsync(TOKEN_KEY).catch(() => {});
-    }
+  const loadUser = useCallback(async (userId: string) => {
+    const profile = await fetchProfile(userId);
+    setUser(profile);
+    setIsLoading(false);
   }, []);
 
   useEffect(() => {
-    const restore = async () => {
-      try {
-        const token = await SecureStore.getItemAsync(TOKEN_KEY);
-        if (token) {
-          await refreshUser();
-        }
-      } catch {
-        // token inválido ou expirado — ignora
-      } finally {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        loadUser(session.user.id);
+      } else {
         setIsLoading(false);
       }
-    };
-    restore();
-  }, [refreshUser]);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        if (session?.user) {
+          loadUser(session.user.id);
+        } else {
+          setUser(null);
+          setIsLoading(false);
+        }
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, [loadUser]);
 
   const login = useCallback(async (email: string, password: string) => {
-    const res = await api.post<{ access_token: string; user: AuthUser }>(
-      "/auth/login",
-      { email, password },
-    );
-    await SecureStore.setItemAsync(TOKEN_KEY, res.access_token);
-    setUser(res.user);
-  }, []);
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (error) throw new Error(error.message);
+    if (data.user) await loadUser(data.user.id);
+  }, [loadUser]);
 
   const register = useCallback(async (data: RegisterData) => {
-    const res = await api.post<{ access_token: string; user: AuthUser }>(
-      "/auth/register",
-      data,
-    );
-    await SecureStore.setItemAsync(TOKEN_KEY, res.access_token);
-    setUser(res.user);
-  }, []);
+    const { data: authData, error } = await supabase.auth.signUp({
+      email: data.email,
+      password: data.password,
+      options: {
+        data: { name: data.name, username: data.username ?? null },
+      },
+    });
+    if (error) throw new Error(error.message);
+    if (authData.user) {
+      if (data.phone) {
+        await supabase
+          .from("user_profile")
+          .update({ phone: data.phone })
+          .eq("id", authData.user.id);
+      }
+      await loadUser(authData.user.id);
+    }
+  }, [loadUser]);
 
   const logout = useCallback(async () => {
-    await SecureStore.deleteItemAsync(TOKEN_KEY).catch(() => {});
+    await supabase.auth.signOut();
     setUser(null);
   }, []);
+
+  const refreshUser = useCallback(async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user) await loadUser(session.user.id);
+  }, [loadUser]);
 
   return (
     <AuthContext.Provider
