@@ -1,7 +1,7 @@
-import { api } from '@/src/lib/api';
-import { useRouter } from 'expo-router';
-import { ArrowLeft, Crown } from 'lucide-react-native';
-import React, { useEffect, useState } from 'react';
+import { supabase } from "@/src/lib/supabase";
+import { useRouter } from "expo-router";
+import { ArrowLeft, Crown } from "lucide-react-native";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -11,29 +11,25 @@ import {
   Text,
   TouchableOpacity,
   View,
-} from 'react-native';
+} from "react-native";
 
 interface RankUser {
   rank: number;
-  id: number;
+  id: string;
   name: string;
   username: string | null;
   avatar: string | null;
-  postCount: number;
-  followerCount: number;
+  post_count: number;
+  follower_count: number;
 }
 
-const CROWN_COLORS = ['#FFD700', '#C0C0C0', '#CD7F32'];
+const CROWN_COLORS = ["#FFD700", "#C0C0C0", "#CD7F32"];
 
 function PodiumCard({ user }: { user: RankUser }) {
-  const crownColor = CROWN_COLORS[user.rank - 1] ?? '#555';
+  const crownColor = CROWN_COLORS[user.rank - 1] ?? "#555";
   const isFirst = user.rank === 1;
-
   return (
-    <View
-      className="items-center mx-2"
-      style={{ marginTop: isFirst ? 0 : 20 }}
-    >
+    <View className="items-center mx-2" style={{ marginTop: isFirst ? 0 : 20 }}>
       <Crown size={20} color={crownColor} style={{ marginBottom: 4 }} />
       <Image
         source={{ uri: user.avatar ?? `https://i.pravatar.cc/150?u=${user.id}` }}
@@ -49,12 +45,9 @@ function PodiumCard({ user }: { user: RankUser }) {
         {user.username ?? user.name}
       </Text>
       <Text className="text-gray-400 text-xs mt-0.5">
-        {user.followerCount} seguidores
+        {user.follower_count} seguidores
       </Text>
-      <View
-        style={{ backgroundColor: crownColor }}
-        className="rounded-full px-2 py-0.5 mt-1"
-      >
+      <View style={{ backgroundColor: crownColor }} className="rounded-full px-2 py-0.5 mt-1">
         <Text className="text-black text-xs font-bold">#{user.rank}</Text>
       </View>
     </View>
@@ -67,24 +60,23 @@ export default function RankingScreen() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api
-      .get<RankUser[]>('/ranking?limit=20')
-      .then(setRanking)
-      .catch(console.error)
+    supabase
+      .rpc("get_ranking", { p_limit: 20 })
+      .then(({ data, error }) => {
+        if (error) { console.error(error); return; }
+        setRanking((data ?? []).map((r: Omit<RankUser, "rank">, i: number) => ({ ...r, rank: i + 1 })));
+      })
       .finally(() => setLoading(false));
   }, []);
 
   const top3 = ranking.slice(0, 3);
   const rest = ranking.slice(3);
-
-  // reorder podium: 2nd | 1st | 3rd
   const podiumOrder = [top3[1], top3[0], top3[2]].filter(Boolean) as RankUser[];
 
   return (
     <SafeAreaView className="flex-1 bg-black">
       <StatusBar barStyle="light-content" backgroundColor="#000" />
 
-      {/* Header */}
       <View className="flex-row items-center px-4 py-4 border-b border-gray-800">
         <TouchableOpacity onPress={() => router.back()} className="mr-3">
           <ArrowLeft size={24} color="#39FF14" />
@@ -102,7 +94,6 @@ export default function RankingScreen() {
         </View>
       ) : (
         <ScrollView showsVerticalScrollIndicator={false}>
-          {/* Podium Top 3 */}
           {top3.length > 0 && (
             <View className="bg-[#0f0f0f] mx-4 mt-6 rounded-2xl py-6">
               <Text className="text-center text-gray-400 text-xs uppercase tracking-widest mb-4">
@@ -116,7 +107,6 @@ export default function RankingScreen() {
             </View>
           )}
 
-          {/* Lista restante */}
           {rest.length > 0 && (
             <View className="mx-4 mt-4 mb-8">
               {rest.map((user) => (
@@ -128,9 +118,7 @@ export default function RankingScreen() {
                     {user.rank}
                   </Text>
                   <Image
-                    source={{
-                      uri: user.avatar ?? `https://i.pravatar.cc/150?u=${user.id}`,
-                    }}
+                    source={{ uri: user.avatar ?? `https://i.pravatar.cc/150?u=${user.id}` }}
                     className="w-10 h-10 rounded-full border border-gray-700 ml-2"
                   />
                   <View className="ml-3 flex-1">
@@ -140,7 +128,7 @@ export default function RankingScreen() {
                     ) : null}
                   </View>
                   <Text className="text-[#39FF14] text-xs font-bold">
-                    {user.followerCount} seg.
+                    {user.follower_count} seg.
                   </Text>
                 </View>
               ))}

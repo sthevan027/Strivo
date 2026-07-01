@@ -1,12 +1,7 @@
-/**
- * profileStorage.ts
- * Shim de compatibilidade — delega para o backend NestJS.
- * Mantemos a mesma interface para não quebrar chamadas existentes.
- */
-import { api } from "@/src/lib/api";
+import { supabase } from "@/src/lib/supabase";
 
 export interface ProfileData {
-  id?: number;
+  id?: string;
   username?: string;
   name?: string;
   bio?: string;
@@ -20,19 +15,28 @@ export interface ProfileData {
 }
 
 export async function loadProfileData(): Promise<ProfileData | null> {
-  try {
-    return await api.get<ProfileData>("/users/me");
-  } catch {
-    return null;
-  }
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.user) return null;
+  const { data } = await supabase
+    .from("user_profile")
+    .select("id, name, username, bio, avatar, phone")
+    .eq("id", session.user.id)
+    .single();
+  if (!data) return null;
+  return { ...data, email: session.user.email };
 }
 
 export async function saveProfileData(data: ProfileData): Promise<void> {
-  await api.patch("/users/me", {
-    name: data.name,
-    username: data.username,
-    bio: data.bio,
-    avatar: data.avatar,
-    phone: data.phone,
-  });
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.user) throw new Error("Não autenticado");
+  await supabase
+    .from("user_profile")
+    .update({
+      name: data.name,
+      username: data.username,
+      bio: data.bio,
+      avatar: data.avatar,
+      phone: data.phone,
+    })
+    .eq("id", session.user.id);
 }

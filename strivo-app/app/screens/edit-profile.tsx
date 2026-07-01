@@ -1,5 +1,5 @@
 import { useAuth } from '@/src/contexts/AuthContext';
-import { api } from '@/src/lib/api';
+import { supabase } from '@/src/lib/supabase';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
@@ -272,11 +272,17 @@ export default function EditProfileScreen() {
     }
 
     try {
-      await api.patch('/users/me', {
-        name: form.fullname.trim() || undefined,
-        username: form.username.trim() || undefined,
-        bio: form.bio.trim() || undefined,
-      });
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) throw new Error('Não autenticado');
+      const { error } = await supabase
+        .from('user_profile')
+        .update({
+          name: form.fullname.trim() || undefined,
+          username: form.username.trim() || undefined,
+          bio: form.bio.trim() || undefined,
+        })
+        .eq('id', session.user.id);
+      if (error) throw new Error(error.message);
       await refreshUser();
       showNotification('Sucesso!', 'Perfil atualizado com sucesso!', 'success', true);
     } catch (error: any) {

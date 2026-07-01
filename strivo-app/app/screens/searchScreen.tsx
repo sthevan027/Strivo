@@ -1,6 +1,6 @@
-import { api } from '@/src/lib/api';
-import { Search, X } from 'lucide-react-native';
-import React, { useState } from 'react';
+import { supabase } from "@/src/lib/supabase";
+import { Search, X } from "lucide-react-native";
+import React, { useState } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -11,18 +11,18 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-} from 'react-native';
+} from "react-native";
 
 interface SearchUser {
-  id: number;
+  id: string;
   name: string;
   username: string | null;
   avatar: string | null;
-  isFollowing: boolean;
+  is_following: boolean;
 }
 
 export default function SearchScreen() {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [results, setResults] = useState<SearchUser[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -34,10 +34,14 @@ export default function SearchScreen() {
     }
     setLoading(true);
     try {
-      const data = await api.get<SearchUser[]>(
-        `/users/search?q=${encodeURIComponent(text)}`,
-      );
-      setResults(data);
+      const { data: { session } } = await supabase.auth.getSession();
+      const currentUserId = session?.user.id ?? "";
+      const { data, error } = await supabase.rpc("search_users", {
+        q: text,
+        current_user_id: currentUserId,
+      });
+      if (error) throw error;
+      setResults(data ?? []);
     } catch {
       setResults([]);
     } finally {
@@ -45,25 +49,34 @@ export default function SearchScreen() {
     }
   };
 
-  const toggleFollow = async (userId: number, isFollowing: boolean) => {
+  const toggleFollow = async (userId: string, isFollowing: boolean) => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.user) return;
     try {
       if (isFollowing) {
-        await api.delete(`/users/${userId}/follow`);
+        await supabase
+          .from("follows")
+          .delete()
+          .eq("follower_id", session.user.id)
+          .eq("following_id", userId);
       } else {
-        await api.post(`/users/${userId}/follow`, {});
+        await supabase.from("follows").insert({
+          follower_id: session.user.id,
+          following_id: userId,
+        });
       }
       setResults((prev) =>
         prev.map((u) =>
-          u.id === userId ? { ...u, isFollowing: !isFollowing } : u,
-        ),
+          u.id === userId ? { ...u, is_following: !isFollowing } : u
+        )
       );
     } catch (err) {
-      console.log('Follow error:', err);
+      console.log("Follow error:", err);
     }
   };
 
   const clearSearch = () => {
-    setSearchQuery('');
+    setSearchQuery("");
     setResults([]);
   };
 
@@ -120,17 +133,17 @@ export default function SearchScreen() {
               </View>
 
               <TouchableOpacity
-                onPress={() => toggleFollow(user.id, user.isFollowing)}
+                onPress={() => toggleFollow(user.id, user.is_following)}
                 className={`px-4 py-2 rounded-xl ${
-                  user.isFollowing ? 'bg-gray-700' : 'bg-[#39FF14]'
+                  user.is_following ? "bg-gray-700" : "bg-[#39FF14]"
                 }`}
               >
                 <Text
                   className={`text-xs font-bold ${
-                    user.isFollowing ? 'text-white' : 'text-black'
+                    user.is_following ? "text-white" : "text-black"
                   }`}
                 >
-                  {user.isFollowing ? 'Seguindo' : 'Seguir'}
+                  {user.is_following ? "Seguindo" : "Seguir"}
                 </Text>
               </TouchableOpacity>
             </View>
