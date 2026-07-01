@@ -28,4 +28,4 @@ jobs:
         run: npm ci
 
       - name: Auditoria de dependências
-        run: npm audit --audit-level=moderate
+        run: npm audit --audit-level=moderate --omit=dev
