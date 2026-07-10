@@ -10,6 +10,20 @@
 create type if not exists public.media_kind   as enum ('photo', 'video');
 create type if not exists public.media_status as enum ('pending', 'ready', 'failed');
 
+-- do $$
+-- begin
+--     create type public.media_kind as enum ('photo', 'video');
+--   exception
+--     when duplicate_object then null;
+-- end $$
+
+-- do $$
+-- begin
+--     create type public.media_status as enum ('pending', 'ready', 'failed');
+--   exception
+--     when duplicate_object then null;
+-- end $$
+
 
 -- ------------------------------------------------------------
 -- 2. TABELAS
