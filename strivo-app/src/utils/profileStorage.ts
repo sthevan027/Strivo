@@ -1,18 +1,12 @@
 import { supabase } from "@/src/lib/supabase";
+import type { Profile } from "@/src/types/profile";
 
-export interface ProfileData {
-  id?: string;
-  username?: string;
-  name?: string;
-  bio?: string;
+// Colunas reais de user_profile; email vem da sessão (auth), não do banco.
+export type ProfileData = Partial<
+  Pick<Profile, "id" | "name" | "username" | "bio" | "avatar" | "phone">
+> & {
   email?: string;
-  avatar?: string;
-  phone?: string;
-  youtube?: string;
-  twitch?: string;
-  instagram?: string;
-  twitter?: string;
-}
+};
 
 export async function loadProfileData(): Promise<ProfileData | null> {
   const { data: { session } } = await supabase.auth.getSession();
