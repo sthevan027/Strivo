@@ -119,18 +119,35 @@ alter table public.post_media   enable row level security;
 alter table public.follows      enable row level security;
 
 -- user_profile
+-- A tabela tem coluna sensível (phone), e RLS protege linha, não coluna:
+-- a leitura direta fica restrita ao dono. Perfis de terceiros devem ser
+-- lidos pela view user_profile_public (abaixo) ou pelas RPCs.
 drop policy if exists "read all profiles"  on public.user_profile;
+drop policy if exists "read own profile"   on public.user_profile;
 drop policy if exists "update own profile" on public.user_profile;
 drop policy if exists "insert own profile" on public.user_profile;
 
-create policy "read all profiles"
-  on public.user_profile for select using (true);
+create policy "read own profile"
+  on public.user_profile for select using (auth.uid() = id);
 
 create policy "insert own profile"
   on public.user_profile for insert with check (auth.uid() = id);
 
 create policy "update own profile"
   on public.user_profile for update using (auth.uid() = id);
+
+-- Visão pública do perfil: só colunas não sensíveis (sem phone).
+-- security_invoker = off: a view lê a tabela com os privilégios do dono
+-- (postgres), ignorando o RLS acima — por isso ela não pode expor phone.
+-- Como view simples é auto-atualizável, a escrita é revogada para não
+-- virar um bypass do RLS da tabela.
+create or replace view public.user_profile_public
+with (security_invoker = off) as
+  select id, name, username, bio, avatar, created_at
+  from public.user_profile;
+
+revoke all on public.user_profile_public from anon, authenticated;
+grant select on public.user_profile_public to anon, authenticated;
 
 -- posts
 drop policy if exists "read all posts"  on public.posts;
@@ -194,6 +211,10 @@ create policy "unfollow"
 -- 5. FUNÇÕES RPC
 -- ------------------------------------------------------------
 
+-- As RPCs abaixo são security definer para poderem ler user_profile de
+-- qualquer usuário (o RLS restringe select ao dono) — elas só expõem
+-- colunas não sensíveis (id, name, username, avatar).
+
 -- Feed com cursor pagination (cursor = created_at + id)
 create or replace function public.get_feed(
   p_limit      int,
@@ -209,6 +230,7 @@ returns table (
   media      json
 )
 language sql stable
+security definer set search_path = public
 as $$
   select
     p.id,
@@ -256,6 +278,7 @@ returns table (
   follower_count bigint
 )
 language sql stable
+security definer set search_path = public
 as $$
   select
     up.id,
@@ -286,6 +309,7 @@ returns table (
   is_following bool
 )
 language sql stable
+security definer set search_path = public
 as $$
   select
     up.id,
