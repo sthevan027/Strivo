@@ -18,7 +18,7 @@ export default function StoryCamera() {
   const loadUserAvatar = useCallback(async () => {
     try {
       const profileData = await loadProfileData();
-      if (profileData.avatar) {
+      if (profileData?.avatar) {
         setUserAvatar(profileData.avatar);
       }
     } catch (error) {

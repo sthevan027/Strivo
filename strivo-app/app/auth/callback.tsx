@@ -31,8 +31,10 @@ export default function Callback() {
         const metadata = user.user_metadata
 
         // 🔎 verifica se já existe profile (sem quebrar)
+        // Normalmente o trigger handle_new_user já criou a linha no signup;
+        // isto é só uma rede de segurança.
         const { data: existingProfile } = await supabase
-          .from('profiles')
+          .from('user_profile')
           .select('id')
           .eq('id', user.id)
           .maybeSingle()
@@ -40,13 +42,12 @@ export default function Callback() {
         // 🔥 só cria se não existir
         if (!existingProfile) {
           const { error } = await supabase
-            .from('profiles')
+            .from('user_profile')
             .insert({
               id: user.id,
-              nome: metadata?.full_name || '',
-              age: metadata?.age ? Number(metadata.age) : null,
-              phone: metadata?.phone || '',
-              avatar_url: null,
+              name: metadata?.name || metadata?.full_name || 'Usuário',
+              username: metadata?.username || null,
+              phone: metadata?.phone || null,
             })
 
           if (error) {

@@ -11,12 +11,13 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { supabase } from '../../../src/lib/supabase'
+import type { PublicProfile } from '../../../src/types/profile'
 
 export default function UserProfileScreen() {
   const router = useRouter()
   const { userId } = useLocalSearchParams()
 
-  const [profile, setProfile] = useState<any>(null)
+  const [profile, setProfile] = useState<PublicProfile | null>(null)
   const [myId, setMyId] = useState<string | null>(null)
   const [isFollowing, setIsFollowing] = useState(false)
   const [posts, setPosts] = useState<any[]>([])
@@ -29,10 +30,10 @@ export default function UserProfileScreen() {
 
     setMyId(me)
 
-    // 👤 perfil
+    // 👤 perfil (view pública, sem colunas sensíveis)
     const { data: userProfile } = await supabase
-      .from('profiles')
-      .select('*')
+      .from('user_profile_public')
+      .select('id, name, username, bio, avatar, created_at')
       .eq('id', userId)
       .single()
 
@@ -41,11 +42,11 @@ export default function UserProfileScreen() {
     // 🔁 seguidores
     if (me !== userId) {
       const { data: follow } = await supabase
-        .from('followers')
-        .select('*')
+        .from('follows')
+        .select('follower_id')
         .eq('follower_id', me)
         .eq('following_id', userId)
-        .single()
+        .maybeSingle()
 
       setIsFollowing(!!follow)
     }
@@ -53,8 +54,8 @@ export default function UserProfileScreen() {
     // 🔥 POSTS DO USUÁRIO
     const { data: userPosts } = await supabase
       .from('posts')
-      .select('*')
-      .eq('user_id', userId)
+      .select('id, caption, created_at')
+      .eq('author_id', userId)
       .order('created_at', { ascending: false })
 
     setPosts(userPosts || [])
@@ -70,14 +71,14 @@ export default function UserProfileScreen() {
 
     if (isFollowing) {
       await supabase
-        .from('followers')
+        .from('follows')
         .delete()
         .eq('follower_id', myId)
         .eq('following_id', userId)
 
       setIsFollowing(false)
     } else {
-      await supabase.from('followers').insert({
+      await supabase.from('follows').insert({
         follower_id: myId,
         following_id: userId,
       })
@@ -108,14 +109,14 @@ export default function UserProfileScreen() {
           <Image
             source={{
               uri:
-                profile.avatar_url ||
+                profile.avatar ||
                 'https://api.dicebear.com/7.x/avataaars/svg?seed=user',
             }}
             style={{ width: 120, height: 120, borderRadius: 999 }}
           />
 
           <Text className="text-white text-2xl font-bold mt-3">
-            {profile.nome}
+            {profile.name}
           </Text>
 
           <Text className="text-gray-400">
@@ -180,7 +181,7 @@ export default function UserProfileScreen() {
                 }}
               >
                 <Image
-                  source={{ uri: post.media_url }}
+                  source={{ uri: `https://picsum.photos/seed/${post.id}/300` }}
                   style={{
                     width: '100%',
                     height: '100%',
