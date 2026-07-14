@@ -332,15 +332,37 @@ $$;
 
 
 -- ------------------------------------------------------------
--- 6. STORAGE — bucket "posts"
--- (Execute manualmente no dashboard ou via API se preferir)
+-- 6. STORAGE — bucket "posts" (privado; acesso via signed URLs)
 -- ------------------------------------------------------------
--- No Supabase Dashboard → Storage → New bucket:
---   Name: posts
---   Public: false (acesso via signed URLs)
---
--- Policies necessárias no bucket "posts":
---   • SELECT  → autenticados podem ler    (using: true)
---   • INSERT  → dono pode fazer upload    (using: auth.uid()::text = (storage.foldername(name))[2])
---   • DELETE  → dono pode deletar
--- ------------------------------------------------------------
+
+insert into storage.buckets (id, name, public)
+values ('posts', 'posts', false)
+on conflict (id) do nothing;
+
+drop policy if exists "posts read authenticated" on storage.objects;
+drop policy if exists "posts insert own folder"  on storage.objects;
+drop policy if exists "posts delete own folder"  on storage.objects;
+
+-- Leitura: qualquer usuário autenticado (o bucket é privado, então anon
+-- só chega via signed URL emitida por quem pode ler)
+create policy "posts read authenticated"
+  on storage.objects for select to authenticated
+  using (bucket_id = 'posts');
+
+-- Upload/delete: apenas dentro da própria pasta users/<uid>/...
+-- (o app grava em users/<uid>/posts/AAAA/MM/arquivo — ver create-post.tsx)
+create policy "posts insert own folder"
+  on storage.objects for insert to authenticated
+  with check (
+    bucket_id = 'posts'
+    and (storage.foldername(name))[1] = 'users'
+    and (storage.foldername(name))[2] = auth.uid()::text
+  );
+
+create policy "posts delete own folder"
+  on storage.objects for delete to authenticated
+  using (
+    bucket_id = 'posts'
+    and (storage.foldername(name))[1] = 'users'
+    and (storage.foldername(name))[2] = auth.uid()::text
+  );
