@@ -7,8 +7,21 @@
 -- 1. TIPOS ENUM
 -- ------------------------------------------------------------
 
-create type if not exists public.media_kind   as enum ('photo', 'video');
-create type if not exists public.media_status as enum ('pending', 'ready', 'failed');
+-- "create type" não suporta "if not exists"; os blocos DO ignoram o erro
+-- de tipo duplicado para o script continuar idempotente.
+do $$
+begin
+  create type public.media_kind as enum ('photo', 'video');
+exception
+  when duplicate_object then null;
+end $$;
+
+do $$
+begin
+  create type public.media_status as enum ('pending', 'ready', 'failed');
+exception
+  when duplicate_object then null;
+end $$;
 
 
 -- ------------------------------------------------------------
