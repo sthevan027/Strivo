@@ -23,21 +23,6 @@ exception
   when duplicate_object then null;
 end $$;
 
--- do $$
--- begin
---     create type public.media_kind as enum ('photo', 'video');
---   exception
---     when duplicate_object then null;
--- end $$
-
--- do $$
--- begin
---     create type public.media_status as enum ('pending', 'ready', 'failed');
---   exception
---     when duplicate_object then null;
--- end $$
-
-
 -- ------------------------------------------------------------
 -- 2. TABELAS
 -- ------------------------------------------------------------
