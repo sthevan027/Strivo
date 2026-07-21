@@ -7,8 +7,21 @@
 -- 1. TIPOS ENUM
 -- ------------------------------------------------------------
 
-create type if not exists public.media_kind   as enum ('photo', 'video');
-create type if not exists public.media_status as enum ('pending', 'ready', 'failed');
+-- "create type" não suporta "if not exists"; os blocos DO ignoram o erro
+-- de tipo duplicado para o script continuar idempotente.
+do $$
+begin
+  create type public.media_kind as enum ('photo', 'video');
+exception
+  when duplicate_object then null;
+end $$;
+
+do $$
+begin
+  create type public.media_status as enum ('pending', 'ready', 'failed');
+exception
+  when duplicate_object then null;
+end $$;
 
 -- do $$
 -- begin
@@ -120,18 +133,35 @@ alter table public.post_media   enable row level security;
 alter table public.follows      enable row level security;
 
 -- user_profile
+-- A tabela tem coluna sensível (phone), e RLS protege linha, não coluna:
+-- a leitura direta fica restrita ao dono. Perfis de terceiros devem ser
+-- lidos pela view user_profile_public (abaixo) ou pelas RPCs.
 drop policy if exists "read all profiles"  on public.user_profile;
+drop policy if exists "read own profile"   on public.user_profile;
 drop policy if exists "update own profile" on public.user_profile;
 drop policy if exists "insert own profile" on public.user_profile;
 
-create policy "read all profiles"
-  on public.user_profile for select using (true);
+create policy "read own profile"
+  on public.user_profile for select using (auth.uid() = id);
 
 create policy "insert own profile"
   on public.user_profile for insert with check (auth.uid() = id);
 
 create policy "update own profile"
   on public.user_profile for update using (auth.uid() = id);
+
+-- Visão pública do perfil: só colunas não sensíveis (sem phone).
+-- security_invoker = off: a view lê a tabela com os privilégios do dono
+-- (postgres), ignorando o RLS acima — por isso ela não pode expor phone.
+-- Como view simples é auto-atualizável, a escrita é revogada para não
+-- virar um bypass do RLS da tabela.
+create or replace view public.user_profile_public
+with (security_invoker = off) as
+  select id, name, username, bio, avatar, created_at
+  from public.user_profile;
+
+revoke all on public.user_profile_public from anon, authenticated;
+grant select on public.user_profile_public to anon, authenticated;
 
 -- posts
 drop policy if exists "read all posts"  on public.posts;
@@ -195,6 +225,10 @@ create policy "unfollow"
 -- 5. FUNÇÕES RPC
 -- ------------------------------------------------------------
 
+-- As RPCs abaixo são security definer para poderem ler user_profile de
+-- qualquer usuário (o RLS restringe select ao dono) — elas só expõem
+-- colunas não sensíveis (id, name, username, avatar).
+
 -- Feed com cursor pagination (cursor = created_at + id)
 create or replace function public.get_feed(
   p_limit      int,
@@ -210,6 +244,7 @@ returns table (
   media      json
 )
 language sql stable
+security definer set search_path = public
 as $$
   select
     p.id,
@@ -257,6 +292,7 @@ returns table (
   follower_count bigint
 )
 language sql stable
+security definer set search_path = public
 as $$
   select
     up.id,
@@ -287,6 +323,7 @@ returns table (
   is_following bool
 )
 language sql stable
+security definer set search_path = public
 as $$
   select
     up.id,
@@ -309,15 +346,37 @@ $$;
 
 
 -- ------------------------------------------------------------
--- 6. STORAGE — bucket "posts"
--- (Execute manualmente no dashboard ou via API se preferir)
+-- 6. STORAGE — bucket "posts" (privado; acesso via signed URLs)
 -- ------------------------------------------------------------
--- No Supabase Dashboard → Storage → New bucket:
---   Name: posts
---   Public: false (acesso via signed URLs)
---
--- Policies necessárias no bucket "posts":
---   • SELECT  → autenticados podem ler    (using: true)
---   • INSERT  → dono pode fazer upload    (using: auth.uid()::text = (storage.foldername(name))[2])
---   • DELETE  → dono pode deletar
--- ------------------------------------------------------------
+
+insert into storage.buckets (id, name, public)
+values ('posts', 'posts', false)
+on conflict (id) do nothing;
+
+drop policy if exists "posts read authenticated" on storage.objects;
+drop policy if exists "posts insert own folder"  on storage.objects;
+drop policy if exists "posts delete own folder"  on storage.objects;
+
+-- Leitura: qualquer usuário autenticado (o bucket é privado, então anon
+-- só chega via signed URL emitida por quem pode ler)
+create policy "posts read authenticated"
+  on storage.objects for select to authenticated
+  using (bucket_id = 'posts');
+
+-- Upload/delete: apenas dentro da própria pasta users/<uid>/...
+-- (o app grava em users/<uid>/posts/AAAA/MM/arquivo — ver create-post.tsx)
+create policy "posts insert own folder"
+  on storage.objects for insert to authenticated
+  with check (
+    bucket_id = 'posts'
+    and (storage.foldername(name))[1] = 'users'
+    and (storage.foldername(name))[2] = auth.uid()::text
+  );
+
+create policy "posts delete own folder"
+  on storage.objects for delete to authenticated
+  using (
+    bucket_id = 'posts'
+    and (storage.foldername(name))[1] = 'users'
+    and (storage.foldername(name))[2] = auth.uid()::text
+  );
