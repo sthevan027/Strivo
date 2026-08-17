@@ -1,6 +1,6 @@
 # Strivo — Plataforma de Streaming
 
-![Status](https://img.shields.io/badge/status-em%20desenvolvimento-yellow)
+![Status](<https://img.shields.io/badge/status-em%20desenvolvimento-yellow>)
 
 [![React Native](https://img.shields.io/badge/React_Native_0.81-20232A?style=flat&logo=react&logoColor=61DAFB)](https://reactnative.dev/)
 [![Expo](https://img.shields.io/badge/Expo_54-000020?style=flat&logo=expo&logoColor=fff)](https://expo.dev/)
@@ -14,16 +14,16 @@
 
 ## Stack
 
-| Camada | Tecnologia |
-|--------|-----------|
-| **App** | React Native 0.81 + Expo 54 + Expo Router |
-| **Web** | Expo Web (`expo export -p web`) → Vercel |
-| **Estilização** | NativeWind 4 (Tailwind CSS) |
-| **Backend** | Supabase (Auth + Postgres + Storage) |
-| **Auth** | Supabase Auth (email/senha, sessão persistente) |
-| **Banco** | Supabase Postgres com RLS e RPCs SQL |
-| **Storage** | Supabase Storage (fotos e vídeos via signed URL) |
-| **Ícones** | lucide-react-native + @expo/vector-icons |
+| Camada                  | Tecnologia                                        |
+| ----------------------- | ------------------------------------------------- |
+| **App**           | React Native 0.81 + Expo 54 + Expo Router         |
+| **Web**           | Expo Web (`expo export -p web`) → Vercel       |
+| **Estilização** | NativeWind 4 (Tailwind CSS)                       |
+| **Backend**       | Supabase (Auth + Postgres + Storage)              |
+| **Auth**          | Supabase Auth (email/senha, sessão persistente)  |
+| **Banco**         | Supabase Postgres com RLS e RPCs SQL              |
+| **Storage**       | Supabase Storage (fotos e vídeos via signed URL) |
+| **Ícones**       | lucide-react-native + @expo/vector-icons          |
 
 ---
 
@@ -77,27 +77,27 @@ O arquivo `vercel.json` já está configurado — basta conectar o repositório 
 
 ### ✅ Implementado
 
-| Feature | Arquivo |
-|---------|---------|
+| Feature                           | Arquivo                                 |
+| --------------------------------- | --------------------------------------- |
 | Autenticação (login / registro) | `app/login.tsx`, `app/register.tsx` |
-| Perfil de usuário | `app/screens/profile.tsx` |
-| Editar perfil | `app/screens/edit-profile.tsx` |
-| Feed de posts | `app/(tabs)/home.tsx` |
-| Criar post (foto/vídeo) | `app/screens/create-post.tsx` |
-| Ranking de streamers | `app/screens/ranking.tsx` |
-| Busca de usuários | `app/screens/searchScreen.tsx` |
-| Follow / Unfollow | `src/services/follow.ts` |
-| Configurações | `app/screens/configuration.tsx` |
-| Reels | `app/screens/reels.tsx` |
-| Chat | `app/screens/chat/` |
+| Perfil de usuário                | `app/screens/profile.tsx`             |
+| Editar perfil                     | `app/screens/edit-profile.tsx`        |
+| Feed de posts                     | `app/(tabs)/home.tsx`                 |
+| Criar post (foto/vídeo)          | `app/screens/create-post.tsx`         |
+| Ranking de streamers              | `app/screens/ranking.tsx`             |
+| Busca de usuários                | `app/screens/searchScreen.tsx`        |
+| Follow / Unfollow                 | `src/services/follow.ts`              |
+| Configurações                   | `app/screens/configuration.tsx`       |
+| Reels                             | `app/screens/reels.tsx`               |
+| Chat                              | `app/screens/chat/`                   |
 
 ### ❌ Pendente
 
-| Feature | Situação |
-|---------|---------|
-| Doações | UI pronta (`suport-creator.tsx`), sem integração de pagamento |
-| Lives em tempo real | UI de player existe, sem streaming (WebRTC/RTMP) |
-| Notificações push | Estrutura criada, sem envio real |
+| Feature             | Situação                                                        |
+| ------------------- | ----------------------------------------------------------------- |
+| Doações           | UI pronta (`suport-creator.tsx`), sem integração de pagamento |
+| Lives em tempo real | UI de player existe, sem streaming (WebRTC/RTMP)                  |
+| Notificações push | Estrutura criada, sem envio real                                  |
 
 ---
 
@@ -154,11 +154,11 @@ follows        follower_id, following_id
 
 RLS ativo em todas as tabelas. RPCs disponíveis:
 
-| Função | Descrição |
-|--------|-----------|
-| `get_feed(limit, cursor_at, cursor_id)` | Feed paginado por cursor |
-| `get_ranking(limit)` | Top streamers por posts e seguidores |
-| `search_users(q, current_user_id)` | Busca por nome ou username |
+| Função                                  | Descrição                          |
+| ----------------------------------------- | ------------------------------------ |
+| `get_feed(limit, cursor_at, cursor_id)` | Feed paginado por cursor             |
+| `get_ranking(limit)`                    | Top streamers por posts e seguidores |
+| `search_users(q, current_user_id)`      | Busca por nome ou username           |
 
 ---
 
