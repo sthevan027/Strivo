@@ -99,3 +99,4 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 .idea
 .vscode
 .claude
+package-lock.json

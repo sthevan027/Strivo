@@ -18,7 +18,7 @@ function RouteGuard({ children }: { children: React.ReactNode }) {
     if (!user && !inAuthGroup) {
       router.replace("/login");
     } else if (user && inAuthGroup) {
-      router.replace("/(tabs)");
+      router.replace("/(tabs)/home");
     }
   }, [user, isLoading, segments]);
 

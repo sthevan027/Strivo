@@ -38,13 +38,28 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 async function fetchProfile(userId: string): Promise<AuthUser | null> {
   const { data: { session } } = await supabase.auth.getSession();
-  const email = session?.user.email ?? "";
-  const { data } = await supabase
+  const authUser = session?.user;
+  const email = authUser?.email ?? "";
+  const { data, error } = await supabase
     .from("user_profile")
     .select("id, name, username, avatar, bio, phone")
     .eq("id", userId)
-    .single();
-  if (!data) return null;
+    .maybeSingle();
+  if (error) throw new Error("Não foi possível carregar o seu perfil.");
+  if (!data) {
+    const fallback = {
+      id: userId,
+      name: authUser?.user_metadata?.name ?? "Usuário",
+      username: authUser?.user_metadata?.username ?? null,
+    };
+    const { data: created, error: createError } = await supabase
+      .from("user_profile")
+      .upsert(fallback, { onConflict: "id" })
+      .select("id, name, username, avatar, bio, phone")
+      .single();
+    if (createError) throw new Error("Não foi possível preparar o seu perfil.");
+    return { ...created, email };
+  }
   return { ...data, email };
 }
 

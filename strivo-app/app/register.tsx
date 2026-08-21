@@ -39,7 +39,7 @@ export default function RegisterScreen() {
         password,
         phone: phone.trim() || undefined,
       });
-      router.replace("/(tabs)");
+      router.replace("/(tabs)/home");
     } catch (err: any) {
       Alert.alert("Erro", err.message ?? "Erro ao criar conta");
     } finally {
