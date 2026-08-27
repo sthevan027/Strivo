@@ -13,11 +13,13 @@ function RouteGuard({ children }: { children: React.ReactNode }) {
       segments[0] === "login" ||
       segments[0] === "register" ||
       segments[0] === "verify-email" ||
+      segments[0] === "update-password" ||
       segments[0] === "auth"; // covers auth/callback OAuth flow
+    const isPasswordRecovery = segments[0] === "update-password";
 
     if (!user && !inAuthGroup) {
       router.replace("/login");
-    } else if (user && inAuthGroup) {
+    } else if (user && inAuthGroup && !isPasswordRecovery) {
       router.replace("/(tabs)/home");
     }
   }, [user, isLoading, segments]);

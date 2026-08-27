@@ -29,6 +29,7 @@ interface AuthContextValue {
   user: AuthUser | null;
   isLoading: boolean;
   login(email: string, password: string): Promise<void>;
+  resetPassword(email: string): Promise<void>;
   register(data: RegisterData): Promise<void>;
   logout(): Promise<void>;
   refreshUser(): Promise<void>;
@@ -105,6 +106,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (data.user) await loadUser(data.user.id);
   }, [loadUser]);
 
+  const resetPassword = useCallback(async (email: string) => {
+    const redirectTo = typeof window !== "undefined"
+      ? `${window.location.origin}/update-password`
+      : "strivoapp://update-password";
+    const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
+    if (error) throw new Error(error.message);
+  }, []);
+
   const register = useCallback(async (data: RegisterData) => {
     const { data: authData, error } = await supabase.auth.signUp({
       email: data.email,
@@ -137,7 +146,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, isLoading, login, register, logout, refreshUser }}
+      value={{ user, isLoading, login, resetPassword, register, logout, refreshUser }}
     >
       {children}
     </AuthContext.Provider>

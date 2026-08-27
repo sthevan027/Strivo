@@ -21,18 +21,22 @@ const MUTED = "#8B9489";
 
 function authErrorMessage(error: unknown) {
   const message = error instanceof Error ? error.message : "";
+  if (/rate limit|email rate limit|over_email_send_rate_limit/i.test(message)) {
+    return "Limite de envio de email atingido. Aguarde alguns minutos e tente novamente.";
+  }
   if (/invalid login credentials/i.test(message)) return "Email ou senha incorretos.";
   if (/email not confirmed/i.test(message)) return "Confirme seu email antes de entrar.";
   return message || "Não foi possível entrar agora. Tente novamente.";
 }
 
 export default function LoginScreen() {
-  const { login } = useAuth();
+  const { login, resetPassword } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [resetMsg, setResetMsg] = useState("");
 
   async function handleLogin() {
     Keyboard.dismiss();
@@ -51,6 +55,25 @@ export default function LoginScreen() {
     try {
       await login(normalizedEmail, password);
       router.replace("/(tabs)/home");
+    } catch (error) {
+      setErrorMsg(authErrorMessage(error));
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleResetPassword() {
+    const normalizedEmail = email.trim().toLowerCase();
+    setErrorMsg("");
+    setResetMsg("");
+    if (!/^\S+@\S+\.\S+$/.test(normalizedEmail)) {
+      setErrorMsg("Digite seu email para receber o link de recuperação.");
+      return;
+    }
+    setLoading(true);
+    try {
+      await resetPassword(normalizedEmail);
+      setResetMsg("Se o email estiver cadastrado, enviaremos um link para redefinir sua senha.");
     } catch (error) {
       setErrorMsg(authErrorMessage(error));
     } finally {
@@ -111,6 +134,11 @@ export default function LoginScreen() {
             </View>
 
             {errorMsg ? <Text style={styles.error}>{errorMsg}</Text> : null}
+            {resetMsg ? <Text style={styles.success}>{resetMsg}</Text> : null}
+
+            <Pressable onPress={handleResetPassword} disabled={loading} style={styles.resetLink}>
+              <Text style={styles.link}>Esqueci minha senha</Text>
+            </Pressable>
 
             <Pressable style={({ pressed }) => [styles.button, pressed && styles.buttonPressed, loading && styles.buttonLoading]} onPress={handleLogin} disabled={loading}>
               {loading ? <ActivityIndicator color="#10200F" /> : <Text style={styles.buttonText}>Entrar na conta</Text>}
@@ -143,6 +171,8 @@ const styles = StyleSheet.create({
   inputError: { borderColor: "#D96C6C" },
   input: { flex: 1, color: "#F5F8F3", fontSize: 15, paddingVertical: 16 },
   error: { color: "#F28D8D", fontSize: 13, lineHeight: 18, marginTop: 13, textAlign: "center" },
+  success: { color: GREEN, fontSize: 13, lineHeight: 18, marginTop: 13, textAlign: "center" },
+  resetLink: { alignSelf: "center", marginTop: 18 },
   button: { minHeight: 58, borderRadius: 15, backgroundColor: GREEN, alignItems: "center", justifyContent: "center", marginTop: 25, shadowColor: GREEN, shadowOpacity: 0.18, shadowRadius: 15, shadowOffset: { width: 0, height: 7 }, elevation: 4 },
   buttonPressed: { opacity: 0.86, transform: [{ scale: 0.99 }] },
   buttonLoading: { opacity: 0.7 },

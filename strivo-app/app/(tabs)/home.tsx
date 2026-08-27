@@ -1,6 +1,7 @@
 import { supabase } from "@/src/lib/supabase";
+import { useAuth } from "@/src/contexts/AuthContext";
 import { useRouter } from "expo-router";
-import { Radio } from "lucide-react-native";
+import { Bookmark, Heart, MessageCircle, MoreHorizontal, Plus, Search, Send } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -21,6 +22,7 @@ interface MediaItem {
   id: number;
   path: string;
   kind: "photo" | "video";
+  mime_type?: string;
 }
 
 interface FeedPost {
@@ -43,80 +45,60 @@ interface TopStreamer {
 
 // ── sub-componentes ────────────────────────────────────────────────────────
 
-function TopStreamerCard({ streamer }: { streamer: TopStreamer }) {
-  const label = streamer.username ?? streamer.name;
-  return (
-    <View style={styles.streamerCard}>
-      <View style={styles.streamerAvatarWrap}>
-        <Image
-          source={{ uri: streamer.avatar ?? `https://i.pravatar.cc/150?u=${streamer.id}` }}
-          style={styles.streamerAvatar}
-        />
-        <View style={styles.rankBadge}>
-          <Text style={styles.rankBadgeText}>#{streamer.rank}</Text>
-        </View>
-      </View>
-      <Text style={styles.streamerName} numberOfLines={1}>{label}</Text>
-      <Text style={styles.streamerStat}>{streamer.follower_count} seg.</Text>
-    </View>
-  );
-}
-
 function HomeHeader({
   topStreamers,
   router,
+  userAvatar,
 }: {
   topStreamers: TopStreamer[] | null;
   router: ReturnType<typeof useRouter>;
+  userAvatar?: string | null;
 }) {
   return (
     <View>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Strivo</Text>
+        <Text style={styles.headerTitle}>strivo</Text>
+        <View style={styles.headerActions}>
+          <TouchableOpacity onPress={() => router.push("/screens/ranking")}>
+            <Search color="#F5F5F5" size={24} strokeWidth={2.2} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => router.push("/screens/create-post")}>
+            <Plus color="#F5F5F5" size={25} strokeWidth={2.2} />
+          </TouchableOpacity>
+        </View>
       </View>
 
-      <View style={styles.section}>
+      <View style={styles.storiesSection}>
         <View style={styles.sectionRow}>
-          <Text style={styles.sectionTitle}>Top Streamers</Text>
-          <TouchableOpacity onPress={() => router.push("/screens/ranking")}>
-            <Text style={styles.sectionLink}>Ver ranking</Text>
-          </TouchableOpacity>
+          <Text style={styles.sectionTitle}>Stories</Text>
         </View>
 
         {!topStreamers ? (
           <ActivityIndicator color="#39FF14" style={{ marginVertical: 16 }} />
-        ) : topStreamers.length === 0 ? (
-          <Text style={styles.emptyNote}>Nenhum streamer ainda.</Text>
         ) : (
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ paddingHorizontal: 12, paddingVertical: 8 }}
+            contentContainerStyle={styles.storiesList}
           >
+            <TouchableOpacity style={styles.storyItem} onPress={() => router.push("/screens/story-screen")}>
+              <View style={styles.storyAvatarWrap}>
+                <Image source={{ uri: userAvatar ?? "https://i.pravatar.cc/150?u=me" }} style={styles.storyAvatar} />
+                <View style={styles.addStory}><Plus color="#000" size={13} strokeWidth={3} /></View>
+              </View>
+              <Text style={styles.storyName} numberOfLines={1}>Seu story</Text>
+            </TouchableOpacity>
             {topStreamers.map((s) => (
-              <TopStreamerCard key={s.id} streamer={s} />
+              <TouchableOpacity key={s.id} style={styles.storyItem} onPress={() => router.push("/screens/profile/other-user-profile")}>
+                <View style={styles.storyAvatarWrap}>
+                  <Image source={{ uri: s.avatar ?? `https://i.pravatar.cc/150?u=${s.id}` }} style={styles.storyAvatar} />
+                </View>
+                <Text style={styles.storyName} numberOfLines={1}>{s.username ?? s.name}</Text>
+              </TouchableOpacity>
             ))}
           </ScrollView>
         )}
       </View>
-
-      <View style={styles.section}>
-        <View style={styles.sectionRow}>
-          <Text style={styles.sectionTitle}>Lives em Destaque</Text>
-          <View style={styles.liveBadge}>
-            <Radio size={10} color="#ff3b30" />
-            <Text style={styles.liveBadgeText}>AO VIVO</Text>
-          </View>
-        </View>
-        <View style={styles.livesEmpty}>
-          <Text style={styles.livesEmptyText}>Nenhuma live ao vivo agora</Text>
-          <Text style={styles.livesEmptyHint}>Volte mais tarde!</Text>
-        </View>
-      </View>
-
-      <Text style={[styles.sectionTitle, { paddingHorizontal: 16, marginBottom: 4 }]}>
-        Feed
-      </Text>
     </View>
   );
 }
@@ -127,8 +109,11 @@ const LIMIT = 20;
 
 export default function HomeScreen() {
   const router = useRouter();
+  const { user } = useAuth();
   const [topStreamers, setTopStreamers] = useState<TopStreamer[] | null>(null);
   const [posts, setPosts] = useState<FeedPost[]>([]);
+  const [likedPosts, setLikedPosts] = useState<Record<number, boolean>>({});
+  const [savedPosts, setSavedPosts] = useState<Record<number, boolean>>({});
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [hasMore, setHasMore] = useState(true);
@@ -183,6 +168,10 @@ export default function HomeScreen() {
     loadFeed(true);
   }
 
+  function mediaUrl(media: MediaItem) {
+    return supabase.storage.from("posts").getPublicUrl(media.path).data.publicUrl;
+  }
+
   if (loading) {
     return (
       <SafeAreaView style={styles.center}>
@@ -196,7 +185,7 @@ export default function HomeScreen() {
       <FlatList
         data={posts}
         keyExtractor={(item) => String(item.id)}
-        ListHeaderComponent={<HomeHeader topStreamers={topStreamers} router={router} />}
+        ListHeaderComponent={<HomeHeader topStreamers={topStreamers} router={router} userAvatar={user?.avatar} />}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#39FF14" />
         }
@@ -212,18 +201,41 @@ export default function HomeScreen() {
           <View style={styles.postCard}>
             <View style={styles.postHeader}>
               <Image
-                source={{ uri: item.author.avatar ?? "https://i.pravatar.cc/150" }}
+                source={{ uri: item.author.avatar ?? `https://i.pravatar.cc/150?u=${item.author.id}` }}
                 style={styles.avatar}
               />
-              <Text style={styles.authorName}>{item.author.name}</Text>
+              <View style={styles.authorInfo}>
+                <Text style={styles.authorName}>{item.author.name}</Text>
+                <Text style={styles.postLocation}>Strivo</Text>
+              </View>
+              <TouchableOpacity style={styles.moreButton}>
+                <MoreHorizontal color="#F5F5F5" size={21} />
+              </TouchableOpacity>
             </View>
             {item.media[0] ? (
               <Image
-                source={{ uri: `https://picsum.photos/seed/${item.id}/500` }}
+                source={{ uri: mediaUrl(item.media[0]) }}
                 style={styles.postImage}
                 resizeMode="cover"
               />
             ) : null}
+            <View style={styles.postActions}>
+              <View style={styles.actionGroup}>
+                <TouchableOpacity onPress={() => setLikedPosts((prev) => ({ ...prev, [item.id]: !prev[item.id] }))}>
+                  <Heart color={likedPosts[item.id] ? "#FF4D67" : "#F5F5F5"} fill={likedPosts[item.id] ? "#FF4D67" : "transparent"} size={25} />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => {}}>
+                  <MessageCircle color="#F5F5F5" size={24} />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => {}}>
+                  <Send color="#F5F5F5" size={23} />
+                </TouchableOpacity>
+              </View>
+              <TouchableOpacity onPress={() => setSavedPosts((prev) => ({ ...prev, [item.id]: !prev[item.id] }))}>
+                <Bookmark color="#F5F5F5" fill={savedPosts[item.id] ? "#F5F5F5" : "transparent"} size={24} />
+              </TouchableOpacity>
+            </View>
+            {likedPosts[item.id] ? <Text style={styles.likes}>Curtido por você</Text> : null}
             {item.caption ? (
               <Text style={styles.caption}>{item.caption}</Text>
             ) : null}
@@ -239,31 +251,30 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#0F0F0F" },
   center: { flex: 1, backgroundColor: "#0F0F0F", justifyContent: "center", alignItems: "center" },
-  header: { paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: "#1a1a1a" },
-  headerTitle: { color: "#39FF14", fontSize: 22, fontWeight: "bold" },
-  section: { borderBottomWidth: 1, borderBottomColor: "#1a1a1a", paddingBottom: 12, marginTop: 4 },
+  header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 16, paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: "#1a1a1a" },
+  headerTitle: { color: "#F5F5F5", fontSize: 24, fontWeight: "800", letterSpacing: -0.8 },
+  headerActions: { flexDirection: "row", alignItems: "center", gap: 20 },
+  storiesSection: { borderBottomWidth: 1, borderBottomColor: "#1a1a1a", paddingBottom: 12, marginTop: 4 },
   sectionRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 16, paddingTop: 12, marginBottom: 2 },
   sectionTitle: { color: "#fff", fontWeight: "bold", fontSize: 15 },
-  sectionLink: { color: "#39FF14", fontSize: 12 },
-  emptyNote: { color: "#555", fontSize: 13, paddingHorizontal: 16, marginTop: 8 },
-  streamerCard: { alignItems: "center", marginHorizontal: 8, width: 72 },
-  streamerAvatarWrap: { position: "relative" },
-  streamerAvatar: { width: 56, height: 56, borderRadius: 28, borderWidth: 2, borderColor: "#39FF14" },
-  rankBadge: { position: "absolute", bottom: -4, right: -4, backgroundColor: "#39FF14", borderRadius: 8, paddingHorizontal: 4, paddingVertical: 1 },
-  rankBadgeText: { color: "#000", fontSize: 9, fontWeight: "bold" },
-  streamerName: { color: "#fff", fontSize: 11, fontWeight: "600", marginTop: 6, textAlign: "center" },
-  streamerStat: { color: "#666", fontSize: 10, marginTop: 2 },
-  liveBadge: { flexDirection: "row", alignItems: "center", gap: 4 },
-  liveBadgeText: { color: "#ff3b30", fontSize: 10, fontWeight: "bold" },
-  livesEmpty: { marginHorizontal: 16, marginTop: 8, backgroundColor: "#1a1a1a", borderRadius: 12, paddingVertical: 20, alignItems: "center" },
-  livesEmptyText: { color: "#555", fontSize: 13, fontWeight: "600" },
-  livesEmptyHint: { color: "#333", fontSize: 11, marginTop: 4 },
+  storiesList: { paddingHorizontal: 12, paddingVertical: 8 },
+  storyItem: { alignItems: "center", marginHorizontal: 6, width: 70 },
+  storyAvatarWrap: { padding: 2, borderRadius: 34, borderWidth: 2, borderColor: "#39FF14", position: "relative" },
+  storyAvatar: { width: 58, height: 58, borderRadius: 29 },
+  addStory: { position: "absolute", right: -2, bottom: -1, backgroundColor: "#39FF14", borderRadius: 9, width: 18, height: 18, alignItems: "center", justifyContent: "center", borderWidth: 2, borderColor: "#0F0F0F" },
+  storyName: { color: "#ddd", fontSize: 11, marginTop: 6, textAlign: "center" },
   emptyText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
   emptySubText: { color: "#666", fontSize: 13, marginTop: 4 },
-  postCard: { marginBottom: 16, borderBottomWidth: 1, borderBottomColor: "#1a1a1a" },
-  postHeader: { flexDirection: "row", alignItems: "center", paddingHorizontal: 12, paddingVertical: 10 },
-  avatar: { width: 36, height: 36, borderRadius: 18, marginRight: 10 },
+  postCard: { marginBottom: 12, borderBottomWidth: 1, borderBottomColor: "#1a1a1a", paddingBottom: 10 },
+  postHeader: { flexDirection: "row", alignItems: "center", paddingHorizontal: 14, paddingVertical: 11 },
+  avatar: { width: 38, height: 38, borderRadius: 19, marginRight: 10, borderWidth: 1, borderColor: "#39FF14" },
+  authorInfo: { flex: 1 },
   authorName: { color: "#fff", fontWeight: "bold" },
-  postImage: { width: "100%", aspectRatio: 1 },
-  caption: { color: "#ddd", paddingHorizontal: 12, paddingVertical: 8, fontSize: 14 },
+  postLocation: { color: "#777", fontSize: 11, marginTop: 2 },
+  moreButton: { padding: 4 },
+  postImage: { width: "100%", aspectRatio: 1, backgroundColor: "#181818" },
+  postActions: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 14, paddingTop: 12 },
+  actionGroup: { flexDirection: "row", alignItems: "center", gap: 18 },
+  likes: { color: "#F5F5F5", fontWeight: "700", fontSize: 13, paddingHorizontal: 14, paddingTop: 8 },
+  caption: { color: "#ddd", paddingHorizontal: 14, paddingTop: 7, fontSize: 14, lineHeight: 19 },
 });
