@@ -1,7 +1,7 @@
 import { supabase } from "@/src/lib/supabase";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
-import { ArrowLeft, Image as ImageIcon, Video } from "lucide-react-native";
+import { ArrowLeft, Image as ImageIcon, Radio, Video } from "lucide-react-native";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
@@ -135,6 +135,13 @@ export default function CreatePostScreen() {
       </View>
 
       <View className="p-4">
+        <TouchableOpacity
+          onPress={() => router.push({ pathname: "/screens/live", params: { chat: "1" } })}
+          className="mb-3 border border-red-500/60 py-3 rounded-2xl items-center flex-row justify-center gap-2"
+        >
+          <Radio color="#F87171" size={18} />
+          <Text className="text-red-400 font-bold">Transmitir ao vivo</Text>
+        </TouchableOpacity>
         <TouchableOpacity
           onPress={handlePost}
           disabled={loading}

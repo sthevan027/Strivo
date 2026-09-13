@@ -1,4 +1,5 @@
 import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter } from 'expo-router';
 import { Radio, X } from 'lucide-react-native';
 import React, { useState } from 'react';
 import {
@@ -18,6 +19,7 @@ interface StartLiveScreenProps {
 }
 
 const StartLiveScreen = ({ visible, onClose }: StartLiveScreenProps) => {
+  const router = useRouter();
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('Apenas Conversando');
   const [chatEnabled, setChatEnabled] = useState(true);
@@ -43,9 +45,15 @@ const StartLiveScreen = ({ visible, onClose }: StartLiveScreenProps) => {
       return;
     }
 
-    Alert.alert('Sucesso', 'Live iniciada!', [
-      { text: 'OK', onPress: onClose }
-    ]);
+    onClose();
+    router.push({
+      pathname: '/screens/live',
+      params: {
+        title: title.trim(),
+        category,
+        chat: chatEnabled ? '1' : '0',
+      },
+    });
   };
 
   return (

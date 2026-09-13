@@ -4,6 +4,7 @@ import { ActivityIndicator, View } from "react-native";
 
 export default function Index() {
   const { user, isLoading } = useAuth();
+  const skipAuth = process.env.EXPO_PUBLIC_SKIP_AUTH === "true";
 
   if (isLoading) {
     return (
@@ -20,7 +21,7 @@ export default function Index() {
     );
   }
 
-  if (user) {
+  if (user || skipAuth) {
     return <Redirect href="/(tabs)/home" />;
   }
 

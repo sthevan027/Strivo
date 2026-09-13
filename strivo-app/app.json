@@ -38,9 +38,8 @@
         }
       ],
       "expo-font",
-      "expo-image",
+      "expo-camera",
       "expo-secure-store",
-      "expo-status-bar",
       "expo-web-browser"
     ],
     "experiments": {

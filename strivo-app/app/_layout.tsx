@@ -5,8 +5,10 @@ import { useEffect } from "react";
 function RouteGuard({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
   const segments = useSegments();
+  const skipAuth = process.env.EXPO_PUBLIC_SKIP_AUTH === "true";
 
   useEffect(() => {
+    if (skipAuth) return;
     if (isLoading) return;
 
     const inAuthGroup =
@@ -15,14 +17,16 @@ function RouteGuard({ children }: { children: React.ReactNode }) {
       segments[0] === "verify-email" ||
       segments[0] === "update-password" ||
       segments[0] === "auth"; // covers auth/callback OAuth flow
+    // Acesso temporário para visualizar/testar a tela de transmissão sem login.
+    const isLivePreview = segments[0] === "screens" && segments[1] === "live";
     const isPasswordRecovery = segments[0] === "update-password";
 
-    if (!user && !inAuthGroup) {
+    if (!user && !inAuthGroup && !isLivePreview) {
       router.replace("/login");
     } else if (user && inAuthGroup && !isPasswordRecovery) {
       router.replace("/(tabs)/home");
     }
-  }, [user, isLoading, segments]);
+  }, [user, isLoading, segments, skipAuth]);
 
   return <>{children}</>;
 }
