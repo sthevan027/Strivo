@@ -102,9 +102,9 @@ export default function StoryCamera() {
         </Text>
         <TouchableOpacity
           onPress={requestPermission}
-          className="bg-blue-500 px-6 py-3 rounded-full"
+          className="bg-[#39FF14] px-6 py-3 rounded-full"
         >
-          <Text className="text-white font-semibold">Permitir Câmera</Text>
+          <Text className="text-[#0B100D] font-semibold">Permitir Câmera</Text>
         </TouchableOpacity>
       </View>
     );
@@ -205,7 +205,7 @@ export default function StoryCamera() {
             {/* Botão para capturar foto */}
             <TouchableOpacity 
               onPress={handleCapture}
-              className="bg-[#252525]  active:bg-[#7FFF00] rounded-full py-3.5 px-6 flex-row items-center justify-center"
+              className="bg-[#252525] active:bg-[#39FF14] rounded-full py-3.5 px-6 flex-row items-center justify-center"
             >
               <Camera color="white" size={18} strokeWidth={2} style={{ marginRight: 8 }} />
               <Text className="text-white font-semibold text-[15px]">Capturar</Text>
@@ -217,10 +217,10 @@ export default function StoryCamera() {
             {/* Botão Postar */}
             <TouchableOpacity 
               onPress={handlePost}
-              className="bg-blue-500 active:bg-blue-600 rounded-full py-3.5 px-6 flex-row items-center justify-center"
+              className="bg-[#39FF14] active:bg-[#2fd60f] rounded-full py-3.5 px-6 flex-row items-center justify-center"
             >
-              <Send color="white" size={18} strokeWidth={2} style={{ marginRight: 8 }} />
-              <Text className="text-white font-semibold text-[15px]">Postar</Text>
+              <Send color="#0B100D" size={18} strokeWidth={2} style={{ marginRight: 8 }} />
+              <Text className="text-[#0B100D] font-semibold text-[15px]">Postar</Text>
             </TouchableOpacity>
 
             {/* Botão Tirar outra */}

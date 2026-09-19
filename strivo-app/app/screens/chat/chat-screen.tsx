@@ -1,13 +1,15 @@
+import { RingAvatar } from '@/src/components/strivo/RingAvatar';
+import { colors, displayFont, radii } from '@/src/theme/strivo';
 import { Conversation, Message } from '@/src/utils/types/message';
 import { useRouter } from 'expo-router';
-import { ArrowLeft, CheckCheck, MoreVertical, Phone, Send, StickerIcon, Video } from 'lucide-react-native';
+import { ArrowLeft, MoreVertical, Phone, Send, Video } from 'lucide-react-native';
 import React, { useEffect, useRef, useState } from 'react';
-import { Image, KeyboardAvoidingView, Platform, ScrollView, StatusBar, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import MessageActionsMenu from './messa-actions-menu';
 
 
 export default function ChatScreen() {
-  const  conversation:Conversation = {
+  const conversation: Conversation = {
     id: 5,
     username: 'Ana Costa',
     avatar: 'https://i.pravatar.cc/150?img=20',
@@ -19,7 +21,7 @@ export default function ChatScreen() {
     messages: [
       { id: 1, text: 'Show! Até amanhã então', time: 'Ontem', sender: 'them' }
     ]
-  } 
+  };
 
   const navigation = useRouter();
   const [showActions, setShowActions] = useState(false);
@@ -29,11 +31,9 @@ export default function ChatScreen() {
   const scrollViewRef = useRef<ScrollView>(null);
 
   const openMenu = (msg: Message) => {
-  setSelectedMessage(msg);
-  setShowActions(true);
- };
-
-  
+    setSelectedMessage(msg);
+    setShowActions(true);
+  };
 
   const handleSend = () => {
     if (inputText.trim()) {
@@ -51,66 +51,36 @@ export default function ChatScreen() {
   useEffect(() => {
     scrollViewRef.current?.scrollToEnd({ animated: true });
   }, [messages]);
-  
+
   return (
-    <KeyboardAvoidingView 
-      className="flex-1 bg-black"
+    <KeyboardAvoidingView
+      style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <StatusBar barStyle="light-content" />
-      
-      {/* Header */}
-      <View className="px-4 pt-12 pb-3 bg-[#1F2C34] border-b border-gray-800">
-        <View className="flex-row items-center justify-between">
-          <View className="flex-row items-center flex-1">
-            <TouchableOpacity className="mr-3" onPress={() => navigation.back()}>
-              <ArrowLeft size={24} color="#ffffff" />
-            </TouchableOpacity>
-            
-            {/* Avatar */}
-            {conversation.hasStory ? (
-              <View className="rounded-full p-0.5 bg-[#00FF40] mr-3">
-                <View className="rounded-full p-0.5 bg-gray-900">
-                  <Image
-                    source={{ uri: conversation.avatar }}
-                    className="w-10 h-10 rounded-full"
-                  />
-                </View>
-              </View>
-            ) : (
-              <Image
-                source={{ uri: conversation.avatar }}
-                className="w-10 h-10 rounded-full mr-3"
-              />
-            )}
-
-            <View className="flex-1">
-              <Text className="text-white font-semibold text-base">
-                {conversation.username}
-              </Text>
-              <Text className="text-gray-400 text-xs">Online</Text>
-            </View>
-          </View>
-
-          <View className="flex-row items-center gap-4">
-            <TouchableOpacity>
-              <Phone size={22} color="#00FF40" />
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <Video size={22} color="#00FF40" />
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <MoreVertical size={22} color="#00FF40" />
-            </TouchableOpacity>
-          </View>
+      <View style={styles.headerRow}>
+        <TouchableOpacity onPress={() => navigation.back()}>
+          <ArrowLeft size={20} color={colors.text} />
+        </TouchableOpacity>
+        <RingAvatar uri={conversation.avatar} size={34} ring={conversation.hasStory ? "active" : "none"} />
+        <View style={{ flex: 1, minWidth: 0 }}>
+          <Text style={styles.name} numberOfLines={1}>{conversation.username}</Text>
+          <Text style={styles.status}>ativa agora</Text>
         </View>
+        <TouchableOpacity style={styles.headerIcon}>
+          <Phone size={19} color={colors.text} strokeWidth={1.7} />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.headerIcon}>
+          <Video size={20} color={colors.text} strokeWidth={1.7} />
+        </TouchableOpacity>
+        <TouchableOpacity>
+          <MoreVertical size={20} color={colors.textDim} />
+        </TouchableOpacity>
       </View>
 
-      {/* Messages */}
-      <ScrollView 
+      <ScrollView
         ref={scrollViewRef}
-        className="flex-1 px-4 py-4"
-        contentContainerStyle={{ paddingBottom: 20 }}
+        style={{ flex: 1 }}
+        contentContainerStyle={styles.messagesContent}
       >
         {messages.map((message) => (
           <TouchableOpacity
@@ -118,59 +88,37 @@ export default function ChatScreen() {
             activeOpacity={0.9}
             onLongPress={() => openMenu(message)}
             delayLongPress={200}
-            className={`mb-3 max-w-[75%] ${
-              message.sender === 'me' ? 'self-end' : 'self-start'
-            }`}
+            style={[styles.bubbleWrap, message.sender === 'me' ? styles.bubbleWrapMe : styles.bubbleWrapThem]}
           >
-            <View
-              className={`px-4 py-2 rounded-2xl ${
-                message.sender === 'me'
-                  ? 'bg-[#00FF40] rounded-br-md'
-                  : 'bg-gray-800 rounded-bl-md'
-              }`}
-            >
-              <Text className="text-white text-base">{message.text}</Text>
+            <View style={[styles.bubble, message.sender === 'me' ? styles.bubbleMe : styles.bubbleThem]}>
+              <Text style={message.sender === 'me' ? styles.bubbleTextMe : styles.bubbleText}>{message.text}</Text>
             </View>
-            <View className={`flex-row items-center mt-1 ${message.sender === 'me' ? 'justify-end' : 'justify-start'}`}>
-              <Text className="text-gray-500 text-xs mr-1">{message.time}</Text>
-              {message.sender === 'me' && (
-                <CheckCheck size={14} color="#00FF40" />
-              )}
-            </View>
+            <Text style={[styles.messageTime, message.sender === 'me' && { alignSelf: 'flex-end' }]}>{message.time}</Text>
           </TouchableOpacity>
         ))}
       </ScrollView>
 
-      {/* Input */}
-      <View className="px-4 py-3 bg-gray-900 border-t border-gray-800">
-        <View className="flex-row items-start  bg-[#25292e] rounded-full px-4 py-2 mb-4">
+      <View style={styles.inputRow}>
+        <View style={styles.inputField}>
           <TextInput
-            placeholder="Escreva uma mensagem..."
-            placeholderTextColor="#39FF14"
+            placeholder="Mensagem..."
+            placeholderTextColor={colors.textDim}
             value={inputText}
             onChangeText={setInputText}
-            className="flex-1 text-white text-base mr-3 "
+            style={styles.textInput}
             multiline
             maxLength={500}
           />
-          <TouchableOpacity
-            onPress={() => {}}
-            disabled={!inputText.trim()}
-            className={`w-10 h-10 mr-2 rounded-full flex items-center bg-gray-700 justify-center text-center `}
-          >
-            <StickerIcon size={18} color={'#6b7280'} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={handleSend}
-            disabled={!inputText.trim()}
-            className={`w-10 h-10 rounded-full flex items-center justify-center text-center ${
-              inputText.trim() ? 'bg-[#00FF40]' : 'bg-gray-700'
-            }`}
-          >
-            <Send size={18} color={inputText.trim() ? '#000000' : '#6b7280'} />
-          </TouchableOpacity>
         </View>
+        <TouchableOpacity
+          onPress={handleSend}
+          disabled={!inputText.trim()}
+          style={[styles.sendButton, inputText.trim() && styles.sendButtonActive]}
+        >
+          <Send size={17} color={inputText.trim() ? colors.bg : colors.textDim} />
+        </TouchableOpacity>
       </View>
+
       <MessageActionsMenu
         visible={showActions}
         onClose={() => setShowActions(false)}
@@ -194,3 +142,26 @@ export default function ChatScreen() {
     </KeyboardAvoidingView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: colors.bg },
+  headerRow: { flexDirection: "row", alignItems: "center", gap: 12, paddingHorizontal: 18, paddingTop: 54, paddingBottom: 16, borderBottomWidth: 1, borderBottomColor: colors.divider },
+  name: { fontSize: 14.5, color: colors.textStrong, ...displayFont },
+  status: { fontSize: 11, color: colors.accent, marginTop: 1 },
+  headerIcon: { marginRight: 4 },
+  messagesContent: { padding: 14, gap: 10 },
+  bubbleWrap: { maxWidth: "74%", marginBottom: 6 },
+  bubbleWrapMe: { alignSelf: "flex-end" },
+  bubbleWrapThem: { alignSelf: "flex-start" },
+  bubble: { borderRadius: 16, paddingHorizontal: 14, paddingVertical: 10 },
+  bubbleThem: { backgroundColor: colors.bubbleIn, borderBottomLeftRadius: 4 },
+  bubbleMe: { backgroundColor: colors.bubbleOut, borderBottomRightRadius: 4 },
+  bubbleText: { fontSize: 13.5, lineHeight: 18, color: colors.text },
+  bubbleTextMe: { fontSize: 13.5, lineHeight: 18, color: colors.bubbleOutText },
+  messageTime: { fontSize: 10.5, color: colors.textDim, marginTop: 4 },
+  inputRow: { flexDirection: "row", alignItems: "center", gap: 10, paddingHorizontal: 14, paddingTop: 12, paddingBottom: 18, borderTopWidth: 1, borderTopColor: colors.divider },
+  inputField: { flex: 1, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: radii.pill, paddingHorizontal: 14, paddingVertical: 10 },
+  textInput: { fontSize: 13.5, color: colors.text, maxHeight: 100 },
+  sendButton: { width: 38, height: 38, borderRadius: 19, alignItems: "center", justifyContent: "center", backgroundColor: colors.surfaceAlt },
+  sendButtonActive: { backgroundColor: colors.accent },
+});
