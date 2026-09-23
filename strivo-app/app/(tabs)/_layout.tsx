@@ -1,5 +1,6 @@
 import AccountSwitcher, { Account } from "@/src/components/account-swittcher";
 import { useAuth } from "@/src/contexts/AuthContext";
+import { colors } from "@/src/theme/strivo";
 import { Tabs } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { Clapperboard, Home, Search, User, Video } from "lucide-react-native";
@@ -56,10 +57,27 @@ export default function TabsLayout() {
       <Tabs
         screenOptions={{
           headerShown: false,
-          tabBarActiveTintColor: "#00FF40",
+          tabBarActiveTintColor: colors.accent,
+          tabBarInactiveTintColor: colors.textDim,
+          tabBarShowLabel: false,
           tabBarStyle: {
-            backgroundColor: "#000",
+            position: "absolute",
+            left: 20,
+            right: 20,
+            bottom: 18,
+            height: 62,
+            borderRadius: 31,
+            backgroundColor: "rgba(30,34,29,0.92)",
+            borderTopWidth: 0,
+            borderWidth: 1,
+            borderColor: "rgba(255,255,255,0.10)",
+            elevation: 0,
+            shadowColor: "#000",
+            shadowOpacity: 0.35,
+            shadowRadius: 20,
+            shadowOffset: { width: 0, height: 10 },
           },
+          tabBarItemStyle: { paddingTop: 4 },
         }}
       >
         <Tabs.Screen
@@ -120,7 +138,7 @@ export default function TabsLayout() {
                       height: size,
                       borderRadius: size / 2,
                       borderWidth: focused ? 2 : 0,
-                      borderColor: focused ? "#00FF40" : "transparent",
+                      borderColor: focused ? colors.accent : "transparent",
                     }}
                   />
                 )}
@@ -130,7 +148,6 @@ export default function TabsLayout() {
         />
 
         {/* TELAS OCULTAS */}
-        <Tabs.Screen name="screens/ranking" options={{ href: null }} />
         <Tabs.Screen name="screens/story-screen" options={{ href: null }} />
         <Tabs.Screen name="screens/profile/metrics" options={{ href: null }} />
         <Tabs.Screen
@@ -149,6 +166,8 @@ export default function TabsLayout() {
           options={{ href: null }}
         />
         <Tabs.Screen name="screens/edit-profile" options={{ href: null }} />
+        <Tabs.Screen name="screens/stores/store-profile" options={{ href: null }} />
+        <Tabs.Screen name="screens/stores/add-store" options={{ href: null }} />
       </Tabs>
 
       <AccountSwitcher
