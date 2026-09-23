@@ -10,16 +10,15 @@ interface MenuItemProps {
   icon: React.ReactNode;
   title: string;
   badge?: string;
-  danger?: boolean;
   last?: boolean;
   onPress?: () => void;
 }
 
-const MenuItem: React.FC<MenuItemProps> = ({ icon, title, badge, danger, last, onPress }) => (
+const MenuItem: React.FC<MenuItemProps> = ({ icon, title, badge, last, onPress }) => (
   <View>
     <TouchableOpacity onPress={onPress} style={styles.menuRow} activeOpacity={0.7}>
       <View style={styles.menuIcon}>{icon}</View>
-      <Text style={[styles.menuTitle, danger && { color: colors.danger }]}>{title}</Text>
+      <Text style={styles.menuTitle}>{title}</Text>
       {badge ? <Text style={styles.menuBadge}>{badge}</Text> : null}
       <ChevronRight size={15} color={colors.textDim} />
     </TouchableOpacity>
