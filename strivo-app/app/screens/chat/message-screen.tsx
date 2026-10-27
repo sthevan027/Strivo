@@ -1,9 +1,12 @@
 import CreateGroup from '@/src/components/create-group';
+import { RingAvatar } from '@/src/components/strivo/RingAvatar';
+import { colors, displayFont, radii } from '@/src/theme/strivo';
 import { Conversation } from '@/src/utils/types/message';
 import { useRouter } from 'expo-router';
 import { ArrowLeft, Check, CheckCheck, Plus, Search } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { Image, ScrollView, StatusBar, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import NewGroupModal from './group/new-modal';
 
 
@@ -89,128 +92,101 @@ export default function MessagesScreen() {
   );
 
   const handleConversationPress = (conversation: Conversation) => {
-    // Marcar como lida
-    const updatedConversations = conversations.map(conv =>
-      conv.id === conversation.id ? { ...conv, unread: 0 } : conv
+    setConversations((prev) =>
+      prev.map((conv) => (conv.id === conversation.id ? { ...conv, unread: 0 } : conv))
     );
-    setConversations(updatedConversations);
-
-    navigation.navigate('/screens/chat/chat-screen', );
+    navigation.navigate('/screens/chat/chat-screen');
   };
 
   return (
-    <View className="flex-1 bg-black">
-      <StatusBar barStyle="light-content" />
-      
-      {/* Header */}
-      <View className="px-4 pt-12 pb-4 bg-black border-b border-gray-800">
-        <View className="flex-row items-center justify-between mb-4">
-          <View className="flex-row items-center flex-1">
-            <TouchableOpacity className="mr-4" onPress={() => navigation.back()}>
-              <ArrowLeft size={26} color="#ffffff" />
-            </TouchableOpacity>
-            <Text className="text-white text-2xl font-semibold">Mensagens</Text>
-          </View>
-          <View className="flex-row items-center gap-5">
-         
-            <TouchableOpacity onPress={() => setModalVisible(true)}>
-              <Plus size={24} color="#00FF40" />
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* Search Bar */}
-        <View className="flex-row items-center bg-gray-900 rounded-xl px-4 py-2.5">
-          <Search size={18} color="#00FF40" />
-          <TextInput
-            placeholder="Pesquisar..."
-            placeholderTextColor="#00FF40"
-            value={searchText}
-            onChangeText={setSearchText}
-            className="flex-1 ml-3 text-white text-base"
-          />
-        </View>
+    <SafeAreaView style={styles.container} edges={['top']}>
+      <View style={styles.headerRow}>
+        <TouchableOpacity onPress={() => navigation.back()}>
+          <ArrowLeft size={20} color={colors.text} />
+        </TouchableOpacity>
+        <Text style={styles.title}>Mensagens</Text>
+        <TouchableOpacity onPress={() => setModalVisible(true)}>
+          <Plus size={21} color={colors.accent} />
+        </TouchableOpacity>
       </View>
 
-      {/* Messages List */}
-      <ScrollView className="flex-1">
-        {filteredConversations.map((conv) => (
-          <TouchableOpacity
-            key={conv.id}
-            className="flex-row items-center px-4 py-3 border-b border-gray-900"
-            activeOpacity={0.7}
-            onPress={() => handleConversationPress(conv)}
-          >
-            {/* Avatar with Story Ring */}
-            <View className="mr-3">
-              {conv.hasStory ? (
-                <View className="rounded-full p-0.5 bg-[#00FF40]">
-                  <View className="rounded-full p-0.5 bg-black">
-                    <Image
-                      source={{ uri: conv.avatar }}
-                      className="w-14 h-14 rounded-full"
-                    />
-                  </View>
+      <View style={styles.searchField}>
+        <Search size={15} color={colors.textDim} />
+        <TextInput
+          placeholder="Pesquisar"
+          placeholderTextColor={colors.textDim}
+          value={searchText}
+          onChangeText={setSearchText}
+          style={styles.searchInput}
+        />
+      </View>
+
+      <FlatList
+        data={filteredConversations}
+        keyExtractor={(c) => String(c.id)}
+        contentContainerStyle={{ paddingTop: 8, paddingBottom: 40 }}
+        renderItem={({ item: conv }) => (
+          <TouchableOpacity style={styles.row} activeOpacity={0.7} onPress={() => handleConversationPress(conv)}>
+            <RingAvatar uri={conv.avatar} size={52} ring={conv.hasStory ? "active" : "none"} />
+            <View style={{ flex: 1, minWidth: 0 }}>
+              <Text style={styles.convName} numberOfLines={1}>{conv.username}</Text>
+              <View style={styles.lastMessageRow}>
+                {conv.read ? (
+                  <CheckCheck size={14} color={colors.accent} />
+                ) : (
+                  <Check size={14} color={colors.textDim} />
+                )}
+                <Text
+                  style={[styles.lastMessage, conv.unread > 0 && styles.lastMessageUnread]}
+                  numberOfLines={1}
+                >
+                  {conv.lastMessage}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.metaCol}>
+              <Text style={[styles.time, conv.unread > 0 && styles.timeUnread]}>{conv.time}</Text>
+              {conv.unread > 0 && (
+                <View style={styles.unreadBadge}>
+                  <Text style={styles.unreadBadgeText}>{conv.unread}</Text>
                 </View>
-              ) : (
-                <Image
-                  source={{ uri: conv.avatar }}
-                  className="w-14 h-14 rounded-full"
-                />
               )}
             </View>
-            
-
-            {/* Message Info */}
-            <View className="flex-1 flex-row items-center justify-between">
-              <View className="flex-1 mr-3">
-                <Text className="text-white font-semibold text-base mb-1">
-                  {conv.username}
-                </Text>
-                <View className="flex-row items-center">
-                  {conv.read ? (
-                    <CheckCheck size={16} color="#00FF40" style={{ marginRight: 4 }} />
-                  ) : (
-                    <Check size={16} color="#6b7280" style={{ marginRight: 4 }} />
-                  )}
-                  <Text 
-                    className={`text-sm ${conv.unread > 0 ? 'text-white font-medium' : 'text-gray-400'}`}
-                    numberOfLines={1}
-                  >
-                    {conv.lastMessage}
-                  </Text>
-                </View>
-              </View>
-
-              {/* Time and Unread Badge */}
-              <View className="items-end">
-                <Text className="text-gray-400 text-xs mb-1">{conv.time}</Text>
-                {conv.unread > 0 && (
-                  <View className="bg-[#00FF40] rounded-full w-5 h-5 items-center justify-center">
-                    <Text className="text-black text-xs font-bold">{conv.unread}</Text>
-                  </View>
-                )}
-              </View>
-            </View>
           </TouchableOpacity>
-        ))}
-      </ScrollView>
-       
+        )}
+      />
 
-         <CreateGroup 
-          setIsGroupModalVisible={() => {
-            setModalVisible(false);
-            setTimeout(() => setIsGroupModalVisible(true), 50);
-          }} 
-          visible={modalVisible} 
-          onClose={() => setModalVisible(false)} 
-        />
+      <CreateGroup
+        setIsGroupModalVisible={() => {
+          setModalVisible(false);
+          setTimeout(() => setIsGroupModalVisible(true), 50);
+        }}
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+      />
 
-        <NewGroupModal
-          visible={isGroupModalVisible}
-          onClose={() => setIsGroupModalVisible(false)}
-        />
-
-    </View>
+      <NewGroupModal
+        visible={isGroupModalVisible}
+        onClose={() => setIsGroupModalVisible(false)}
+      />
+    </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: colors.bg },
+  headerRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12, paddingHorizontal: 18, paddingTop: 14, paddingBottom: 8 },
+  title: { flex: 1, fontSize: 19, color: colors.textStrong, marginLeft: 4, ...displayFont },
+  searchField: { flexDirection: "row", alignItems: "center", gap: 8, marginHorizontal: 18, marginTop: 8, marginBottom: 8, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: radii.md, paddingHorizontal: 14, paddingVertical: 10 },
+  searchInput: { flex: 1, fontSize: 13, color: colors.text },
+  row: { flexDirection: "row", alignItems: "center", gap: 12, paddingHorizontal: 18, paddingVertical: 10 },
+  convName: { fontSize: 14, fontWeight: "700", color: colors.textStrong },
+  lastMessageRow: { flexDirection: "row", alignItems: "center", gap: 4, marginTop: 2 },
+  lastMessage: { fontSize: 12.5, color: colors.textDim, flexShrink: 1 },
+  lastMessageUnread: { color: colors.text, fontWeight: "600" },
+  metaCol: { alignItems: "flex-end", gap: 6, flexShrink: 0 },
+  time: { fontSize: 11, color: colors.textDim },
+  timeUnread: { color: colors.accent, fontWeight: "600" },
+  unreadBadge: { width: 18, height: 18, borderRadius: 9, backgroundColor: colors.accent, alignItems: "center", justifyContent: "center" },
+  unreadBadgeText: { fontSize: 10, fontWeight: "700", color: colors.bg },
+});

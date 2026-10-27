@@ -365,3 +365,41 @@ create policy "posts delete own folder"
     and (storage.foldername(name))[1] = 'users'
     and (storage.foldername(name))[2] = auth.uid()::text
   );
+
+
+-- ------------------------------------------------------------
+-- 6. STORES — perfis de loja/negócio (Feed 3 · sessão 02/09/2026)
+-- ------------------------------------------------------------
+
+create table if not exists public.stores (
+  id          bigint      generated always as identity primary key,
+  owner_id    uuid        not null references public.user_profile(id) on delete cascade,
+  name        text        not null,
+  category    text        not null,
+  description text,
+  contact     text,
+  avatar      text,
+  cover       text,
+  created_at  timestamptz default now(),
+  updated_at  timestamptz default now()
+);
+create index if not exists stores_owner_idx on public.stores(owner_id);
+
+alter table public.stores enable row level security;
+
+drop policy if exists "read all stores"  on public.stores;
+drop policy if exists "insert own store" on public.stores;
+drop policy if exists "update own store" on public.stores;
+drop policy if exists "delete own store" on public.stores;
+
+create policy "read all stores"
+  on public.stores for select using (true);
+
+create policy "insert own store"
+  on public.stores for insert with check (auth.uid() = owner_id);
+
+create policy "update own store"
+  on public.stores for update using (auth.uid() = owner_id);
+
+create policy "delete own store"
+  on public.stores for delete using (auth.uid() = owner_id);

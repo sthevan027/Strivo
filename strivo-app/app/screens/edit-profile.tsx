@@ -27,8 +27,8 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 // Estilo para campos de texto (especialmente para web)
 const textInputStyle = Platform.OS === 'web' ? { 
-  caretColor: '#00FF40',
-  outlineColor: '#00FF40',
+  caretColor: '#39FF14',
+  outlineColor: '#39FF14',
 } : {};
 
 interface ProfileForm {
@@ -292,21 +292,21 @@ export default function EditProfileScreen() {
   };
 
   return (
-    <SafeAreaView edges={['top']} className="flex-1 bg-black">
+    <SafeAreaView edges={['top']} className="flex-1 bg-[#0B100D]">
       <StatusBar barStyle="light-content" />
       
       {/* Header */}
       <View className="flex-row items-center px-4 py-3">
         <TouchableOpacity
           onPress={() => router.push('/screens/profile')}
-          className="w-10 h-10 bg-emerald-500/20 rounded-full items-center justify-center mr-4 border border-emerald-500/30"
+          className="w-10 h-10 bg-[#39FF14]/20 rounded-full items-center justify-center mr-4 border border-[#39FF14]/30"
         >
-          <ArrowLeft size={20} color="#53fc18" />
+          <ArrowLeft size={20} color="#39FF14" />
         </TouchableOpacity>
         <View className="flex-1">
           <Text className="text-white text-xl font-bold">Editar Perfil</Text>
           <Animated.View
-            className="h-0.5 bg-emerald-500 mt-1"
+            className="h-0.5 bg-[#39FF14] mt-1"
             style={{
               transform: [{ scaleX: lineScale }],
             }}
@@ -319,11 +319,11 @@ export default function EditProfileScreen() {
         contentContainerStyle={{ paddingBottom: 40 }}
       >
         {/* Profile Picture Section */}
-        <View className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 mx-4 mb-6">
+        <View className="bg-[#15170F] border border-[#262626] rounded-3xl p-6 mx-4 mb-6">
           <View className="items-center">
             <View className="relative mb-4">
               <LinearGradient
-                colors={['#53fc18', '#45d614']}
+                colors={['#39FF14', '#2fd60f']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={{
@@ -333,7 +333,7 @@ export default function EditProfileScreen() {
                   padding: 4,
                 }}
               >
-                <View className="w-full h-full bg-black rounded-full items-center justify-center overflow-hidden">
+                <View className="w-full h-full bg-[#0B100D] rounded-full items-center justify-center overflow-hidden">
                   <Image
                     source={{ uri: profileImage }}
                     className="w-full h-full rounded-full"
@@ -343,19 +343,19 @@ export default function EditProfileScreen() {
               </LinearGradient>
               <TouchableOpacity
                 onPress={pickImage}
-                className="absolute bottom-0 right-0 w-10 h-10 bg-emerald-500 rounded-full items-center justify-center border-2 border-black"
+                className="absolute bottom-0 right-0 w-10 h-10 bg-[#39FF14] rounded-full items-center justify-center border-2 border-black"
               >
                 <Camera size={20} color="#000" />
               </TouchableOpacity>
             </View>
             <TouchableOpacity onPress={pickImage}>
-              <Text className="text-emerald-500 text-sm font-medium">Alterar foto de perfil</Text>
+              <Text className="text-[#39FF14] text-sm font-medium">Alterar foto de perfil</Text>
             </TouchableOpacity>
           </View>
         </View>
 
         {/* Form Section */}
-        <View className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 mx-4 mb-6">
+        <View className="bg-[#15170F] border border-[#262626] rounded-3xl p-6 mx-4 mb-6">
           <Text className="text-white text-lg font-bold mb-6">Informações Pessoais</Text>
 
           {/* Username */}
@@ -368,11 +368,11 @@ export default function EditProfileScreen() {
               <TextInput
                 value={form.username}
                 onChangeText={(text) => setForm({ ...form, username: text })}
-                className="bg-black border border-zinc-800 rounded-xl pl-8 pr-4 py-3 text-white"
+                className="bg-[#0B100D] border border-[#262626] rounded-xl pl-8 pr-4 py-3 text-white"
                 placeholderTextColor="#666"
                 placeholder="seu_usuario"
-              selectionColor="#00FF40"
-              cursorColor="#00FF40"
+              selectionColor="#39FF14"
+              cursorColor="#39FF14"
               style={textInputStyle}
               />
             </View>
@@ -385,11 +385,11 @@ export default function EditProfileScreen() {
             <TextInput
               value={form.fullname}
               onChangeText={(text) => setForm({ ...form, fullname: text })}
-              className="bg-black border border-zinc-800 rounded-xl px-4 py-3 text-white"
+              className="bg-[#0B100D] border border-[#262626] rounded-xl px-4 py-3 text-white"
               placeholderTextColor="#666"
               placeholder="Seu nome completo"
-              selectionColor="#00FF40"
-              cursorColor="#00FF40"
+              selectionColor="#39FF14"
+              cursorColor="#39FF14"
               style={textInputStyle}
             />
           </View>
@@ -400,13 +400,13 @@ export default function EditProfileScreen() {
             <TextInput
               value={form.bio}
               onChangeText={(text) => setForm({ ...form, bio: text })}
-              className="bg-black border border-zinc-800 rounded-xl px-4 py-3 text-white min-h-[100px]"
+              className="bg-[#0B100D] border border-[#262626] rounded-xl px-4 py-3 text-white min-h-[100px]"
               placeholderTextColor="#666"
               placeholder="Conte um pouco sobre você..."
               multiline
               textAlignVertical="top"
-              selectionColor="#00FF40"
-              cursorColor="#00FF40"
+              selectionColor="#39FF14"
+              cursorColor="#39FF14"
               style={textInputStyle}
             />
             <View className="flex-row justify-between mt-1">
@@ -423,13 +423,13 @@ export default function EditProfileScreen() {
             <TextInput
               value={form.email}
               onChangeText={(text) => setForm({ ...form, email: text })}
-              className="bg-black border border-zinc-800 rounded-xl px-4 py-3 text-white"
+              className="bg-[#0B100D] border border-[#262626] rounded-xl px-4 py-3 text-white"
               placeholderTextColor="#666"
               placeholder="seu@email.com"
               keyboardType="email-address"
               autoCapitalize="none"
-              selectionColor="#00FF40"
-              cursorColor="#00FF40"
+              selectionColor="#39FF14"
+              cursorColor="#39FF14"
               style={textInputStyle}
             />
             <Text className="text-zinc-500 text-xs mt-1">Usado para notificações e recuperação de conta</Text>
@@ -437,7 +437,7 @@ export default function EditProfileScreen() {
         </View>
 
         {/* Social Links Section */}
-        <View className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 mx-4 mb-6">
+        <View className="bg-[#15170F] border border-[#262626] rounded-3xl p-6 mx-4 mb-6">
           <Text className="text-white text-lg font-bold mb-6">Links Sociais</Text>
 
           {/* YouTube */}
@@ -455,13 +455,13 @@ export default function EditProfileScreen() {
               <TextInput
                 value={form.youtube}
                 onChangeText={(text) => setForm({ ...form, youtube: text })}
-                className="bg-black border border-zinc-800 rounded-xl pl-12 pr-4 py-3 text-white"
+                className="bg-[#0B100D] border border-[#262626] rounded-xl pl-12 pr-4 py-3 text-white"
                 placeholderTextColor="#666"
                 placeholder="https://youtube.com/@seu_canal"
                 keyboardType="url"
                 autoCapitalize="none"
-                selectionColor="#00FF40"
-                cursorColor="#00FF40"
+                selectionColor="#39FF14"
+                cursorColor="#39FF14"
                 style={textInputStyle}
               />
             </View>
@@ -482,13 +482,13 @@ export default function EditProfileScreen() {
               <TextInput
                 value={form.twitch}
                 onChangeText={(text) => setForm({ ...form, twitch: text })}
-                className="bg-black border border-zinc-800 rounded-xl pl-12 pr-4 py-3 text-white"
+                className="bg-[#0B100D] border border-[#262626] rounded-xl pl-12 pr-4 py-3 text-white"
                 placeholderTextColor="#666"
                 placeholder="https://twitch.tv/seu_canal"
                 keyboardType="url"
                 autoCapitalize="none"
-                selectionColor="#00FF40"
-                cursorColor="#00FF40"
+                selectionColor="#39FF14"
+                cursorColor="#39FF14"
                 style={textInputStyle}
               />
             </View>
@@ -516,13 +516,13 @@ export default function EditProfileScreen() {
               <TextInput
                 value={form.instagram}
                 onChangeText={(text) => setForm({ ...form, instagram: text })}
-                className="bg-black border border-zinc-800 rounded-xl pl-12 pr-4 py-3 text-white"
+                className="bg-[#0B100D] border border-[#262626] rounded-xl pl-12 pr-4 py-3 text-white"
                 placeholderTextColor="#666"
                 placeholder="https://instagram.com/seu_perfil"
                 keyboardType="url"
                 autoCapitalize="none"
-                selectionColor="#00FF40"
-                cursorColor="#00FF40"
+                selectionColor="#39FF14"
+                cursorColor="#39FF14"
                 style={textInputStyle}
               />
             </View>
@@ -543,13 +543,13 @@ export default function EditProfileScreen() {
               <TextInput
                 value={form.twitter}
                 onChangeText={(text) => setForm({ ...form, twitter: text })}
-                className="bg-black border border-zinc-800 rounded-xl pl-12 pr-4 py-3 text-white"
+                className="bg-[#0B100D] border border-[#262626] rounded-xl pl-12 pr-4 py-3 text-white"
                 placeholderTextColor="#666"
                 placeholder="https://x.com/seu_perfil"
                 keyboardType="url"
                 autoCapitalize="none"
-                selectionColor="#00FF40"
-                cursorColor="#00FF40"
+                selectionColor="#39FF14"
+                cursorColor="#39FF14"
                 style={textInputStyle}
               />
             </View>
@@ -560,13 +560,13 @@ export default function EditProfileScreen() {
         <View className="flex-row gap-4 mx-4 mb-6">
           <TouchableOpacity
             onPress={handleSave}
-            className="flex-1 bg-emerald-500 rounded-xl py-4"
+            className="flex-1 bg-[#39FF14] rounded-xl py-4"
           >
             <Text className="text-black text-center font-bold text-lg">Salvar Alterações</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => router.push('/screens/profile')}
-            className="flex-1 bg-zinc-900 border border-zinc-800 rounded-xl py-4"
+            className="flex-1 bg-[#15170F] border border-[#262626] rounded-xl py-4"
           >
             <Text className="text-white text-center font-bold text-lg">Cancelar</Text>
           </TouchableOpacity>
@@ -580,8 +580,8 @@ export default function EditProfileScreen() {
         transparent
         onRequestClose={() => setIsCropModalVisible(false)}
       >
-        <View className="flex-1 bg-black/80 items-center justify-center p-4">
-          <View className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 w-full max-w-lg">
+        <View className="flex-1 bg-[#0B100D]/80 items-center justify-center p-4">
+          <View className="bg-[#15170F] border border-[#262626] rounded-3xl p-6 w-full max-w-lg">
             <View className="flex-row items-center justify-between mb-4">
               <Text className="text-white text-xl font-bold">Ajustar Foto de Perfil</Text>
               <TouchableOpacity onPress={() => setIsCropModalVisible(false)}>
@@ -596,7 +596,7 @@ export default function EditProfileScreen() {
                 setContainerSize(width);
               }}
             >
-              <View className="w-full bg-black rounded-xl overflow-hidden" style={{ aspectRatio: 1, minHeight: 300 }}>
+              <View className="w-full bg-[#0B100D] rounded-xl overflow-hidden" style={{ aspectRatio: 1, minHeight: 300 }}>
                 <View className="absolute inset-0 items-center justify-center" style={{ overflow: 'hidden' }}>
                   {selectedImageUri && (
                     <View
@@ -654,7 +654,7 @@ export default function EditProfileScreen() {
                   />
                   {/* Overlay circular (área visível) */}
                   <View
-                    className="absolute border-2 border-emerald-500 rounded-full"
+                    className="absolute border-2 border-[#39FF14] rounded-full"
                     style={{
                       width: '80%',
                       height: '80%',
@@ -692,11 +692,11 @@ export default function EditProfileScreen() {
                 {...sliderPanResponder.panHandlers}
               >
                 <View
-                  className="h-full bg-emerald-500 rounded-full absolute left-0"
+                  className="h-full bg-[#39FF14] rounded-full absolute left-0"
                   style={{ width: `${((zoom - 0.5) / 2.5) * 100}%` }}
                 />
                 <View
-                  className="absolute w-5 h-5 bg-emerald-500 rounded-full border-2 border-black"
+                  className="absolute w-5 h-5 bg-[#39FF14] rounded-full border-2 border-black"
                   style={{
                     left: `${((zoom - 0.5) / 2.5) * 100}%`,
                     marginLeft: -10,
@@ -726,13 +726,13 @@ export default function EditProfileScreen() {
             <View className="flex-row gap-4">
               <TouchableOpacity
                 onPress={() => setIsCropModalVisible(false)}
-                className="flex-1 bg-black border border-zinc-800 rounded-xl py-3"
+                className="flex-1 bg-[#0B100D] border border-[#262626] rounded-xl py-3"
               >
                 <Text className="text-white text-center font-medium">Cancelar</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={applyCrop}
-                className="flex-1 bg-emerald-500 rounded-xl py-3"
+                className="flex-1 bg-[#39FF14] rounded-xl py-3"
               >
                 <Text className="text-black text-center font-medium">Aplicar</Text>
               </TouchableOpacity>
@@ -749,14 +749,14 @@ export default function EditProfileScreen() {
         onRequestClose={closeNotification}
       >
         <TouchableOpacity
-          className="flex-1 bg-black/60 items-center justify-center p-4"
+          className="flex-1 bg-[#0B100D]/60 items-center justify-center p-4"
           activeOpacity={1}
           onPress={closeNotification}
         >
           <TouchableOpacity activeOpacity={1} onPress={(e) => e.stopPropagation()}>
             <Animated.View
-              className={`bg-zinc-900 border rounded-3xl p-8 w-full max-w-sm ${
-                notificationType === 'error' ? 'border-red-500' : 'border-emerald-500'
+              className={`bg-[#15170F] border rounded-3xl p-8 w-full max-w-sm ${
+                notificationType === 'error' ? 'border-red-500' : 'border-[#39FF14]'
               }`}
               style={{
                 transform: [{ scale: notificationScale }],
@@ -766,20 +766,20 @@ export default function EditProfileScreen() {
               <View className="items-center">
                 <View
                   className={`w-16 h-16 rounded-full items-center justify-center mb-4 ${
-                    notificationType === 'error' ? 'bg-red-500/20' : 'bg-emerald-500/20'
+                    notificationType === 'error' ? 'bg-red-500/20' : 'bg-[#39FF14]/20'
                   }`}
                 >
                   {notificationType === 'error' ? (
                     <X size={32} color="#ef4444" />
                   ) : (
-                    <Check size={32} color="#53fc18" />
+                    <Check size={32} color="#39FF14" />
                   )}
                 </View>
                 <Text className="text-white text-xl font-bold mb-2">{notificationTitle}</Text>
                 <Text className="text-gray-300 mb-6 text-center">{notificationMessage}</Text>
                 <TouchableOpacity
                   onPress={closeNotification}
-                  className="w-full bg-emerald-500 rounded-xl py-3"
+                  className="w-full bg-[#39FF14] rounded-xl py-3"
                 >
                   <Text className="text-black text-center font-medium">OK</Text>
                 </TouchableOpacity>

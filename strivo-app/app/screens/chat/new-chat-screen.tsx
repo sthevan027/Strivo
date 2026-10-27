@@ -1,8 +1,10 @@
-import { Conversation, User } from '@/src/utils/types/message';
+import { colors, displayFont, radii } from '@/src/theme/strivo';
+import { User } from '@/src/utils/types/message';
 import { useRouter } from 'expo-router';
 import { ArrowLeft, Search } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { Image, ScrollView, StatusBar, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { FlatList, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 const allUsers: User[] = [
@@ -22,76 +24,63 @@ export default function NewChatScreen() {
     user.username.toLowerCase().includes(searchText.toLowerCase())
   );
 
-  const handleUserPress = (user: User) => {
-    const newConversation: Conversation = {
-      id: user.id,
-      username: user.username,
-      avatar: user.avatar,
-      lastMessage: '',
-      time: 'Agora',
-      unread: 0,
-      read: true,
-      hasStory: false,
-      messages: []
-    };
+  const handleUserPress = (_user: User) => {
     navigation.navigate('/screens/chat/chat-screen');
   };
 
   return (
-    <View className="flex-1 bg-black">
-      <StatusBar barStyle="light-content" />
-      
-      {/* Header */}
-      <View className="px-4 pt-12 pb-4 bg-black border-b border-gray-800">
-        <View className="flex-row items-center mb-4">
-          <TouchableOpacity className="mr-4" onPress={() => navigation.push('/screens/chat/message-screen')}>
-            <ArrowLeft size={26} color="#ffffff" />
-          </TouchableOpacity>
-          <Text className="text-white text-2xl font-semibold">Nova Conversa</Text>
-        </View>
-
-        {/* Search Bar */}
-        <View className="flex-row items-center bg-gray-900 rounded-xl px-4 py-2.5">
-          <Search size={18} color="#00FF40" />
-          <TextInput
-            placeholder="Buscar usuários..."
-            placeholderTextColor="#00FF40"
-            value={searchText}
-            onChangeText={setSearchText}
-            className="flex-1 ml-3 text-white text-base"
-            autoFocus
-          />
-        </View>
+    <SafeAreaView style={styles.container} edges={['top']}>
+      <View style={styles.headerRow}>
+        <TouchableOpacity onPress={() => navigation.push('/screens/chat/message-screen')}>
+          <ArrowLeft size={20} color={colors.text} />
+        </TouchableOpacity>
+        <Text style={styles.title}>Nova conversa</Text>
       </View>
 
-      {/* Users List */}
-      <ScrollView className="flex-1">
-        {filteredUsers.length > 0 ? (
-          filteredUsers.map((user) => (
-            <TouchableOpacity
-              key={user.id}
-              className="flex-row items-center px-4 py-3 border-b border-gray-900"
-              activeOpacity={0.7}
-              onPress={() => handleUserPress(user)}
-            >
-              <Image
-                source={{ uri: user.avatar }}
-                className="w-14 h-14 rounded-full mr-3"
-              />
-              <View className="flex-1">
-                <Text className="text-white font-semibold text-base">
-                  {user.username}
-                </Text>
-                <Text className="text-gray-400 text-sm">Toque para conversar</Text>
-              </View>
-            </TouchableOpacity>
-          ))
-        ) : (
-          <View className="items-center justify-center py-20">
-            <Text className="text-gray-500 text-base">Nenhum usuário encontrado</Text>
+      <View style={styles.searchField}>
+        <Search size={15} color={colors.textDim} />
+        <TextInput
+          placeholder="Buscar usuários..."
+          placeholderTextColor={colors.textDim}
+          value={searchText}
+          onChangeText={setSearchText}
+          style={styles.searchInput}
+          autoFocus
+        />
+      </View>
+
+      <FlatList
+        data={filteredUsers}
+        keyExtractor={(u) => String(u.id)}
+        ListEmptyComponent={
+          <View style={styles.center}>
+            <Text style={styles.centerText}>Nenhum usuário encontrado</Text>
           </View>
+        }
+        renderItem={({ item: user }) => (
+          <TouchableOpacity style={styles.row} activeOpacity={0.7} onPress={() => handleUserPress(user)}>
+            <Image source={{ uri: user.avatar }} style={styles.avatar} />
+            <View>
+              <Text style={styles.userName}>{user.username}</Text>
+              <Text style={styles.userHint}>Toque para conversar</Text>
+            </View>
+          </TouchableOpacity>
         )}
-      </ScrollView>
-    </View>
+      />
+    </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: colors.bg },
+  headerRow: { flexDirection: "row", alignItems: "center", gap: 14, paddingHorizontal: 18, paddingTop: 14, paddingBottom: 14 },
+  title: { fontSize: 18, color: colors.textStrong, ...displayFont },
+  searchField: { flexDirection: "row", alignItems: "center", gap: 8, marginHorizontal: 18, marginBottom: 12, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: radii.md, paddingHorizontal: 14, paddingVertical: 11 },
+  searchInput: { flex: 1, fontSize: 13.5, color: colors.text },
+  center: { alignItems: "center", justifyContent: "center", paddingVertical: 80 },
+  centerText: { color: colors.textDim },
+  row: { flexDirection: "row", alignItems: "center", gap: 12, paddingHorizontal: 18, paddingVertical: 10 },
+  avatar: { width: 52, height: 52, borderRadius: 26 },
+  userName: { fontSize: 14, fontWeight: "700", color: colors.textStrong },
+  userHint: { fontSize: 12, color: colors.textDim, marginTop: 2 },
+});

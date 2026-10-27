@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 import {
   ArrowLeft,
   Image as ImageIcon,
+  Radio,
   Send,
   Video,
 } from "lucide-react-native";
@@ -151,6 +152,15 @@ export default function CreatePostScreen() {
               <Text className="text-white text-lg">Aa</Text>
             </View>
             <Text className="text-white text-xs mt-1">Texto</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => router.push({ pathname: "/screens/live", params: { chat: "1" } })}
+            className="items-center"
+          >
+            <View className="bg-black/70 p-4 rounded-full border border-red-500/60">
+              <Radio size={22} color="#F87171" />
+            </View>
+            <Text className="text-red-400 text-xs mt-1">Ao vivo</Text>
           </TouchableOpacity>
         </View>
 
