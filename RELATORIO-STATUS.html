@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Strivo — Relatório de Status</title>
+<style>
+:root{
+  --bg:#f6f7f9;--card:#fff;--text:#1b1f27;--muted:#5d6675;--line:#e3e6ec;
+  --crit:#c62828;--crit-bg:#fdeaea;--high:#d2570f;--high-bg:#fff0e5;
+  --med:#a37a00;--med-bg:#fff7d9;--low:#2b6cb0;--low-bg:#e8f1fb;--ok:#2e7d32;--ok-bg:#e6f4e7;
+  --code:#eef0f4;--accent:#5b4bdb;
+}
+@media (prefers-color-scheme:dark){
+:root{
+  --bg:#11141a;--card:#1a1f28;--text:#e8ebf1;--muted:#9aa4b5;--line:#2b3340;
+  --crit:#ff6b6b;--crit-bg:#3a1c1f;--high:#ff9a57;--high-bg:#3a2616;
+  --med:#e8c24a;--med-bg:#3a3216;--low:#6aaaf0;--low-bg:#172a40;--ok:#6fcf74;--ok-bg:#183222;
+  --code:#252c38;--accent:#9d90ff;
+}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:980px;margin:0 auto;padding:24px 16px 64px}
+header h1{margin:0 0 4px;font-size:28px}
+header p{margin:0;color:var(--muted)}
+h2{margin:36px 0 12px;font-size:20px;border-bottom:1px solid var(--line);padding-bottom:6px}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin:20px 0}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px}
+.stat b{display:block;font-size:28px;line-height:1.1}
+.stat span{color:var(--muted);font-size:13px}
+.stat.crit b{color:var(--crit)}.stat.high b{color:var(--high)}.stat.med b{color:var(--med)}.stat.low b{color:var(--low)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:10px 0}
+.card h3{margin:0 0 6px;font-size:16px;display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap}
+.card p{margin:4px 0}
+.tag{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.t-crit{background:var(--crit-bg);color:var(--crit)}.t-high{background:var(--high-bg);color:var(--high)}
+.t-med{background:var(--med-bg);color:var(--med)}.t-low{background:var(--low-bg);color:var(--low)}
+.t-ok{background:var(--ok-bg);color:var(--ok)}
+.src{font-size:12px;color:var(--muted)}
+code{background:var(--code);padding:1px 5px;border-radius:4px;font-size:13px;word-break:break-word}
+.fix{margin-top:6px;padding:8px 10px;border-left:3px solid var(--accent);background:var(--code);border-radius:0 6px 6px 0;font-size:14px}
+.fix b{color:var(--accent)}
+ul{padding-left:20px;margin:6px 0}
+li{margin:3px 0}
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:14px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{background:var(--code);font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+tr:last-child td{border-bottom:0}
+.scroll{overflow-x:auto}
+.note{background:var(--med-bg);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:12px 0}
+footer{margin-top:40px;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Strivo — Relatório de Status</h1>
+  <p>Auditoria de backend e segurança · repositório <code>sthevan027/Strivo</code> · 27/11/2026 · somente leitura, nenhum arquivo do projeto foi alterado</p>
+</header>
+
+<div class="note">
+  <b>Limites da análise:</b> tudo vem de leitura de código. <code>tsc</code> e lint não rodaram (<code>strivo-app/node_modules</code> não existe). O <code>npm audit</code> rodou. A configuração real do projeto Supabase (Auth, Redirect URLs, rate limits, grants efetivos, bucket real) não foi verificada, pois exige o painel ou o MCP do Supabase. As RPCs não foram testadas contra o banco.
+</div>
+
+<h2>Resumo executivo</h2>
+<div class="grid">
+  <div class="stat crit"><b>3</b><span>Críticos (app quebra)</span></div>
+  <div class="stat high"><b>10</b><span>Altos</span></div>
+  <div class="stat med"><b>12</b><span>Médios</span></div>
+  <div class="stat low"><b>6</b><span>Baixos</span></div>
+  <div class="stat"><b>0</b><span>Segredos reais vazados</span></div>
+</div>
+<ul>
+  <li><b>Arquitetura:</b> app React Native/Expo (também web via Vercel) falando direto com Supabase (Auth, Postgres, Storage) por supabase-js. Não há servidor próprio. O backend NestJS antigo foi removido.</li>
+  <li><b>Banco:</b> 6 tabelas (<code>user_profile</code>, <code>posts</code>, <code>media</code>, <code>post_media</code>, <code>follows</code>, <code>stores</code>), a view <code>user_profile_public</code>, 3 RPCs (<code>get_feed</code>, <code>get_ranking</code>, <code>search_users</code>), RLS em todas as tabelas e o bucket <code>posts</code> privado. As colunas que o app usa existem no SQL.</li>
+  <li><b>Funcionalidades sem backend:</b> chat, notificações, comentários, likes, salvos, stories, reels e lives. Likes e salvos são só estado local, e o chat usa mock (<code>contact-mock.ts</code>). Não há realtime.</li>
+  <li><b>Segurança:</b> risco geral <b>médio-alto</b>. Não há segredo real no código nem nos 126 commits. Os problemas principais são RPCs executáveis por <code>anon</code>, policies sem <code>WITH CHECK</code>, ausência de headers no deploy web e dependências vulneráveis.</li>
+  <li><b>Onde o app realmente quebra:</b> mídia do feed, reset de senha no celular, deep links de auth e o fluxo de cadastro com confirmação de e-mail.</li>
+</ul>
+
+<h2>Crítico — o app quebra</h2>
+
+<div class="card">
+  <h3><span class="tag t-crit">Crítico</span> C1. Imagens do feed nunca carregam</h3>
+  <p class="src">strivo-app/app/(tabs)/home.tsx:199 · supabase/setup.sql:337-339</p>
+  <p>O app usa <code>getPublicUrl()</code>, mas o bucket <code>posts</code> é privado. A URL devolve 400/404, então toda mídia de post quebra.</p>
+  <div class="fix"><b>Correção:</b> gerar <code>createSignedUrls</code> em lote para os <code>path</code> do feed, com TTL curto. Não tornar o bucket público, pois isso exporia todas as mídias.</div>
+</div>
+
+<div class="card">
+  <h3><span class="tag t-crit">Crítico</span> C2. Reset de senha quebra no app nativo</h3>
+  <p class="src">strivo-app/src/contexts/AuthContext.tsx:110 (e 258-264)</p>
+  <p><code>typeof window !== "undefined"</code> é verdadeiro no React Native, mas <code>window.location</code> é <code>undefined</code>. <code>window.location.origin</code> lança TypeError antes de chamar o Supabase, então "Esqueci minha senha" falha no iOS/Android.</p>
+  <div class="fix"><b>Correção:</b> testar <code>Platform.OS === "web"</code> e usar <code>window.location.origin</code> só na web. No nativo, usar o scheme <code>strivoapp://</code>.</div>
+</div>
+
+<div class="card">
+  <h3><span class="tag t-crit">Crítico</span> C3. Deep links de auth nunca são consumidos no nativo</h3>
+  <p class="src">strivo-app/src/lib/supabase.ts:13 · strivo-app/app/update-password.tsx:30</p>
+  <p><code>detectSessionInUrl: false</code> fora da web, e não há <code>Linking</code>, <code>setSession</code> nem <code>exchangeCodeForSession</code> em lugar nenhum. O link <code>strivoapp://update-password</code> abre a tela sem sessão, e <code>updateUser({password})</code> falha com "Auth session missing".</p>
+  <div class="fix"><b>Correção:</b> tratar a URL inicial e o evento de URL com <code>expo-linking</code>, extrair <code>access_token</code>/<code>refresh_token</code> (ou <code>code</code>) e chamar <code>setSession</code>/<code>exchangeCodeForSession</code>.</div>
+</div>
+
+<h2>Alto</h2>
+
+<div class="card">
+  <h3><span class="tag t-high">Alto</span> A1. Cadastro com confirmação de e-mail ativa falha, mas cria a conta</h3>
+  <p class="src">AuthContext.tsx:117-134, 56-61 · setup.sql:94-99</p>
+  <p><code>signUp</code> não devolve sessão, então o <code>update</code> de <code>phone</code> é bloqueado pelo RLS e o erro é ignorado. Depois o <code>upsert</code> do perfil falha sem <code>auth.uid()</code> e lança "Não foi possível preparar o seu perfil". Uma nova tentativa dá "já cadastrado". O trigger <code>handle_new_user</code> também ignora <code>phone</code>.</p>
+  <div class="fix"><b>Correção:</b> se <code>authData.session</code> for nulo, enviar para <code>/verify-email</code> sem tocar em <code>user_profile</code>. Mandar <code>phone</code> em <code>options.data</code> e copiá-lo no trigger.</div>
+</div>
+
+<div class="card">
+  <h3><span class="tag t-high">Alto</span> A2. <code>loadUser</code> pode travar o app no spinner</h3>
+  <p class="src">AuthContext.tsx:71-75, 79, 89</p>
+  <p>Se <code>fetchProfile</code> lançar, <code>setIsLoading(false)</code> nunca roda, e as chamadas sem <code>.catch</code> geram unhandled rejection. <code>app/index.tsx</code> fica em loading infinito.</p>
+  <div class="fix"><b>Correção:</b> <code>try/finally</code> em <code>loadUser</code>.</div>
+</div>
+
+<div class="card">
+  <h3><span class="tag t-high">Alto</span> A3. <code>/auth/callback</code> e <code>verify-email</code> estão desconectados</h3>
+  <p class="src">AuthContext.tsx (signUp) · app/auth/callback.tsx:12 · app/verify-email.tsx</p>
+  <p><code>signUp</code> não passa <code>emailRedirectTo</code>, então o link de confirmação cai no Site URL. <code>verify-email</code> é só texto, sem botão de reenviar (<code>auth.resend</code>). O callback chama <code>refreshSession()</code> sem sessão e ignora o erro.</p>
+</div>
+
+<div class="card">
+  <h3><span class="tag t-high">Alto</span> A4. Username duplicado derruba o cadastro</h3>
+  <p class="src">setup.sql:34, 94</p>
+  <p><code>username text unique</code> mais o insert direto no trigger faz o <code>signUp</code> devolver "Database error saving new user". Também não há normalização nem CHECK, então <code>Ana</code> e <code>ana</code> são diferentes. Isso permite enumerar usernames.</p>
+  <div class="fix"><b>Correção:</b> tratar a colisão no trigger (sufixo ou <code>null</code>), validar antes e normalizar para minúsculas com CHECK.</div>
+</div>
+
+<div class="card">
+  <h3><span class="tag t-high">Alto</span> A5. Falha de follow é ignorada e a UI muda mesmo assim</h3>
+  <p class="src">searchScreen.tsx:56-72 · other-user-profile.tsx:71-88 · src/services/follow.ts</p>
+  <p>O supabase-js devolve <code>{error}</code> em vez de lançar, então o <code>try/catch</code> não pega. <code>is_following</code> é invertido localmente mesmo com falha. A lógica está duplicada em duas telas e <code>follow.ts</code> não é importado por ninguém.</p>
+</div>
+
+<div class="card">
+  <h3><span class="tag t-high">Alto</span> A6. CI fraco</h3>
+  <p class="src">.github/workflows/ci.yml · security.yml</p>
+  <p>O job se chama <code>lint-and-test</code>, mas só roda lint. Não há <code>tsc</code>, teste nem <code>expo export -p web</code>, e o <code>package.json</code> não tem script <code>typecheck</code> ou <code>test</code>. O build do Vercel só é validado no deploy.</p>
+</div>
+
+<div class="card">
+  <h3><span class="tag t-high">Alto</span> S1. RPCs <code>SECURITY DEFINER</code> executáveis por <code>anon</code>; IDOR em <code>search_users</code></h3>
+  <p class="src">supabase/setup.sql:218-330 · searchScreen.tsx:40-42</p>
+  <ul>
+    <li><code>search_users(q, current_user_id)</code> aceita o ID do usuário como parâmetro. Qualquer pessoa, inclusive sem login, enumera usuários (nome, username, avatar) via <code>/rest/v1/rpc/search_users</code> e consulta quem um UUID arbitrário segue.</li>
+    <li>O <code>q</code> entra em <code>ilike '%'||q||'%'</code> sem escapar <code>%</code> e <code>_</code>. <code>q='%'</code> varre tudo, sem rate limit e sem índice trigram.</li>
+    <li><code>get_feed</code> e <code>get_ranking</code> ignoram o RLS, não têm teto de <code>p_limit</code> e permitem scraping e DoS. Uma regra futura de perfil privado seria contornada.</li>
+    <li>Não há <code>REVOKE EXECUTE</code>, e o Postgres concede EXECUTE a PUBLIC por padrão.</li>
+  </ul>
+  <div class="fix"><b>Correção:</b> usar <code>auth.uid()</code> dentro da função e remover o parâmetro; <code>revoke execute ... from public, anon; grant execute ... to authenticated;</code>; escapar curingas; exigir mínimo de 2-3 caracteres; <code>least(p_limit, 50)</code>; preferir <code>SECURITY INVOKER</code>.</div>
+</div>
+
+<div class="card">
+  <h3><span class="tag t-high">Alto</span> S2. Policies sem <code>WITH CHECK</code> em <code>media</code>, <code>post_media</code> e <code>user_profile</code></h3>
+  <p class="src">setup.sql:135-136, 176-177, 186-192</p>
+  <ul>
+    <li><code>update own media</code> não tem <code>WITH CHECK</code>: o dono pode alterar <code>owner_id</code>, <code>bucket</code> e <code>path</code> e apontar para o arquivo de outro usuário. A leitura de <code>media</code> é <code>using(true)</code>.</li>
+    <li><code>insert own media</code> aceita <code>bucket</code> e <code>path</code> arbitrários.</li>
+    <li><code>insert post_media</code> valida o dono do post, mas não o da mídia: dá para anexar a mídia de outra pessoa.</li>
+    <li>O update de <code>user_profile</code> não tem <code>WITH CHECK</code>.</li>
+  </ul>
+  <div class="fix"><b>Correção:</b> <code>WITH CHECK (auth.uid() = owner_id and path like 'users/'||auth.uid()||'/%')</code> no insert e no update de <code>media</code>; checar <code>exists(media where owner_id = auth.uid())</code> em <code>post_media</code>; <code>with check (auth.uid() = id)</code> em <code>user_profile</code>.</div>
+</div>
+
+<div class="card">
+  <h3><span class="tag t-high">Alto</span> S3. Bypass de login por <code>EXPO_PUBLIC_SKIP_AUTH</code> e rota pública</h3>
+  <p class="src">strivo-app/app/_layout.tsx:8-10, 20-25 · app/index.tsx:7</p>
+  <p>Variáveis <code>EXPO_PUBLIC_*</code> vão no bundle. Se <code>SKIP_AUTH=true</code> for definido por engano no build ou no Vercel, o guard some. A rota <code>/screens/live</code> é pública ("acesso temporário"). O impacto é só de UI, porque os dados continuam sob RLS.</p>
+  <div class="fix"><b>Correção:</b> condicionar a flag a <code>__DEV__</code> ou removê-la, e remover a exceção <code>isLivePreview</code>.</div>
+</div>
+
+<div class="card">
+  <h3><span class="tag t-high">Alto</span> S4. Dependências vulneráveis (<code>npm audit --omit=dev</code>)</h3>
+  <p>22 vulnerabilidades: <b>1 crítica, 11 altas, 10 moderadas</b>.</p>
+  <ul>
+    <li>Crítica: <code>shell-quote 1.8.4–1.10.0</code>, command injection (GHSA-pqg4-j6r4-53mv).</li>
+    <li>Altas: <code>@xmldom/xmldom</code>, <code>brace-expansion</code>, <code>browserslist</code>, <code>decode-uri-component</code>, <code>node-forge</code>, <code>source-map-js</code>, <code>zod</code>.</li>
+    <li>Moderadas: <code>glob</code>, <code>minimatch</code>, <code>postcss-selector-parser</code>, <code>uuid</code> (via <code>xcode</code>).</li>
+  </ul>
+  <p>Quase todas são transitivas do toolchain Expo/Metro (build-time), então o risco é maior em dev e CI que em runtime. Os <code>overrides</code> do <code>package.json</code> ainda resolvem para faixas afetadas. O <code>security.yml</code> usa <code>--audit-level=high</code> e tende a falhar hoje.</p>
+  <div class="fix"><b>Correção:</b> <code>npm audit fix</code>, ajustar os overrides e atualizar o Expo.</div>
+</div>
+
+<h2>Médio</h2>
+<div class="scroll">
+<table>
+<thead><tr><th>#</th><th>Achado</th><th>Onde</th><th>Correção / nota</th></tr></thead>
+<tbody>
+<tr><td>M1</td><td><b>Sem headers de segurança</b> no deploy web (CSP, HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy)</td><td>strivo-app/vercel.json (5 linhas)</td><td>Adicionar bloco <code>headers</code>. Sem CSP, um XSS rouba a sessão do <code>localStorage</code>.</td></tr>
+<tr><td>M2</td><td><b>Sessão em <code>localStorage</code> na web</b> (nativo usa SecureStore, correto)</td><td>src/lib/storage.ts:8-17</td><td>CSP restritiva e JWT com expiração curta. Não há <code>innerHTML</code>, <code>eval</code> nem WebView no código.</td></tr>
+<tr><td>M3</td><td><b>SecureStore ~2 KB:</b> a sessão costuma passar o limite e pode falhar silenciosamente no nativo</td><td>storage.ts:12</td><td>Criptografar com chave no SecureStore e gravar o blob no AsyncStorage.</td></tr>
+<tr><td>M4</td><td><b>Policy de leitura do storage</b> permite a qualquer autenticado ler qualquer objeto do bucket <code>posts</code></td><td>setup.sql:347-349</td><td>Se houver perfis privados, restringir via join com <code>media</code>/<code>follows</code>.</td></tr>
+<tr><td>M5</td><td><b>Confirmação de e-mail só na UI.</b> O RLS não exige e-mail confirmado</td><td>AuthContext / auth/callback.tsx:37-45</td><td>Ativar "Confirm email" no Supabase Auth e/ou exigir <code>email_confirmed_at</code> nas policies sensíveis. <code>phone</code> de <code>user_metadata</code> não é validado.</td></tr>
+<tr><td>M6</td><td><b>Enumeração de usuários:</b> mensagens de erro do Supabase repassadas à UI</td><td>AuthContext.tsx:36-39, 249-255</td><td>Mensagens genéricas.</td></tr>
+<tr><td>M7</td><td><b>Senha mínima de 6</b> caracteres e sem rate limiting próprio</td><td>update-password.tsx:21-30</td><td>8+ caracteres; configurar a política no Supabase Auth e conferir limites de e-mail/OTP.</td></tr>
+<tr><td>M8</td><td><b>Fallback <code>http://localhost:3001</code></b> sem TLS; o cliente envia o JWT <code>strivo_jwt</code> como Bearer</td><td>src/lib/api.ts:3</td><td>Resto do NestJS removido; ninguém importa. Remover o arquivo.</td></tr>
+<tr><td>M9</td><td><b>Post sem atomicidade</b>, erros não checados; falha deixa <code>media</code> órfã (<code>pending</code>) ou mídia sem post</td><td>create-post.tsx:62-95</td><td>RPC transacional. Não há policy de delete para limpar.</td></tr>
+<tr><td>M10</td><td><b><code>mime_type</code>, <code>kind</code> e <code>size</code> inventados no cliente</b> (PNG vira <code>image/jpeg</code>, size cai para 1 MB). Bucket sem <code>file_size_limit</code> nem <code>allowed_mime_types</code></td><td>create-post.tsx:52-80 · setup.sql:337-339</td><td>Limites no bucket e CHECKs no SQL. Risco de abuso de armazenamento e upload de HTML/SVG.</td></tr>
+<tr><td>M11</td><td><b>Performance de RPCs:</b> <code>get_feed</code> retorna LIMIT+2 linhas (app manda +1 e a função soma +1) e não tem índice em <code>posts(created_at desc, id desc)</code>; <code>get_ranking</code> faz produto cartesiano <code>posts × follows</code> sem paginação</td><td>home.tsx:160 · setup.sql:265, 289-291</td><td>Ajustar o limite, criar o índice e reescrever o ranking com agregação prévia.</td></tr>
+<tr><td>M12</td><td><b>Integridade:</b> <code>follows</code> sem <code>CHECK (follower_id &lt;&gt; following_id)</code>; sem <code>update</code>/<code>delete</code> em <code>posts</code>, <code>media</code>, <code>post_media</code>; storage sem policy de <code>update</code>; <code>posts</code>, <code>follows</code> e <code>media</code> legíveis por <code>anon</code></td><td>setup.sql</td><td>Editar e apagar post hoje é impossível pelo cliente. Cuidado ao "consertar" para não abrir demais.</td></tr>
+</tbody>
+</table>
+</div>
+
+<p style="margin-top:14px"><b>Outros achados médios do app:</b></p>
+<ul>
+  <li><b>Sem <code>AppState</code></b> para <code>startAutoRefresh</code>/<code>stopAutoRefresh</code> no nativo (<code>supabase.ts</code>): o refresh pode falhar em segundo plano.</li>
+  <li><b><code>onAuthStateChange</code> recarrega o perfil em todo evento</b> (<code>AuthContext.tsx:86-95</code>): 2 a 3 fetches por login e <code>setUser</code> com objeto novo a cada refresh de token, o que dispara <code>useEffect([user])</code> em <code>profile.tsx:76</code>, sem proteção contra respostas fora de ordem.</li>
+  <li><b><code>update-password</code>:</b> após trocar a senha o usuário continua logado com a sessão de recovery e o <code>RouteGuard</code> o manda para <code>/home</code>, contradizendo a mensagem "Você já pode entrar". Não valida o evento <code>PASSWORD_RECOVERY</code>.</li>
+  <li><b><code>other-user-profile.tsx:34-40</code>:</b> <code>.single()</code> sem tratar erro deixa a tela <code>null</code> para sempre. Usa <code>auth.getUser()</code> (rede) em vez de <code>getSession</code> e lista posts sem limite. <code>profile.tsx</code> e <code>store-profile.tsx</code> usam thumbnails de <code>picsum.photos</code> em vez da mídia real.</li>
+  <li><b><code>vercel.json</code>:</b> o build web precisa de <code>EXPO_PUBLIC_SUPABASE_URL</code> e <code>EXPO_PUBLIC_SUPABASE_ANON_KEY</code> no Vercel. Sem elas, <code>createClient</code> lança em <code>supabase.ts</code> (usa <code>!</code> sem validação).</li>
+</ul>
+
+<h2>Baixo</h2>
+<div class="scroll">
+<table>
+<thead><tr><th>#</th><th>Achado</th><th>Nota</th></tr></thead>
+<tbody>
+<tr><td>B1</td><td>ID do projeto Supabase em texto no <code>setup.sql:3</code></td><td>Identificador público da URL, não é segredo.</td></tr>
+<tr><td>B2</td><td><code>.env</code> commitado no passado (<code>905f35b</code>) e removido (<code>7be2cb1</code>)</td><td>Só continha <code>EXPO_PUBLIC_API_URL=http://localhost:3001</code>. O <code>.gitignore</code> não cobre <code>.env.production</code>/<code>.env.development</code>: trocar por <code>.env*</code> com <code>!.env.example</code>.</td></tr>
+<tr><td>B3</td><td>Código morto: <code>bcryptjs</code> e <code>@types/bcryptjs</code>, <code>src/lib/api.ts</code>, <code>services/follow.ts</code>, <code>utils/profileStorage.ts</code> (<code>saveProfileData</code> ignora erros)</td><td>Hash de senha no cliente nunca deve existir. Remover.</td></tr>
+<tr><td>B4</td><td>~25 <code>console.log</code>/<code>console.error</code></td><td>Nenhum imprime token ou senha. Alguns imprimem erros do Supabase e URIs de foto. Considerar plugin babel para removê-los em produção.</td></tr>
+<tr><td>B5</td><td>Dados mock e CDNs externos (<code>pravatar.cc</code>, <code>dicebear.com</code>, <code>picsum.photos</code>)</td><td>Sem PII real. Precisam entrar na CSP quando ela existir.</td></tr>
+<tr><td>B6</td><td>CI sem <code>permissions:</code> mínimo nem <code>concurrency</code>; actions pinadas só por tag (<code>@v4</code>)</td><td>Adicionar <code>permissions: contents: read</code>. Sem <code>pull_request_target</code> e sem uso de <code>secrets.*</code>. Bom.</td></tr>
+<tr><td>B7</td><td>Higiene do repo e do SQL</td><td>README desatualizado (diz RN 0.81/Expo 54; o <code>package.json</code> tem RN 0.86.3, Expo ~57 e TS ~6.0.3). Telas duplicadas (<code>account-privacy</code>, <code>search</code> e <code>searchScreen</code>). Duas seções "6" no SQL, sem <code>updated_at</code> automático, <code>avatar varchar(255)</code> versus <code>text</code> nas RPCs, <code>bio varchar(500)</code> com UI limitando a 150.</td></tr>
+<tr><td>B8</td><td>Redirect URLs do Supabase e deep link de recovery</td><td><code>redirectTo</code> não usa parâmetros de query, então não vi open redirect no app. Confirmar no painel que a allowlist tem só domínios próprios. Na web, <code>detectSessionInUrl</code> deixa tokens no fragmento da URL durante o recovery.</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2>O que está bem</h2>
+<ul>
+  <li><span class="tag t-ok">OK</span> RLS ligado nas 6 tabelas. Insert e delete em <code>posts</code>, <code>follows</code> e <code>stores</code> amarrados ao dono.</li>
+  <li><span class="tag t-ok">OK</span> Bucket <code>posts</code> privado, com policies de insert e delete restritas à pasta <code>users/&lt;uid&gt;/</code>.</li>
+  <li><span class="tag t-ok">OK</span> <code>phone</code> só é legível pelo dono. A view <code>user_profile_public</code> omite a coluna, com <code>revoke all</code> mais <code>grant select</code>. O e-mail fica em <code>auth.users</code> e não é exposto.</li>
+  <li><span class="tag t-ok">OK</span> Funções <code>SECURITY DEFINER</code> têm <code>search_path = public</code> fixado.</li>
+  <li><span class="tag t-ok">OK</span> Só a chave <code>anon</code> está no cliente, como esperado. Nenhuma <code>service_role</code> nem segredo no repo ou no histórico (os acertos de JWT, <code>sb_*</code>, <code>sk_*</code>, AKIA e <code>ghp_</code> eram hashes de lockfile).</li>
+  <li><span class="tag t-ok">OK</span> Nenhum <code>dangerouslySetInnerHTML</code>, <code>innerHTML</code>, <code>eval</code> ou WebView. Nenhum <code>.map</code> versionado.</li>
+  <li><span class="tag t-ok">OK</span> Workflows sem <code>pull_request_target</code> e sem segredos.</li>
+</ul>
+
+<h2>Plano de ação sugerido</h2>
+<div class="scroll">
+<table>
+<thead><tr><th>Fase</th><th>O que fazer</th><th>Itens</th></tr></thead>
+<tbody>
+<tr><td><b>1. Banco e exposição</b></td><td>Revogar EXECUTE de <code>anon</code>, usar <code>auth.uid()</code> em <code>search_users</code>, limitar <code>p_limit</code>, adicionar <code>WITH CHECK</code> e validação de <code>path</code>/<code>media_id</code></td><td>S1, S2, M12</td></tr>
+<tr><td><b>2. App quebrado</b></td><td>URLs assinadas, reset de senha no nativo, deep links com <code>setSession</code>, cadastro sem sessão, <code>try/finally</code> em <code>loadUser</code>, trigger de username</td><td>C1–C3, A1–A4</td></tr>
+<tr><td><b>3. Deploy web</b></td><td>Headers de segurança no <code>vercel.json</code>, remover <code>SKIP_AUTH</code> e a exceção de <code>live</code>, variáveis no Vercel, ativar "Confirm email"</td><td>M1, S3, M5</td></tr>
+<tr><td><b>4. Qualidade e CI</b></td><td><code>tsc</code>, <code>expo export</code> e testes no CI, <code>permissions</code> mínimas, <code>npm audit fix</code> e overrides, remover código morto</td><td>A6, S4, B3, B6</td></tr>
+<tr><td><b>5. Robustez</b></td><td>Upload atômico com limites de bucket, follow com tratamento de erro, <code>AppState</code> e storage de sessão, índices e ranking, policies de update/delete</td><td>A5, M3, M9–M12</td></tr>
+</tbody>
+</table>
+</div>
+
+<footer>
+  Gerado a partir de duas auditorias paralelas (backend e segurança) feitas apenas por leitura de código e <code>npm audit</code>. Os números de linha refletem o estado do repositório na data do relatório.
+</footer>
+
+</div>
+</body>
+</html>
